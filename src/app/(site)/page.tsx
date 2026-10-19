@@ -8,8 +8,11 @@ import { AskButton } from "@/components/site/HelperWidget";
 import { ResourceCard } from "@/components/site/ResourceCard";
 import { AreaMap } from "@/components/site/AreaMap";
 import { Reveal } from "@/components/fx/motion";
-import { SectionArt, Skyline, sectionClass } from "@/components/art/Landmarks";
-import { SentenceFinder, type FinderListing } from "@/components/home/SentenceFinder";
+import { SectionArt, sectionClass } from "@/components/art/Landmarks";
+import { type FinderListing } from "@/components/home/SentenceFinder";
+import { LivingHero } from "@/components/home/LivingHero";
+import { Morph } from "@/components/fx/Morph";
+import { Stamp } from "@/components/fx/Stamp";
 
 const CHAPTERS = [
   { slug: "chronic-illness-support", blurb: "Therapy, rehabilitation, hospitals, and living well with a long term condition or disability." },
@@ -50,28 +53,7 @@ export default function HomePage() {
   return (
     <>
       {/* ------------------------------------------------------------ Hero */}
-      <section aria-labelledby="hero-title" className="relative overflow-hidden border-b-[1.5px] border-ink">
-        <Container className="relative pt-10 sm:pt-14">
-          <div className="flex flex-wrap items-center justify-between gap-4">
-            <p className="kicker text-ink-2">A local guide · Havering, Romford, Brentwood and nearby</p>
-            <p aria-hidden="true" className="hidden rotate-[-3deg] font-hand text-[1.6rem] leading-none text-accent md:block">
-              every listing checked &amp; dated ✓
-            </p>
-          </div>
-          <h1 id="hero-title" className="sr-only">
-            Find local support in Havering, Romford and Brentwood
-          </h1>
-          <div className="mt-8 max-w-5xl">
-            <Reveal y={12}>
-              <SentenceFinder listings={finderListings} topics={topicOpts} areas={areaOpts} />
-            </Reveal>
-          </div>
-          <p className="mt-10 max-w-2xl text-[1.08rem] text-ink-2">{home?.summary}</p>
-        </Container>
-        <div className="overflow-hidden">
-          <Skyline className="mt-6 block h-auto w-full min-w-[720px] translate-y-[2px]" />
-        </div>
-      </section>
+      <LivingHero listings={finderListings} topics={topicOpts} areas={areaOpts} summary={home?.summary} />
 
       {/* ------------------------------------------------------------ Contents */}
       <section aria-labelledby="contents-title" className="py-20 sm:py-24">
@@ -92,11 +74,13 @@ export default function HomePage() {
                   <Reveal delay={i * 0.04}>
                     <div className="group relative isolate grid items-center gap-x-8 gap-y-3 py-7 sm:grid-cols-[5rem_1fr_9rem] sm:py-8">
                       <span aria-hidden="true" className="absolute inset-y-0 -left-4 -right-4 -z-10 rounded-2xl bg-sec-soft opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-                      <span className="font-display text-[3.2rem] font-semibold leading-none text-sec">{String(i + 1).padStart(2, "0")}</span>
+                      <span className="slide-on-scroll font-display text-[3.2rem] font-semibold leading-none text-sec">{String(i + 1).padStart(2, "0")}</span>
                       <div>
                         <h3 className="text-[1.65rem] font-semibold leading-tight sm:text-[2rem]">
                           <Link href={`/${page.slug}`} className="after:absolute after:inset-0 group-hover:underline group-hover:decoration-2 group-hover:underline-offset-4">
-                            {page.title}
+                            <Morph name={`page-${page.id}`}>
+                              <span className="soft-hover inline-block">{page.title}</span>
+                            </Morph>
                           </Link>
                         </h3>
                         <p className="mt-1.5 max-w-2xl text-ink-2">{c.blurb}</p>
@@ -112,7 +96,7 @@ export default function HomePage() {
                           </ul>
                         )}
                       </div>
-                      <SectionArt section={c.slug} className="hidden h-24 w-36 transition-transform duration-500 group-hover:-rotate-2 group-hover:scale-105 sm:block" />
+                      <SectionArt section={c.slug} className="sketch-on-scroll hidden h-24 w-36 transition-transform duration-500 group-hover:-rotate-2 group-hover:scale-105 sm:block" />
                     </div>
                   </Reveal>
                 </li>
@@ -203,13 +187,12 @@ export default function HomePage() {
             ].map((s, i) => (
               <li key={s.stamp}>
                 <Reveal delay={i * 0.08}>
-                  <span
-                    aria-hidden="true"
+                  <Stamp
+                    rotate={[-8, 5, -3][i]}
                     className="inline-grid size-28 place-items-center rounded-full border-[3px] border-double border-[#f0a07a] text-center font-display text-[1rem] font-bold uppercase tracking-[0.14em] text-[#f0a07a]"
-                    style={{ transform: `rotate(${[-8, 5, -3][i]}deg)` }}
                   >
                     {s.stamp}
-                  </span>
+                  </Stamp>
                   <h3 className="mt-6 text-[1.5rem] font-semibold">
                     <span className="sr-only">{s.stamp} </span>
                     {s.title}

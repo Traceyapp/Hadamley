@@ -36,6 +36,7 @@ export function PageView({ page, preview = false }: { page: Page; preview?: bool
         title={page.title}
         summary={page.summary}
         section={isLegal ? undefined : page.section}
+        morph={`page-${page.id}`}
       />
 
       {page.template === "section" && kids.length > 0 && (

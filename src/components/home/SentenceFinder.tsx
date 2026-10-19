@@ -2,8 +2,9 @@
 
 import Link from "next/link";
 import { ArrowRight, CalendarCheck, ChevronDown, MapPin, RotateCcw } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
+import { Morph } from "@/components/fx/Morph";
 
 export type FinderListing = {
   id: string;
@@ -76,11 +77,26 @@ function Blank({ id, label, value, options, onChange }: { id: string; label: str
   );
 }
 
-export function SentenceFinder({ listings, topics, areas }: { listings: FinderListing[]; topics: Opt[]; areas: Opt[] }) {
+export function SentenceFinder({
+  listings,
+  topics,
+  areas,
+  onFocusChange,
+  scene,
+}: {
+  listings: FinderListing[];
+  topics: Opt[];
+  areas: Opt[];
+  /** Lets the hero illustration follow what the visitor picks. */
+  onFocusChange?: (focus: { need: string; place: string }) => void;
+  /** Rendered between the sentence and the results, so cause and effect sit together. */
+  scene?: React.ReactNode;
+}) {
   const reduce = useReducedMotion();
   const [need, setNeed] = useState("");
   const [place, setPlace] = useState("");
   const [way, setWay] = useState("");
+  useEffect(() => onFocusChange?.({ need, place }), [need, place, onFocusChange]);
 
   const needOpts: Opt[] = [{ value: "", label: "any kind of support" }, ...topics.map((t) => ({ value: t.value, label: NEEDS[t.value] ?? t.label.toLowerCase() }))];
   const placeOpts: Opt[] = [{ value: "", label: "anywhere nearby" }, ...areas];
@@ -115,7 +131,7 @@ export function SentenceFinder({ listings, topics, areas }: { listings: FinderLi
 
   return (
     <form action="/find-support" className="sec-find">
-      <p className="font-display text-[2rem] font-medium leading-[1.35] tracking-[-0.02em] text-ink sm:text-[2.6rem] lg:text-[3.1rem]">
+      <p className="max-w-5xl font-display text-[2rem] font-medium leading-[1.35] tracking-[-0.02em] text-ink sm:text-[2.6rem] lg:text-[3.1rem]">
         I&apos;m looking for <Blank id="topic" label="What kind of support" value={need} options={needOpts} onChange={setNeed} />
         {" near "}
         <Blank id="area" label="Where" value={place} options={placeOpts} onChange={setPlace} />
@@ -123,6 +139,7 @@ export function SentenceFinder({ listings, topics, areas }: { listings: FinderLi
         <Blank id="way" label="What matters to you" value={way} options={WAYS} onChange={setWay} />.
       </p>
 
+      {scene}
       <div className="mt-8 flex flex-wrap items-center gap-x-5 gap-y-3" aria-live="polite">
         <p className="text-lg">
           <span className="font-display text-[2.2rem] font-semibold leading-none text-sec">{matches.length}</span>{" "}
@@ -164,7 +181,9 @@ export function SentenceFinder({ listings, topics, areas }: { listings: FinderLi
             >
               <Link href={`/find-support/${l.id}`} className="card-print card-print-hover group flex h-full flex-col p-5">
                 <span className="kicker text-ink-2">{l.provider}</span>
-                <span className="mt-1.5 font-display text-[1.2rem] font-semibold leading-snug group-hover:underline">{l.name}</span>
+                <Morph name={`listing-${l.id}`}>
+                  <span className="soft-hover mt-1.5 inline-block font-display text-[1.2rem] font-semibold leading-snug group-hover:underline">{l.name}</span>
+                </Morph>
                 <span className="mt-1.5 line-clamp-2 text-[0.93rem] text-ink-2">{l.summary}</span>
                 <span className="mt-auto flex flex-wrap items-center gap-x-3 gap-y-1 pt-4 text-[0.85rem] text-ink-2">
                   <span className="inline-flex items-center gap-1">

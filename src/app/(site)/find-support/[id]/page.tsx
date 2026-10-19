@@ -55,6 +55,7 @@ export default async function ListingPage({ params }: Props) {
           </div>
         }
         title={l.name}
+        morph={`listing-${l.id}`}
         summary={l.summary}
       >
         <div className="mt-6">

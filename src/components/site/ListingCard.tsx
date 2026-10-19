@@ -3,6 +3,7 @@ import { ArrowRight, MapPin, PoundSterling } from "lucide-react";
 import type { Listing } from "@/lib/types";
 import { readDb } from "@/lib/db";
 import { CheckedDate, DeliveryList, ProviderBadge } from "./bits";
+import { Morph } from "@/components/fx/Morph";
 
 export function areaNames(l: Listing) {
   const db = readDb();
@@ -26,7 +27,9 @@ export function ListingCard({ listing, headingLevel = 3 }: { listing: Listing; h
       </div>
       <H className="mt-4 text-[1.4rem] font-semibold leading-snug">
         <Link href={`/find-support/${listing.id}`} className="after:absolute after:inset-0 after:rounded-[var(--radius-card)] group-hover:underline group-hover:decoration-2 group-hover:underline-offset-4">
-          {listing.name}
+          <Morph name={`listing-${listing.id}`}>
+            <span className="soft-hover inline-block">{listing.name}</span>
+          </Morph>
         </Link>
       </H>
       <p className="mt-2 text-ink-2">{listing.summary}</p>
