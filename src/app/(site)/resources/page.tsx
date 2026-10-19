@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { getPublishedPage, publishedResources, topics } from "@/lib/repo";
 import { KIND_LABEL, type ResourceKind } from "@/lib/types";
-import { Container, Disclaimer, SectionIcon } from "@/components/site/bits";
+import { Container, Disclaimer } from "@/components/site/bits";
 import { PageHero } from "@/components/site/PageHero";
 import { Stagger } from "@/components/fx/motion";
 import { ResourceCard } from "@/components/site/ResourceCard";
@@ -21,7 +21,7 @@ export default async function ResourcesPage({ searchParams }: { searchParams: SP
   const kinds = (Object.keys(KIND_LABEL) as ResourceKind[]).filter((k) => all.some((r) => r.kind === k));
 
   const pill = (active: boolean) =>
-    `inline-flex min-h-10 items-center rounded-full border px-4 text-[0.95rem] font-bold ${active ? "border-transparent bg-grad-brand text-white shadow-glow" : "border-line bg-surface hover:border-brand hover:text-brand"}`;
+    `inline-flex min-h-10 items-center rounded-full border-[1.5px] px-4 text-[0.95rem] font-bold ${active ? "border-ink bg-ink text-paper" : "border-ink bg-surface hover:bg-sand"}`;
   const href = (k?: string, tp?: string) => {
     const p = new URLSearchParams();
     if (k) p.set("kind", k);
@@ -33,7 +33,7 @@ export default async function ResourcesPage({ searchParams }: { searchParams: SP
     <>
       <PageHero
         crumbs={[{ label: "Resources and Downloads" }]}
-        icon={<SectionIcon section="resources" className="size-16 sm:size-[5.5rem]" />}
+        section="resources"
         title={page?.title ?? "Resources and Downloads"}
         summary={page?.summary}
       />

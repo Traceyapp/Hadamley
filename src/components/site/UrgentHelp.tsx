@@ -48,7 +48,7 @@ export function UrgentHelpButton() {
       <button
         type="button"
         onClick={() => ref.current?.showModal()}
-        className="inline-flex min-h-11 items-center gap-1.5 whitespace-nowrap rounded-full border-2 border-urgent bg-urgent-soft px-2.5 text-[0.86rem] sm:gap-2 sm:px-4 sm:text-[0.95rem] font-bold text-urgent hover:bg-urgent hover:text-white dark:hover:text-[#1b0b0a]"
+        className="inline-flex min-h-11 items-center gap-1.5 whitespace-nowrap rounded-full border-[1.5px] border-urgent bg-urgent-soft px-2.5 text-[0.86rem] sm:gap-2 sm:px-4 sm:text-[0.95rem] font-bold text-urgent hover:bg-urgent hover:text-white dark:hover:text-[#1b0b0a]"
         aria-haspopup="dialog"
       >
         <LifeBuoy className="size-4 sm:size-5" aria-hidden />
@@ -57,9 +57,9 @@ export function UrgentHelpButton() {
       <dialog
         ref={ref}
         aria-labelledby="urgent-title"
-        className="m-auto w-[min(34rem,calc(100vw-2rem))] rounded-3xl border border-line bg-paper p-0 text-ink shadow-lift backdrop:bg-ink/50 backdrop:backdrop-blur-sm"
+        className="card-print m-auto w-[min(34rem,calc(100vw-2rem))] overflow-hidden !bg-paper p-0 text-ink backdrop:bg-[#1d1b16]/60"
       >
-        <div className="flex items-start justify-between gap-4 border-b border-line bg-urgent-soft px-6 py-5">
+        <div className="flex items-start justify-between gap-4 border-b-[1.5px] border-ink bg-urgent-soft px-6 py-5">
           <div className="flex items-center gap-3">
             <span className="grid size-11 place-items-center rounded-full bg-urgent text-white dark:text-[#1b0b0a]">
               <LifeBuoy className="size-6" aria-hidden />

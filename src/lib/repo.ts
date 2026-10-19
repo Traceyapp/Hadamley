@@ -72,13 +72,20 @@ export interface ListingQuery {
   provider?: ProviderType[];
   area?: string[];
   delivery?: Delivery[];
+  self?: boolean;
+  free?: boolean;
 }
+
+/** Towns inside the London Borough of Havering: borough-wide services cover them too. */
+const HAVERING_TOWNS = new Set(["romford", "hornchurch", "upminster", "rainham"]);
 
 export function searchListings(query: ListingQuery): Listing[] {
   const db = readDb();
   const bySlug = (slug: string) => db.taxa.find((t) => t.slug === slug)?.id;
   const topicIds = (query.topic ?? []).map(bySlug).filter(Boolean) as string[];
-  const areaIds = (query.area ?? []).map(bySlug).filter(Boolean) as string[];
+  const areaSlugs = [...(query.area ?? [])];
+  if (areaSlugs.some((a) => HAVERING_TOWNS.has(a))) areaSlugs.push("havering");
+  const areaIds = areaSlugs.map(bySlug).filter(Boolean) as string[];
   const words = (query.q ?? "").toLowerCase().split(/\s+/).filter((w) => w.length > 1);
 
   return approvedListings()
@@ -86,6 +93,8 @@ export function searchListings(query: ListingQuery): Listing[] {
     .filter((l) => (areaIds.length ? l.areaIds.some((a) => areaIds.includes(a)) : true))
     .filter((l) => (query.provider?.length ? query.provider.includes(l.providerType) : true))
     .filter((l) => (query.delivery?.length ? l.delivery.some((d) => query.delivery!.includes(d)) : true))
+    .filter((l) => (query.self ? l.selfReferral === "yes" : true))
+    .filter((l) => (query.free ? l.feeConfirmed && /\bfree\b/i.test(l.fees) : true))
     .map((l) => {
       if (!words.length) return { l, score: 0 };
       const hay = [l.name, l.summary, l.description, l.eligibility, l.address, ...l.topicIds.map((id) => db.taxa.find((t) => t.id === id)?.name ?? "")]

@@ -44,24 +44,34 @@ export default async function FindSupportPage({ searchParams }: { searchParams: 
     area: arr(sp.area),
     delivery: arr(sp.delivery) as Delivery[],
   };
-  const results = searchListings({ q, ...sel });
+  // "way" comes from the homepage sentence when submitted without JavaScript.
+  const way = typeof sp.way === "string" ? sp.way : "";
+  if (way === "home" && !sel.delivery.includes("home")) sel.delivery.push("home");
+  if (way === "remote") for (const d of ["phone", "online"] as Delivery[]) if (!sel.delivery.includes(d)) sel.delivery.push(d);
+  const self = sp.self === "1" || way === "self";
+  const free = sp.free === "1" || way === "free";
+  const results = searchListings({ q, ...sel, self, free });
   const approvedCount = approvedListings().length;
   const page = getPublishedPage("find-support");
   const topicList = topics();
   const areaList = areas();
-  const activeCount = sel.topic.length + sel.provider.length + sel.area.length + sel.delivery.length;
+  const activeCount = sel.topic.length + sel.provider.length + sel.area.length + sel.delivery.length + (self ? 1 : 0) + (free ? 1 : 0);
 
   const chips: { label: string; href: string }[] = [];
   const build = (drop: { key: string; value: string }) => {
     const p = new URLSearchParams();
     if (q) p.set("q", q);
     for (const [k, vs] of Object.entries(sel)) for (const v of vs) if (!(k === drop.key && v === drop.value)) p.append(k, v);
+    if (self && drop.key !== "self") p.set("self", "1");
+    if (free && drop.key !== "free") p.set("free", "1");
     return `/find-support${p.size ? `?${p}` : ""}`;
   };
   sel.topic.forEach((v) => chips.push({ label: topicList.find((t) => t.slug === v)?.name ?? v, href: build({ key: "topic", value: v }) }));
   sel.provider.forEach((v) => chips.push({ label: PROVIDER_LABEL[v] ?? v, href: build({ key: "provider", value: v }) }));
   sel.area.forEach((v) => chips.push({ label: areaList.find((t) => t.slug === v)?.name ?? v, href: build({ key: "area", value: v }) }));
   sel.delivery.forEach((v) => chips.push({ label: DELIVERY_LABEL[v] ?? v, href: build({ key: "delivery", value: v }) }));
+  if (self) chips.push({ label: "Self-referral accepted", href: build({ key: "self", value: "1" }) });
+  if (free) chips.push({ label: "Free", href: build({ key: "free", value: "1" }) });
 
   const filters = (
     <div className="space-y-5">
@@ -81,6 +91,7 @@ export default async function FindSupportPage({ searchParams }: { searchParams: 
     <>
       <PageHero
         crumbs={[{ label: "Find Support" }]}
+        section="find-support"
         eyebrow={<Eyebrow>{approvedCount} services, each checked and dated</Eyebrow>}
         title={page?.title ?? "Find Support"}
         summary={page?.summary}
@@ -88,12 +99,12 @@ export default async function FindSupportPage({ searchParams }: { searchParams: 
 
       <AutoSubmitForm className="group">
         <Container className="pt-0">
-          <div role="search" className="conic-border relative z-10 -mt-8 max-w-3xl rounded-[1.4rem] p-[2px] shadow-glow">
-            <div className="flex items-center gap-2 rounded-[1.3rem] bg-surface p-2">
+          <div role="search" className="card-print relative z-10 -mt-8 max-w-3xl rounded-2xl p-1.5">
+            <div className="flex items-center gap-2">
             <label htmlFor="dir-q" className="sr-only">
               Search services
             </label>
-            <Search className="ml-3 size-5 shrink-0 text-brand" aria-hidden />
+            <Search className="ml-3 size-5 shrink-0" aria-hidden />
             <input
               id="dir-q"
               name="q"
@@ -102,7 +113,7 @@ export default async function FindSupportPage({ searchParams }: { searchParams: 
               placeholder="Search by service name, condition or need"
               className="min-h-12 w-full min-w-0 bg-transparent px-2 text-[1.05rem] outline-none placeholder:text-ink-2/80 focus-visible:shadow-none focus-visible:outline-none"
             />
-            <button type="submit" className="min-h-12 shrink-0 rounded-2xl bg-grad-brand px-6 font-bold text-white shadow-glow transition hover:brightness-110">
+            <button type="submit" className="min-h-12 shrink-0 rounded-xl bg-ink px-6 font-bold text-paper">
               Search
             </button>
             </div>
@@ -135,7 +146,7 @@ export default async function FindSupportPage({ searchParams }: { searchParams: 
               <ul className="mt-3 flex flex-wrap gap-2" aria-label="Active filters">
                 {chips.map((c) => (
                   <li key={c.href + c.label}>
-                    <Link href={c.href} scroll={false} className="inline-flex min-h-9 items-center gap-1.5 rounded-full bg-grad-brand py-1 pl-3.5 pr-2 text-[0.9rem] font-bold text-white shadow-glow transition hover:brightness-110">
+                    <Link href={c.href} scroll={false} className="inline-flex min-h-9 items-center gap-1.5 rounded-full bg-ink py-1 pl-3.5 pr-2 text-[0.9rem] font-bold text-paper">
                       {c.label}
                       <X className="size-4" aria-hidden />
                       <span className="sr-only">Remove filter</span>

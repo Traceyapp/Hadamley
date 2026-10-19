@@ -34,9 +34,9 @@ export default async function Dashboard() {
 
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         {stats.map((s) => (
-          <Link key={s.label} href={s.href} className="ring-grad group relative overflow-hidden rounded-3xl border border-line bg-surface p-5 shadow-soft transition duration-300 hover:-translate-y-0.5 hover:shadow-lift">
+          <Link key={s.label} href={s.href} className="card-print card-print-hover p-5">
             <p className="text-[0.9rem] font-bold text-ink-2">{s.label}</p>
-            <p className="mt-2 font-display text-[2.7rem] font-semibold leading-none text-gradient">{s.value}</p>
+            <p className="mt-2 font-display text-[2.7rem] font-semibold leading-none text-brand">{s.value}</p>
             <p className="mt-2 text-[0.85rem] text-ink-2">{s.sub}</p>
           </Link>
         ))}

@@ -55,7 +55,7 @@ export function Breadcrumbs({ items }: { items: { label: string; href?: string }
 
 export function Disclaimer({ className = "" }: { className?: string }) {
   return (
-    <aside className={`flex gap-3 rounded-2xl border border-line bg-sand px-5 py-4 text-[0.95rem] text-ink-2 ${className}`} aria-label="About this information">
+    <aside className={`flex gap-3 rounded-[var(--radius-card)] border-[1.5px] border-dashed border-line-strong px-5 py-4 text-[0.95rem] text-ink-2 ${className}`} aria-label="About this information">
       <Info className="mt-0.5 size-5 shrink-0 text-brand" aria-hidden />
       <p>
         Hadamley provides information and signposting. It is not medical, legal or financial advice. Including a service does not mean we recommend it or
@@ -130,23 +130,20 @@ export const SECTION_ICON: Record<string, LucideIcon> = {
   accessibility: Accessibility,
 };
 
-export const SECTION_GRADIENT: Record<string, string> = {
-  "chronic-illness-support": "linear-gradient(135deg,#0b5458 0%,#13857a 55%,#2a95b8 100%)",
-  "mental-health-support": "linear-gradient(135deg,#1c9c83 0%,#36b48f 60%,#8fd18a 100%)",
-  "mobility-daily-living-transport": "linear-gradient(135deg,#e2804a 0%,#f0a065 55%,#f6c27d 100%)",
-  "find-support": "linear-gradient(135deg,#2f6fc4 0%,#4a7fdc 50%,#6c6ad8 100%)",
-  resources: "linear-gradient(135deg,#7a62d9 0%,#a274e0 50%,#d77eb0 100%)",
+const SECTION_SCOPE: Record<string, string> = {
+  "chronic-illness-support": "sec-ltc",
+  "mental-health-support": "sec-mh",
+  "mobility-daily-living-transport": "sec-mob",
+  "find-support": "sec-find",
+  resources: "sec-res",
 };
 
+/** Flat section-coloured icon tile with a printed edge. */
 export function SectionIcon({ section, className = "size-12" }: { section: string; className?: string }) {
   const Icon = SECTION_ICON[section] ?? Info;
   return (
-    <span
-      className={`relative grid shrink-0 place-items-center rounded-[28%] text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.45),0_12px_28px_-10px_rgba(11,84,88,0.55)] ${className}`}
-      style={{ background: SECTION_GRADIENT[section] ?? "var(--grad-brand)" }}
-    >
-      <span aria-hidden="true" className="absolute inset-0 rounded-[inherit] bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.4),transparent_55%)]" />
-      <Icon className="relative size-[50%]" aria-hidden strokeWidth={1.9} />
+    <span className={`${SECTION_SCOPE[section] ?? "sec-ltc"} grid shrink-0 place-items-center rounded-xl border-[1.5px] border-ink bg-sec-soft text-sec ${className}`}>
+      <Icon className="size-[52%]" aria-hidden strokeWidth={1.8} />
     </span>
   );
 }

@@ -193,10 +193,10 @@ export function HelperWidget() {
             whileHover={reduce ? undefined : { y: -3 }}
             whileTap={reduce ? undefined : { scale: 0.96 }}
             transition={{ type: "spring", stiffness: 380, damping: 26 }}
-            className="pulse-ring fixed bottom-4 right-4 z-40 isolate inline-flex min-h-14 items-center gap-2.5 rounded-full bg-grad-brand py-3 pl-3 pr-5 font-bold text-white shadow-glow sm:bottom-6 sm:right-6"
+            className="fixed bottom-4 right-4 z-40 inline-flex min-h-14 items-center gap-2.5 rounded-full border-[1.5px] border-ink bg-ink py-3 pl-3 pr-5 font-bold text-paper shadow-[4px_4px_0_0_var(--accent)] sm:bottom-6 sm:right-6"
             aria-haspopup="dialog"
           >
-            <span className="grid size-9 place-items-center rounded-full bg-white/18 ring-1 ring-white/30">
+            <span className="grid size-9 place-items-center rounded-full bg-paper text-ink">
               <MessageCircleQuestion className="size-5" aria-hidden />
             </span>
             Ask Hadamley
@@ -215,24 +215,22 @@ export function HelperWidget() {
           exit={reduce ? undefined : { opacity: 0, scale: 0.9, y: 30, filter: "blur(6px)" }}
           transition={{ type: "spring", stiffness: 300, damping: 28 }}
           style={{ transformOrigin: "bottom right" }}
-          className="fixed inset-x-2 bottom-2 top-16 z-50 flex flex-col overflow-hidden rounded-[1.75rem] border border-line bg-paper shadow-[0_30px_90px_-20px_rgba(6,40,43,0.55)] sm:inset-auto sm:bottom-6 sm:right-6 sm:top-auto sm:h-[min(44rem,calc(100dvh-7rem))] sm:w-[27rem]"
+          className="card-print fixed inset-x-2 bottom-2 top-16 z-50 flex flex-col overflow-hidden !bg-paper sm:inset-auto sm:bottom-6 sm:right-6 sm:top-auto sm:h-[min(44rem,calc(100dvh-7rem))] sm:w-[27rem]"
         >
-          <div className="relative isolate flex items-start justify-between gap-3 overflow-hidden bg-[#06282b] px-5 py-5 text-white">
-            <div aria-hidden="true" className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_80%_120%_at_0%_0%,#0f7a6c_0%,transparent_60%),radial-gradient(ellipse_60%_120%_at_100%_100%,#1f8fae_0%,transparent_65%)]" />
-            <div aria-hidden="true" className="absolute -right-8 -top-10 -z-10 size-36 rounded-full bg-[#ffc49a]/25 blur-2xl" />
+          <div className="flex items-start justify-between gap-3 border-b-[1.5px] border-ink bg-sand px-5 py-4 text-ink">
             <div>
               <h2 id="helper-title" className="font-display text-xl font-semibold">
                 Ask Hadamley
               </h2>
-              <p className="text-sm opacity-90">Answers come only from information on this website.</p>
+              <p className="text-sm text-ink-2">Answers come only from information on this website.</p>
             </div>
             <div className="flex gap-1">
               {msgs.length > 0 && (
-                <button type="button" onClick={() => setMsgs([])} className="grid size-10 place-items-center rounded-full hover:bg-white/15" aria-label="Start a new conversation">
+                <button type="button" onClick={() => setMsgs([])} className="grid size-10 place-items-center rounded-full hover:bg-sand-2" aria-label="Start a new conversation">
                   <RotateCcw className="size-5" aria-hidden />
                 </button>
               )}
-              <button type="button" onClick={close} className="grid size-10 place-items-center rounded-full hover:bg-white/15" aria-label="Close helper">
+              <button type="button" onClick={close} className="grid size-10 place-items-center rounded-full hover:bg-sand-2" aria-label="Close helper">
                 <X className="size-6" aria-hidden />
               </button>
             </div>
@@ -253,7 +251,7 @@ export function HelperWidget() {
                         key={s}
                         type="button"
                         onClick={() => send(s)}
-                        className="rounded-xl border border-line bg-surface px-4 py-2.5 text-left text-[0.95rem] hover:border-brand hover:bg-brand-tint"
+                        className="rounded-xl border-[1.5px] border-line-strong bg-surface px-4 py-2.5 text-left font-display text-[1.02rem] hover:border-ink hover:bg-accent-soft"
                       >
                         {s}
                       </button>
@@ -265,7 +263,7 @@ export function HelperWidget() {
             {msgs.map((m, i) =>
               m.role === "user" ? (
                 <div key={i} className="flex justify-end">
-                  <p className="max-w-[85%] rounded-2xl rounded-br-md bg-grad-brand px-4 py-2.5 text-white shadow-glow">{m.text}</p>
+                  <p className="max-w-[85%] rounded-2xl rounded-br-md bg-ink px-4 py-2.5 text-paper">{m.text}</p>
                 </div>
               ) : (
                 <div key={i} className="animate-rise max-w-[95%]">
@@ -312,7 +310,7 @@ export function HelperWidget() {
               <button
                 type="submit"
                 disabled={!input.trim() || busy}
-                className="grid size-11 shrink-0 place-items-center rounded-xl bg-grad-brand text-white shadow-glow transition disabled:opacity-40 disabled:shadow-none"
+                className="grid size-11 shrink-0 place-items-center rounded-xl bg-ink text-paper transition disabled:opacity-40"
                 aria-label="Send question"
               >
                 <ArrowUp className="size-5" aria-hidden />

@@ -1,62 +1,80 @@
-import { Backdrop } from "@/components/fx/Aurora";
 import { Reveal } from "@/components/fx/motion";
+import { SectionArt, sectionClass } from "@/components/art/Landmarks";
 import { Breadcrumbs, Container } from "./bits";
 
-/** Shared hero for inner pages: soft aurora, breadcrumb, title and intro. */
+const CHAPTER: Record<string, { n: string; name: string }> = {
+  "chronic-illness-support": { n: "01", name: "Long term conditions" },
+  "mobility-daily-living-transport": { n: "02", name: "Mobility and transport" },
+  "mental-health-support": { n: "03", name: "Mental health" },
+  "find-support": { n: "04", name: "Find support" },
+  resources: { n: "05", name: "Resources" },
+};
+
+/**
+ * Chapter opener for inner pages: the section's colour, its chapter number
+ * and a small illustrated scene. Legal and info pages get a plain version.
+ */
 export function PageHero({
   crumbs,
   eyebrow,
   title,
   summary,
-  icon,
+  section,
   children,
 }: {
   crumbs: { label: string; href?: string }[];
   eyebrow?: React.ReactNode;
   title: React.ReactNode;
   summary?: React.ReactNode;
+  section?: string;
+  /** Kept for older callers; the chapter art replaces it. */
   icon?: React.ReactNode;
   children?: React.ReactNode;
 }) {
+  const chapter = section ? CHAPTER[section] : undefined;
   return (
-    <header className="grain relative isolate overflow-hidden border-b border-line">
-      <Backdrop soft />
-      <Container className="relative z-10 pb-14 pt-8 sm:pb-16 sm:pt-10">
-        <Breadcrumbs items={crumbs} />
-        <div className="mt-10 flex flex-col gap-7 sm:flex-row sm:items-start">
-          {icon && <Reveal y={12}>{icon}</Reveal>}
-          <Reveal className="max-w-3xl" delay={0.05}>
+    <header className={`${section ? sectionClass(section) : ""} border-b-[1.5px] border-ink ${chapter ? "bg-sec-soft" : "bg-paper-2"}`}>
+      <Container className="grid gap-8 pb-12 pt-8 sm:pb-14 sm:pt-10 lg:grid-cols-[1fr_17rem] lg:items-end">
+        <div>
+          <Breadcrumbs items={crumbs} />
+          <Reveal className="mt-10 max-w-3xl" y={10}>
+            {chapter && (
+              <p className="kicker flex items-center gap-3 text-sec">
+                <span className="font-display text-[1.6rem] font-semibold normal-case tracking-normal">{chapter.n}</span>
+                <span className="h-px w-8 bg-current" aria-hidden />
+                {chapter.name}
+              </p>
+            )}
             {eyebrow && <div className="mb-4">{eyebrow}</div>}
-            <h1 className="text-[2.5rem] font-semibold leading-[1.04] sm:text-[3.4rem]">{typeof title === "string" ? <AccentTitle text={title} /> : title}</h1>
-            {summary && <p className="mt-5 text-[1.18rem] leading-relaxed text-ink-2">{summary}</p>}
+            <h1 className={`${chapter ? "mt-3" : ""} text-[2.5rem] font-semibold leading-[1.04] sm:text-[3.5rem]`}>{typeof title === "string" ? <AccentTitle text={title} /> : title}</h1>
+            {summary && <p className="mt-5 max-w-2xl text-[1.18rem] leading-relaxed text-ink-2">{summary}</p>}
             {children}
           </Reveal>
         </div>
+        {section && (
+          <div className="hidden lg:block">
+            <div className="card-print rotate-[1.5deg] p-3">
+              <SectionArt section={section} className="aspect-[4/3] w-full" />
+            </div>
+          </div>
+        )}
       </Container>
     </header>
   );
 }
 
-export function Eyebrow({ children }: { children: React.ReactNode }) {
-  return (
-    <span className="glass inline-flex items-center gap-2 rounded-full px-3.5 py-1.5 text-[0.85rem] font-bold text-ink-2 shadow-soft">
-      <span className="relative flex size-2">
-        <span className="absolute inline-flex size-full animate-ping rounded-full bg-[var(--glow-1)] opacity-60" />
-        <span className="relative inline-flex size-2 rounded-full bg-grad-brand" />
-      </span>
-      {children}
-    </span>
-  );
-}
-
-/** Gives the last word of a title the gradient italic treatment. */
+/** Sets the last word of a title in the section colour, in italic. */
 export function AccentTitle({ text }: { text: string }) {
   const i = text.trimEnd().lastIndexOf(" ");
-  if (i < 0) return <span className="text-gradient">{text}</span>;
+  if (i < 0) return <>{text}</>;
   return (
     <>
       {text.slice(0, i + 1)}
-      <span className="text-gradient italic font-normal pr-1">{text.slice(i + 1)}</span>
+      <span className="font-normal italic text-sec">{text.slice(i + 1)}</span>
     </>
   );
+}
+
+export function Eyebrow({ children }: { children: React.ReactNode }) {
+  return <span className="kicker inline-flex items-center gap-2 text-ink-2">{children}</span>;
 }

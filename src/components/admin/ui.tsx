@@ -5,7 +5,7 @@ import { STATUS_LABEL } from "@/lib/types";
 export const input =
   "block w-full rounded-xl border border-line-strong bg-surface px-3.5 py-2.5 text-[0.97rem] text-ink placeholder:text-ink-2/70 focus:border-brand disabled:opacity-60";
 export const btn = {
-  primary: "inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-grad-brand px-5 font-bold text-white shadow-glow transition hover:-translate-y-px hover:brightness-110 disabled:opacity-50 disabled:shadow-none",
+  primary: "inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-ink px-5 font-bold text-paper transition hover:-translate-y-px disabled:opacity-50",
   secondary: "inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-line-strong bg-surface px-5 font-bold text-ink hover:border-brand hover:text-brand disabled:opacity-50",
   ghost: "inline-flex min-h-10 items-center justify-center gap-2 rounded-lg px-3 font-bold text-ink-2 hover:bg-sand hover:text-ink",
   danger: "inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-urgent/50 px-5 font-bold text-urgent hover:bg-urgent-soft",

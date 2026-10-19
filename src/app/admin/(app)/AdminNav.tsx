@@ -28,7 +28,7 @@ export function AdminNav({ counts }: { counts: { inbox: number; due: number } })
               <Link
                 href={href}
                 aria-current={active ? "page" : undefined}
-                className={`relative flex min-h-11 items-center gap-3 whitespace-nowrap rounded-xl px-3 font-bold transition ${active ? "bg-surface text-brand shadow-soft before:absolute before:inset-y-2 before:-left-0.5 before:w-1 before:rounded-full before:bg-grad-brand" : "text-ink hover:bg-sand-2"}`}
+                className={`relative flex min-h-11 items-center gap-3 whitespace-nowrap rounded-xl px-3 font-bold transition ${active ? "bg-surface text-brand shadow-soft before:absolute before:inset-y-2 before:-left-0.5 before:w-1 before:rounded-full before:bg-brand" : "text-ink hover:bg-sand-2"}`}
               >
                 <Icon className="size-5 shrink-0" aria-hidden />
                 <span className="flex-1">{label}</span>

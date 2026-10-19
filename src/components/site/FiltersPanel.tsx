@@ -7,7 +7,7 @@ import { useState } from "react";
 export function FiltersPanel({ activeCount, children }: { activeCount: number; children: React.ReactNode }) {
   const [open, setOpen] = useState(false);
   return (
-    <div className="rounded-2xl border border-line bg-surface lg:sticky lg:top-36">
+    <div className="rounded-[var(--radius-card)] border-[1.5px] border-ink bg-surface lg:sticky lg:top-28">
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}
@@ -17,7 +17,7 @@ export function FiltersPanel({ activeCount, children }: { activeCount: number; c
       >
         <span className="inline-flex items-center gap-2">
           <SlidersHorizontal className="size-5" aria-hidden /> Filters
-          {activeCount > 0 && <span className="rounded-full bg-brand px-2 text-sm text-paper">{activeCount}</span>}
+          {activeCount > 0 && <span className="rounded-full bg-ink px-2 text-sm text-paper">{activeCount}</span>}
         </span>
         <span className="text-sm text-ink-2">{open ? "Hide" : "Show"}</span>
       </button>

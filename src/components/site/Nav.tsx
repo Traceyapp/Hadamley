@@ -11,7 +11,7 @@ function isActive(path: string, href: string) {
   return path === href || path.startsWith(href + "/");
 }
 
-/** Sticky bar that turns to frosted glass once the page scrolls. */
+/** Sticky bar that gains a printed rule once the page scrolls. */
 export function HeaderShell({ children }: { children: React.ReactNode }) {
   const [scrolled, setScrolled] = useState(false);
   useEffect(() => {
@@ -23,7 +23,7 @@ export function HeaderShell({ children }: { children: React.ReactNode }) {
   return (
     <header
       className={`sticky top-0 z-30 transition-[background-color,box-shadow,border-color] duration-500 ${
-        scrolled ? "glass border-x-0 border-t-0 shadow-[0_10px_30px_-18px_rgba(15,30,34,0.35)]" : "border-b border-transparent bg-paper/40 backdrop-blur-sm"
+        scrolled ? "border-b-[1.5px] border-ink bg-paper/95 backdrop-blur" : "border-b-[1.5px] border-transparent bg-paper"
       }`}
     >
       {children}
@@ -57,7 +57,7 @@ export function DesktopNav({ items }: { items: NavItem[] }) {
 
   return (
     <nav ref={navRef} aria-label="Main" className="hidden xl:block">
-      <ul className="flex items-center gap-0.5 rounded-full border border-line/70 bg-surface/60 p-1 shadow-soft backdrop-blur" onMouseLeave={() => setHover(null)}>
+      <ul className="flex items-center gap-0.5" onMouseLeave={() => setHover(null)}>
         {items.map((item) => {
           const active = isActive(path, item.href);
           const hasKids = item.children.length > 0;
@@ -68,7 +68,7 @@ export function DesktopNav({ items }: { items: NavItem[] }) {
                 <motion.span
                   layoutId="nav-pill"
                   aria-hidden="true"
-                  className={`absolute inset-0 rounded-full ${active ? "bg-grad-brand shadow-glow" : "bg-sand-2"}`}
+                  className={`absolute inset-0 rounded-full ${active ? "bg-ink" : "bg-sand-2"}`}
                   transition={reduce ? { duration: 0 } : { type: "spring", stiffness: 420, damping: 34 }}
                 />
               )}
@@ -77,7 +77,7 @@ export function DesktopNav({ items }: { items: NavItem[] }) {
                   href={item.href}
                   aria-current={path === item.href ? "page" : undefined}
                   className={`flex min-h-10 items-center whitespace-nowrap rounded-full py-2 text-[0.93rem] font-bold transition-colors ${hasKids ? "pl-4 pr-0.5" : "px-4"} ${
-                    active && pillAt === item.href ? "text-white" : active ? "text-brand" : "text-ink"
+                    active && pillAt === item.href ? "text-paper" : "text-ink"
                   }`}
                 >
                   {item.label}
@@ -89,7 +89,7 @@ export function DesktopNav({ items }: { items: NavItem[] }) {
                     aria-controls={`menu-${item.href}`}
                     aria-label={`Show pages in ${item.label}`}
                     onClick={() => setOpen(isOpen ? null : item.href)}
-                    className={`mr-1 grid size-8 place-items-center rounded-full transition-colors ${active && pillAt === item.href ? "text-white hover:bg-white/15" : "hover:bg-sand"}`}
+                    className={`mr-1 grid size-8 place-items-center rounded-full transition-colors ${active && pillAt === item.href ? "text-paper hover:bg-white/15" : "hover:bg-sand"}`}
                   >
                     <ChevronDown className={`size-4 transition-transform duration-300 ${isOpen ? "rotate-180" : ""}`} aria-hidden />
                   </button>
@@ -103,16 +103,15 @@ export function DesktopNav({ items }: { items: NavItem[] }) {
                     animate={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
                     exit={reduce ? undefined : { opacity: 0, y: 6, scale: 0.98, filter: "blur(4px)" }}
                     transition={{ duration: 0.25, ease: [0.21, 0.7, 0.2, 1] }}
-                    className="absolute left-0 top-full z-40 mt-3 w-[30rem] origin-top-left overflow-hidden rounded-3xl border border-line bg-surface shadow-lift"
+                    className="card-print absolute left-0 top-full z-40 mt-3 w-[30rem] origin-top-left overflow-hidden"
                   >
-                    <div className="relative overflow-hidden bg-grad-brand px-5 py-4 text-white">
-                      <div aria-hidden="true" className="absolute -right-10 -top-10 size-40 rounded-full bg-white/15 blur-2xl" />
+                    <div className="relative overflow-hidden border-b-[1.5px] border-ink bg-sand px-5 py-4 text-ink">
                       <Link href={item.href} className="group relative flex items-center justify-between font-bold">
                         <span>
-                          <span className="block text-[0.75rem] uppercase tracking-[0.14em] text-white/75">Section overview</span>
+                          <span className="kicker block text-ink-2">Section overview</span>
                           <span className="font-display text-xl">{item.label}</span>
                         </span>
-                        <span className="grid size-9 place-items-center rounded-full bg-white/15 transition group-hover:translate-x-1 group-hover:bg-white/25">
+                        <span className="grid size-9 place-items-center rounded-full border-[1.5px] border-ink transition group-hover:translate-x-1 group-hover:bg-ink group-hover:text-paper">
                           <ArrowRight className="size-4" aria-hidden />
                         </span>
                       </Link>
@@ -125,10 +124,10 @@ export function DesktopNav({ items }: { items: NavItem[] }) {
                           animate={{ opacity: 1, x: 0 }}
                           transition={{ delay: 0.05 + i * 0.04 }}
                         >
-                          <Link href={c.href} className="group flex gap-3 rounded-2xl px-4 py-3 transition hover:bg-brand-tint">
-                            <span className="mt-2 size-2 shrink-0 rounded-full bg-grad-brand transition group-hover:scale-150" aria-hidden />
+                          <Link href={c.href} className="group flex gap-3 rounded-xl px-4 py-3 transition hover:bg-sand">
+                            <span className="mt-[0.7rem] h-0.5 w-3 shrink-0 bg-accent transition-all group-hover:w-5" aria-hidden />
                             <span>
-                              <span className="block font-bold text-ink group-hover:text-brand">{c.label}</span>
+                              <span className="block font-bold text-ink group-hover:underline">{c.label}</span>
                               <span className="mt-0.5 block text-sm leading-snug text-ink-2 line-clamp-2">{c.summary}</span>
                             </span>
                           </Link>
@@ -173,7 +172,7 @@ export function MobileNav({ items, funeralUrl }: { items: NavItem[]; funeralUrl:
         onClick={() => setOpen(true)}
         aria-expanded={open}
         aria-controls="mobile-menu"
-        className="inline-flex min-h-11 min-w-11 items-center justify-center gap-2 rounded-full border border-line-strong bg-surface font-bold shadow-soft sm:px-4"
+        className="inline-flex min-h-11 min-w-11 items-center justify-center gap-2 rounded-full border-[1.5px] border-ink bg-surface font-bold sm:px-4"
       >
         <Menu className="size-5" aria-hidden />
         <span className="sr-only sm:not-sr-only">Menu</span>
@@ -191,12 +190,6 @@ export function MobileNav({ items, funeralUrl }: { items: NavItem[]; funeralUrl:
             exit={reduce ? undefined : { opacity: 0, clipPath: "circle(0% at 92% 4%)" }}
             transition={{ duration: 0.55, ease: [0.21, 0.7, 0.2, 1] }}
           >
-            <div aria-hidden="true" className="aurora aurora-soft">
-              <span />
-              <span />
-              <span />
-              <span />
-            </div>
             <div className="relative z-10 flex items-center justify-between border-b border-line px-4 py-3">
               <span className="font-display text-2xl font-semibold">Menu</span>
               <button
@@ -219,7 +212,7 @@ export function MobileNav({ items, funeralUrl }: { items: NavItem[]; funeralUrl:
                   <motion.li
                     key={item.href}
                     variants={{ hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0 } }}
-                    className="glass overflow-hidden rounded-3xl shadow-soft"
+                    className="card-print overflow-hidden"
                   >
                     <Link
                       href={item.href}
@@ -227,7 +220,7 @@ export function MobileNav({ items, funeralUrl }: { items: NavItem[]; funeralUrl:
                       className="flex items-center justify-between px-5 py-4 font-display text-[1.35rem] font-semibold text-ink"
                     >
                       {item.label}
-                      <ArrowRight className="size-5 text-brand" aria-hidden />
+                      <ArrowRight className="size-5" aria-hidden />
                     </Link>
                     {item.children.length > 0 && (
                       <ul className="border-t border-line/70 px-2 py-2">
