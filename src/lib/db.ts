@@ -1,16 +1,18 @@
 import fs from "node:fs";
 import path from "node:path";
 import type { Database } from "./types";
+import { buildSeed } from "./seed";
 
 /**
  * Local file-backed store used for development and demos.
  *
- * Every read and write in the app goes through this module and the
- * repositories in ./repo.ts, so swapping to Supabase (schema in
- * supabase/migrations) means reimplementing those repositories only.
+ * Public pages read through ./repo.ts; the admin actions and the AI helper
+ * also read and write here directly. Moving to a hosted database means
+ * replacing this module and updating those callers to await it.
  */
 
-const DATA_DIR = path.join(process.cwd(), "data");
+// HADAMLEY_DATA_DIR lets tests run against a throwaway copy of the seed.
+export const DATA_DIR = process.env.HADAMLEY_DATA_DIR || path.join(process.cwd(), "data");
 const DB_FILE = path.join(DATA_DIR, "db.json");
 export const UPLOAD_DIR = path.join(DATA_DIR, "uploads");
 
@@ -24,9 +26,6 @@ function ensureDirs() {
 export function readDb(): Database {
   ensureDirs();
   if (!fs.existsSync(DB_FILE)) {
-    // Lazy import keeps the seed out of the hot path once data exists.
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const { buildSeed } = require("./seed") as typeof import("./seed");
     const db = buildSeed();
     writeDb(db);
     return db;

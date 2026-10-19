@@ -4,6 +4,7 @@ import type { Database, Listing, Page, Resource, Taxon } from "./types";
 import { hashPassword } from "./password";
 import { makePdf } from "./pdf";
 import { buildAllChunks } from "./ai/chunks";
+import { UPLOAD_DIR } from "./db";
 
 /**
  * Starter content.
@@ -780,7 +781,7 @@ const starterFiles: { r: Omit<Resource, "size" | "storedName" | "mime" | "update
 ];
 
 export function buildSeed(): Database {
-  const uploadDir = path.join(process.cwd(), "data", "uploads");
+  const uploadDir = UPLOAD_DIR;
   fs.mkdirSync(uploadDir, { recursive: true });
 
   const resources: Resource[] = starterFiles.map(({ r, text }) => {
