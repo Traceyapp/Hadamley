@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ArrowRight, ChevronDown, ExternalLink, Menu, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import type { NavItem } from "@/lib/repo";
 
@@ -177,6 +178,8 @@ export function MobileNav({ items, funeralUrl }: { items: NavItem[]; funeralUrl:
         <Menu className="size-5" aria-hidden />
         <span className="sr-only sm:not-sr-only">Menu</span>
       </button>
+      {typeof document !== "undefined" &&
+        createPortal(
       <AnimatePresence>
         {open && (
           <motion.div
@@ -252,7 +255,9 @@ export function MobileNav({ items, funeralUrl }: { items: NavItem[]; funeralUrl:
             </nav>
           </motion.div>
         )}
-      </AnimatePresence>
+      </AnimatePresence>,
+          document.body,
+        )}
     </div>
   );
 }
