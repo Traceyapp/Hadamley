@@ -3,6 +3,7 @@ import { getSettings, navigation } from "@/lib/repo";
 import { Logo } from "./Logo";
 import { DesktopNav, HeaderShell, MobileNav } from "./Nav";
 import { TextSizeControl } from "./TextSize";
+import { ThemeToggle } from "./ThemeToggle";
 import { UrgentHelpButton } from "./UrgentHelp";
 
 export function Header() {
@@ -13,7 +14,11 @@ export function Header() {
       <div className="relative z-40 border-b border-line bg-sand/80 text-[0.85rem] backdrop-blur">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-1.5 sm:px-6">
           <p className="hidden text-ink-2 lg:block">Information and signposting for Havering, Romford, Brentwood and nearby</p>
-          <TextSizeControl />
+          <div className="flex items-center gap-1 sm:gap-3">
+            <TextSizeControl />
+            <span className="h-5 w-px bg-line-strong" aria-hidden />
+            <ThemeToggle />
+          </div>
           <a
             href={funeralCompanionUrl}
             target="_blank"

@@ -22,8 +22,9 @@ export const viewport: Viewport = {
   ],
 };
 
-// Applies the saved text size before first paint, so pages never jump.
-const prefsScript = `try{var t=localStorage.getItem('hadamley-text');if(t)document.documentElement.dataset.text=t;}catch(e){}`;
+// Applies saved text size and theme before first paint, so pages never jump or flash.
+// Theme preference is auto | light | dark; data-theme always holds the resolved value.
+const prefsScript = `try{var d=document.documentElement,t=localStorage.getItem('hadamley-text');if(t)d.dataset.text=t;var p=localStorage.getItem('hadamley-theme')||'auto';d.dataset.themePref=p;d.dataset.theme=p==='auto'?(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'):p;}catch(e){}`;
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (

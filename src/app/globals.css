@@ -1,5 +1,8 @@
 @import "tailwindcss";
 
+/* dark: utilities follow the resolved theme set by the script in layout.tsx */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
 /* ------------------------------------------------------------------
    Hadamley design system: "the local guidebook"
 
