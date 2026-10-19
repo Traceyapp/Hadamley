@@ -3,7 +3,10 @@ import { ArrowRight, ExternalLink, MessageCircleQuestion } from "lucide-react";
 import type { Page } from "@/lib/types";
 import { withHeadingIds } from "@/lib/html";
 import { childPages, getPageAnyStatus, getSettings, listingsForTopics, publishedResources, searchListings, topicIdsForSlugs } from "@/lib/repo";
-import { Breadcrumbs, Container, Disclaimer, SectionIcon } from "./bits";
+import { Container, Disclaimer, SectionIcon } from "./bits";
+import { PageHero } from "./PageHero";
+import { Spotlight, Stagger } from "@/components/fx/motion";
+import { Aurora } from "@/components/fx/Aurora";
 import { ListingCard } from "./ListingCard";
 import { ResourceCard } from "./ResourceCard";
 import { AskButton } from "./HelperWidget";
@@ -28,38 +31,33 @@ export function PageView({ page, preview = false }: { page: Page; preview?: bool
 
   return (
     <article>
-      <header className="grain border-b border-line">
-        <Container className="pb-12 pt-8 sm:pb-14 sm:pt-10">
-          <Breadcrumbs items={crumbs} />
-          <div className="mt-8 flex flex-col gap-6 sm:flex-row sm:items-start">
-            {!isLegal && <SectionIcon section={page.section} className="size-16 sm:size-20" />}
-            <div className="max-w-3xl">
-              <h1 className="text-[2.3rem] font-semibold leading-[1.08] sm:text-[3rem]">{page.title}</h1>
-              {page.summary && <p className="mt-4 text-[1.15rem] leading-relaxed text-ink-2">{page.summary}</p>}
-            </div>
-          </div>
-        </Container>
-      </header>
+      <PageHero
+        crumbs={crumbs}
+        title={page.title}
+        summary={page.summary}
+        icon={!isLegal ? <SectionIcon section={page.section} className="size-16 sm:size-[5.5rem]" /> : undefined}
+      />
 
       {page.template === "section" && kids.length > 0 && (
-        <Container className="pt-12">
+        <Container className="relative z-10 pt-0">
           <h2 className="sr-only">Pages in this section</h2>
-          <ul className="grid gap-4 md:grid-cols-3">
-            {kids.map((k) => (
-              <li key={k.id}>
-                <Link
-                  href={preview ? `/admin/pages/${k.id}/preview` : `/${k.slug}`}
-                  className="group flex h-full flex-col rounded-[var(--radius-card)] border border-line bg-surface p-5 shadow-soft transition hover:-translate-y-0.5 hover:border-brand hover:shadow-lift"
-                >
-                  <span className="font-display text-[1.25rem] font-semibold leading-snug group-hover:text-brand">{k.title}</span>
+          <Stagger className="-mt-6 grid gap-5 md:grid-cols-3">
+            {kids.map((k, i) => (
+              <Spotlight key={k.id} className="ring-grad group relative z-10 h-full rounded-[var(--radius-card)] border border-line bg-surface shadow-lift transition duration-500 hover:-translate-y-1">
+                <Link href={preview ? `/admin/pages/${k.id}/preview` : `/${k.slug}`} className="flex h-full flex-col p-6">
+                  <span className="font-display text-[0.95rem] font-semibold text-gradient">0{i + 1}</span>
+                  <span className="mt-2 font-display text-[1.35rem] font-semibold leading-snug group-hover:text-brand">{k.title}</span>
                   <span className="mt-2 text-[0.95rem] text-ink-2">{k.summary}</span>
-                  <span className="mt-auto inline-flex items-center gap-1.5 pt-4 font-bold text-brand">
-                    Read more <ArrowRight className="size-4 transition group-hover:translate-x-1" aria-hidden />
+                  <span className="mt-auto inline-flex items-center gap-2 pt-5 font-bold text-brand">
+                    Read more
+                    <span className="grid size-7 place-items-center rounded-full bg-brand-tint transition group-hover:translate-x-1 group-hover:bg-grad-brand group-hover:text-white">
+                      <ArrowRight className="size-3.5" aria-hidden />
+                    </span>
                   </span>
                 </Link>
-              </li>
+              </Spotlight>
             ))}
-          </ul>
+          </Stagger>
         </Container>
       )}
 
@@ -75,7 +73,7 @@ export function PageView({ page, preview = false }: { page: Page; preview?: bool
 
         <aside className="space-y-6 lg:sticky lg:top-36 lg:self-start" aria-label="Page navigation">
           {toc.length > 1 && (
-            <nav aria-labelledby="toc-title" className="rounded-2xl border border-line bg-surface p-5">
+            <nav aria-labelledby="toc-title" className="rounded-3xl border border-line bg-surface/80 p-5 shadow-soft backdrop-blur">
               <h2 id="toc-title" className="font-sans text-[0.8rem] font-bold uppercase tracking-[0.12em] text-ink-2">
                 On this page
               </h2>
@@ -91,7 +89,7 @@ export function PageView({ page, preview = false }: { page: Page; preview?: bool
             </nav>
           )}
           {sectionNav.length > 0 && (
-            <nav aria-labelledby="insection-title" className="rounded-2xl border border-line bg-surface p-5">
+            <nav aria-labelledby="insection-title" className="rounded-3xl border border-line bg-surface/80 p-5 shadow-soft backdrop-blur">
               <h2 id="insection-title" className="font-sans text-[0.8rem] font-bold uppercase tracking-[0.12em] text-ink-2">
                 In this section
               </h2>
@@ -112,11 +110,15 @@ export function PageView({ page, preview = false }: { page: Page; preview?: bool
             </nav>
           )}
           {!isLegal && (
-            <div className="rounded-2xl bg-brand p-5 text-paper">
-              <MessageCircleQuestion className="size-7" aria-hidden />
+            <div className="relative isolate overflow-hidden rounded-3xl bg-[#06282b] p-6 text-white shadow-lift">
+              <div aria-hidden="true" className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_90%_70%_at_0%_0%,#0f7a6c_0%,transparent_65%),radial-gradient(ellipse_70%_70%_at_100%_100%,#1f8fae_0%,transparent_65%)]" />
+              <div aria-hidden="true" className="absolute -right-6 -top-6 -z-10 size-28 rounded-full bg-[#ffc49a]/30 blur-2xl" />
+              <span className="grid size-11 place-items-center rounded-xl bg-white/15 ring-1 ring-white/25">
+                <MessageCircleQuestion className="size-6" aria-hidden />
+              </span>
               <p className="mt-3 font-display text-xl font-semibold">Have a question?</p>
               <p className="mt-1 text-[0.95rem] opacity-90">Ask in your own words. Answers come only from Hadamley.</p>
-              <AskButton className="mt-4 inline-flex min-h-11 items-center gap-2 rounded-full bg-paper px-4 font-bold text-brand-strong hover:bg-white">
+              <AskButton className="group mt-5 inline-flex min-h-11 items-center gap-2 rounded-full bg-white px-5 font-bold text-[#073b3e] transition hover:-translate-y-0.5">
                 Ask Hadamley <ArrowRight className="size-4" aria-hidden />
               </AskButton>
             </div>
@@ -135,11 +137,12 @@ export function PageView({ page, preview = false }: { page: Page; preview?: bool
       </Container>
 
       {listings.length > 0 && (
-        <section aria-labelledby="listings-title" className="mt-16 border-y border-line bg-brand-tint py-14">
-          <Container>
+        <section aria-labelledby="listings-title" className="grain relative isolate mt-20 overflow-hidden border-y border-line py-16">
+          <Aurora soft />
+          <Container className="relative z-10">
             <div className="flex flex-wrap items-end justify-between gap-4">
               <div>
-                <p className="text-[0.85rem] font-bold uppercase tracking-[0.14em] text-accent">Local services</p>
+                <p className="text-[0.85rem] font-bold uppercase tracking-[0.18em] text-accent">Local services</p>
                 <h2 id="listings-title" className="mt-1 text-[1.9rem] font-semibold">
                   Services that can help
                 </h2>
@@ -147,19 +150,17 @@ export function PageView({ page, preview = false }: { page: Page; preview?: bool
               {totalListings > listings.length || page.listingTopics.length ? (
                 <Link
                   href={`/find-support?${page.listingTopics.map((t) => `topic=${t}`).join("&")}`}
-                  className="inline-flex min-h-11 items-center gap-1.5 rounded-full border-2 border-brand px-4 font-bold text-brand hover:bg-brand hover:text-paper"
+                  className="group inline-flex min-h-12 items-center gap-2 rounded-full bg-grad-brand px-5 font-bold text-white shadow-glow transition hover:-translate-y-0.5"
                 >
                   {totalListings > listings.length ? `See all ${totalListings}` : "Search and filter"} in Find Support <ArrowRight className="size-4" aria-hidden />
                 </Link>
               ) : null}
             </div>
-            <ul className="mt-8 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+            <Stagger className="mt-10 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
               {listings.map((l) => (
-                <li key={l.id}>
-                  <ListingCard listing={l} />
-                </li>
+                <ListingCard key={l.id} listing={l} />
               ))}
-            </ul>
+            </Stagger>
           </Container>
         </section>
       )}
@@ -170,13 +171,11 @@ export function PageView({ page, preview = false }: { page: Page; preview?: bool
             <h2 id="related-res" className="text-[1.6rem] font-semibold">
               Helpful downloads
             </h2>
-            <ul className="mt-6 grid gap-5 md:grid-cols-3">
+            <Stagger className="mt-6 grid gap-5 md:grid-cols-3">
               {resources.map((r) => (
-                <li key={r.id}>
-                  <ResourceCard r={r} />
-                </li>
+                <ResourceCard key={r.id} r={r} />
               ))}
-            </ul>
+            </Stagger>
           </Container>
         </section>
       )}

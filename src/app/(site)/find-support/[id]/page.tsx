@@ -4,7 +4,9 @@ import { notFound } from "next/navigation";
 import { ArrowLeft, ExternalLink, Globe, Mail, MapPin, Phone, Quote } from "lucide-react";
 import { getApprovedListing, searchListings, taxonById } from "@/lib/repo";
 import { formatDate, telHref } from "@/lib/format";
-import { Breadcrumbs, CheckedDate, Container, DeliveryList, Disclaimer, ProviderBadge, TriStateText } from "@/components/site/bits";
+import { CheckedDate, Container, DeliveryList, Disclaimer, ProviderBadge, TriStateText } from "@/components/site/bits";
+import { PageHero } from "@/components/site/PageHero";
+import { Stagger } from "@/components/fx/motion";
 import { ReportForm } from "@/components/site/ReportForm";
 import { ListingCard } from "@/components/site/ListingCard";
 
@@ -39,39 +41,43 @@ export default async function ListingPage({ params }: Props) {
 
   return (
     <>
-      <header className="grain border-b border-line">
-        <Container className="pb-10 pt-8">
-          <Breadcrumbs items={[{ label: "Find Support", href: "/find-support" }, { label: l.name }]} />
-          <div className="mt-8 max-w-3xl">
-            <div className="flex flex-wrap items-center gap-2">
-              <ProviderBadge type={l.providerType} />
-              {topics.map((t) => (
-                <Link key={t!.id} href={`/find-support?topic=${t!.slug}`} className="rounded-full border border-line bg-surface px-2.5 py-0.5 text-[0.8rem] font-bold text-ink-2 hover:border-brand hover:text-brand">
-                  {t!.name}
-                </Link>
-              ))}
-            </div>
-            <h1 className="mt-4 text-[2.2rem] font-semibold leading-[1.1] sm:text-[2.8rem]">{l.name}</h1>
-            <p className="mt-4 text-[1.15rem] text-ink-2">{l.summary}</p>
-            <div className="mt-5">
-              <CheckedDate date={l.dateChecked} />
-            </div>
+      <PageHero
+        crumbs={[{ label: "Find Support", href: "/find-support" }, { label: l.name }]}
+        eyebrow={
+          <div className="flex flex-wrap items-center gap-2">
+            <ProviderBadge type={l.providerType} />
+            {topics.map((t) => (
+              <Link key={t!.id} href={`/find-support?topic=${t!.slug}`} className="glass rounded-full px-3 py-0.5 text-[0.8rem] font-bold text-ink-2 transition hover:text-brand">
+                {t!.name}
+              </Link>
+            ))}
           </div>
-        </Container>
-      </header>
+        }
+        title={l.name}
+        summary={l.summary}
+      >
+        <div className="mt-6">
+          <span className="glass inline-flex items-center rounded-full px-3.5 py-1.5 shadow-soft">
+            <CheckedDate date={l.dateChecked} />
+          </span>
+        </div>
+      </PageHero>
 
       <Container className="grid gap-10 pt-10 lg:grid-cols-[minmax(0,1fr)_22rem] lg:gap-14">
         <div className="min-w-0 space-y-10">
           {l.referralRoute && (
-            <section aria-labelledby="ref-title" className="rounded-[var(--radius-card)] border-2 border-brand/30 bg-brand-tint p-6">
+            <section aria-labelledby="ref-title" className="relative isolate overflow-hidden rounded-[var(--radius-card)] bg-grad-brand p-[1.5px] shadow-glow">
+              <div className="relative overflow-hidden rounded-[calc(var(--radius-card)-1.5px)] bg-surface p-7">
+              <div aria-hidden="true" className="absolute -right-16 -top-16 size-48 rounded-full bg-[var(--glow-1)] opacity-20 blur-3xl" />
               <h2 id="ref-title" className="font-sans text-[0.85rem] font-bold uppercase tracking-[0.12em] text-brand">
                 How to get referred
               </h2>
               <blockquote className="mt-3 flex gap-3">
-                <Quote className="mt-1 size-5 shrink-0 text-brand" aria-hidden />
-                <p className="text-[1.15rem] font-bold leading-snug text-ink">{l.referralRoute}</p>
+                <Quote className="mt-1.5 size-6 shrink-0 text-brand" aria-hidden />
+                <p className="font-display text-[1.45rem] font-semibold leading-snug text-ink">{l.referralRoute}</p>
               </blockquote>
               <p className="mt-3 text-[0.9rem] text-ink-2">Shown exactly as the provider describes it.</p>
+              </div>
             </section>
           )}
 
@@ -88,7 +94,7 @@ export default async function ListingPage({ params }: Props) {
             <h2 id="details-title" className="text-[1.6rem] font-semibold">
               Details
             </h2>
-            <dl className="mt-3 rounded-[var(--radius-card)] border border-line bg-surface px-5 sm:px-6">
+            <dl className="mt-4 rounded-[var(--radius-card)] border border-line bg-surface px-5 shadow-soft sm:px-7">
               {l.agesServed && <Row label="Ages served">{l.agesServed}</Row>}
               {l.eligibility && <Row label="Who can use it">{l.eligibility}</Row>}
               {areas.length > 0 && <Row label="Areas covered">{areas.map((a) => a!.name).join(", ")}</Row>}
@@ -140,13 +146,13 @@ export default async function ListingPage({ params }: Props) {
         </div>
 
         <aside className="space-y-5 lg:sticky lg:top-36 lg:self-start" aria-label="Contact details">
-          <div className="rounded-[var(--radius-card)] border border-line bg-surface p-6 shadow-soft">
+          <div className="ring-grad rounded-[var(--radius-card)] border border-line bg-surface p-6 shadow-lift">
             <h2 className="text-xl font-semibold">Contact</h2>
             {hasContact ? (
               <ul className="mt-4 space-y-3">
                 {l.phone && (
                   <li>
-                    <a href={telHref(l.phone)} className="flex min-h-12 items-center gap-3 rounded-xl bg-brand px-4 font-bold text-paper hover:bg-brand-strong">
+                    <a href={telHref(l.phone)} className="flex min-h-13 items-center gap-3 rounded-2xl bg-grad-brand px-5 font-bold text-white shadow-glow transition hover:-translate-y-0.5">
                       <Phone className="size-5" aria-hidden /> {l.phone}
                     </a>
                   </li>
@@ -189,13 +195,11 @@ export default async function ListingPage({ params }: Props) {
             <h2 id="rel-title" className="text-[1.6rem] font-semibold">
               Similar services
             </h2>
-            <ul className="mt-6 grid gap-5 md:grid-cols-2">
+            <Stagger className="mt-6 grid gap-5 md:grid-cols-2">
               {related.map((r) => (
-                <li key={r.id}>
-                  <ListingCard listing={r} />
-                </li>
+                <ListingCard key={r.id} listing={r} />
               ))}
-            </ul>
+            </Stagger>
           </Container>
         </section>
       )}

@@ -2,7 +2,9 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { getPublishedPage, publishedResources, topics } from "@/lib/repo";
 import { KIND_LABEL, type ResourceKind } from "@/lib/types";
-import { Breadcrumbs, Container, Disclaimer } from "@/components/site/bits";
+import { Container, Disclaimer, SectionIcon } from "@/components/site/bits";
+import { PageHero } from "@/components/site/PageHero";
+import { Stagger } from "@/components/fx/motion";
 import { ResourceCard } from "@/components/site/ResourceCard";
 
 export const metadata: Metadata = { title: "Resources and Downloads", description: "Free guides, checklists and worksheets from Hadamley." };
@@ -19,7 +21,7 @@ export default async function ResourcesPage({ searchParams }: { searchParams: SP
   const kinds = (Object.keys(KIND_LABEL) as ResourceKind[]).filter((k) => all.some((r) => r.kind === k));
 
   const pill = (active: boolean) =>
-    `inline-flex min-h-10 items-center rounded-full border px-4 text-[0.95rem] font-bold ${active ? "border-brand bg-brand text-paper" : "border-line bg-surface hover:border-brand hover:text-brand"}`;
+    `inline-flex min-h-10 items-center rounded-full border px-4 text-[0.95rem] font-bold ${active ? "border-transparent bg-grad-brand text-white shadow-glow" : "border-line bg-surface hover:border-brand hover:text-brand"}`;
   const href = (k?: string, tp?: string) => {
     const p = new URLSearchParams();
     if (k) p.set("kind", k);
@@ -29,14 +31,13 @@ export default async function ResourcesPage({ searchParams }: { searchParams: SP
 
   return (
     <>
-      <header className="grain border-b border-line">
-        <Container className="pb-10 pt-8">
-          <Breadcrumbs items={[{ label: "Resources and Downloads" }]} />
-          <h1 className="mt-8 text-[2.4rem] font-semibold sm:text-[3rem]">{page?.title ?? "Resources and Downloads"}</h1>
-          <p className="mt-3 max-w-2xl text-[1.12rem] text-ink-2">{page?.summary}</p>
-        </Container>
-      </header>
-      <Container className="pt-8">
+      <PageHero
+        crumbs={[{ label: "Resources and Downloads" }]}
+        icon={<SectionIcon section="resources" className="size-16 sm:size-[5.5rem]" />}
+        title={page?.title ?? "Resources and Downloads"}
+        summary={page?.summary}
+      />
+      <Container className="pt-10">
         <nav aria-label="Filter resources" className="space-y-3">
           <ul className="flex flex-wrap gap-2">
             <li>
@@ -69,13 +70,11 @@ export default async function ResourcesPage({ searchParams }: { searchParams: SP
         </nav>
         <h2 className="sr-only">Downloads</h2>
         {list.length ? (
-          <ul className="mt-8 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+          <Stagger key={list.map((r) => r.id).join()} className="mt-8 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
             {list.map((r) => (
-              <li key={r.id}>
-                <ResourceCard r={r} />
-              </li>
+              <ResourceCard key={r.id} r={r} />
             ))}
-          </ul>
+          </Stagger>
         ) : (
           <p className="mt-10 rounded-2xl border border-dashed border-line-strong p-10 text-center text-ink-2">No downloads match. Try another filter.</p>
         )}

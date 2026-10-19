@@ -5,7 +5,7 @@ import { STATUS_LABEL } from "@/lib/types";
 export const input =
   "block w-full rounded-xl border border-line-strong bg-surface px-3.5 py-2.5 text-[0.97rem] text-ink placeholder:text-ink-2/70 focus:border-brand disabled:opacity-60";
 export const btn = {
-  primary: "inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-brand px-5 font-bold text-paper hover:bg-brand-strong disabled:opacity-50",
+  primary: "inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-grad-brand px-5 font-bold text-white shadow-glow transition hover:-translate-y-px hover:brightness-110 disabled:opacity-50 disabled:shadow-none",
   secondary: "inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-line-strong bg-surface px-5 font-bold text-ink hover:border-brand hover:text-brand disabled:opacity-50",
   ghost: "inline-flex min-h-10 items-center justify-center gap-2 rounded-lg px-3 font-bold text-ink-2 hover:bg-sand hover:text-ink",
   danger: "inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-urgent/50 px-5 font-bold text-urgent hover:bg-urgent-soft",
@@ -30,7 +30,7 @@ export function AdminHeader({ title, description, actions, back }: { title: stri
 
 export function Card({ title, description, children, className = "", aside }: { title?: string; description?: string; children: React.ReactNode; className?: string; aside?: React.ReactNode }) {
   return (
-    <section className={`rounded-2xl border border-line bg-surface p-5 shadow-soft sm:p-6 ${className}`}>
+    <section className={`rounded-3xl border border-line bg-surface p-5 shadow-soft sm:p-6 ${className}`}>
       {(title || aside) && (
         <div className="mb-5 flex items-start justify-between gap-3">
           <div>

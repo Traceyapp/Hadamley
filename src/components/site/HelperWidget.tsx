@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { ArrowUp, ExternalLink, LifeBuoy, MessageCircleQuestion, Phone, RotateCcw, X } from "lucide-react";
 import { Fragment, useCallback, useEffect, useRef, useState } from "react";
+import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 
 type Source = { title: string; url: string; type: "page" | "listing" };
 type Reply =
@@ -125,6 +126,7 @@ export function HelperWidget() {
   const listRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const launcherRef = useRef<HTMLButtonElement>(null);
+  const reduce = useReducedMotion();
 
   useEffect(() => {
     const onOpen = (e: Event) => {
@@ -179,27 +181,45 @@ export function HelperWidget() {
 
   return (
     <>
-      {!open && (
-        <button
-          ref={launcherRef}
-          type="button"
-          onClick={() => setOpen(true)}
-          className="fixed bottom-4 right-4 z-40 inline-flex min-h-14 items-center gap-2.5 rounded-full bg-brand py-3 pl-4 pr-5 font-bold text-paper shadow-lift transition hover:bg-brand-strong sm:bottom-6 sm:right-6"
-          aria-haspopup="dialog"
-        >
-          <MessageCircleQuestion className="size-6" aria-hidden />
-          Ask Hadamley
-        </button>
-      )}
+      <AnimatePresence>
+        {!open && (
+          <motion.button
+            ref={launcherRef}
+            type="button"
+            onClick={() => setOpen(true)}
+            initial={reduce ? false : { opacity: 0, scale: 0.6, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={reduce ? undefined : { opacity: 0, scale: 0.6 }}
+            whileHover={reduce ? undefined : { y: -3 }}
+            whileTap={reduce ? undefined : { scale: 0.96 }}
+            transition={{ type: "spring", stiffness: 380, damping: 26 }}
+            className="pulse-ring fixed bottom-4 right-4 z-40 isolate inline-flex min-h-14 items-center gap-2.5 rounded-full bg-grad-brand py-3 pl-3 pr-5 font-bold text-white shadow-glow sm:bottom-6 sm:right-6"
+            aria-haspopup="dialog"
+          >
+            <span className="grid size-9 place-items-center rounded-full bg-white/18 ring-1 ring-white/30">
+              <MessageCircleQuestion className="size-5" aria-hidden />
+            </span>
+            Ask Hadamley
+          </motion.button>
+        )}
+      </AnimatePresence>
+      <AnimatePresence>
       {open && (
-        <div
+        <motion.div
           role="dialog"
           aria-modal="false"
           aria-labelledby="helper-title"
           onKeyDown={(e) => e.key === "Escape" && close()}
-          className="animate-rise fixed inset-x-2 bottom-2 top-16 z-50 flex flex-col overflow-hidden rounded-3xl border border-line bg-paper shadow-lift sm:inset-auto sm:bottom-6 sm:right-6 sm:top-auto sm:h-[min(44rem,calc(100dvh-7rem))] sm:w-[27rem]"
+          initial={reduce ? false : { opacity: 0, scale: 0.85, y: 40, filter: "blur(8px)" }}
+          animate={{ opacity: 1, scale: 1, y: 0, filter: "blur(0px)" }}
+          exit={reduce ? undefined : { opacity: 0, scale: 0.9, y: 30, filter: "blur(6px)" }}
+          transition={{ type: "spring", stiffness: 300, damping: 28 }}
+          style={{ transformOrigin: "bottom right" }}
+          className="fixed inset-x-2 bottom-2 top-16 z-50 flex flex-col overflow-hidden rounded-[1.75rem] border border-line bg-paper shadow-[0_30px_90px_-20px_rgba(6,40,43,0.55)] sm:inset-auto sm:bottom-6 sm:right-6 sm:top-auto sm:h-[min(44rem,calc(100dvh-7rem))] sm:w-[27rem]"
         >
-          <div className="flex items-start justify-between gap-3 border-b border-line bg-brand px-5 py-4 text-paper">
+          <div className="relative isolate flex items-start justify-between gap-3 overflow-hidden bg-[#06282b] px-5 py-5 text-white">
+            <div aria-hidden="true" className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_80%_120%_at_0%_0%,#0f7a6c_0%,transparent_60%),radial-gradient(ellipse_60%_120%_at_100%_100%,#1f8fae_0%,transparent_65%)]" />
+            <div aria-hidden="true" className="absolute -right-8 -top-10 -z-10 size-36 rounded-full bg-[#ffc49a]/25 blur-2xl" />
             <div>
               <h2 id="helper-title" className="font-display text-xl font-semibold">
                 Ask Hadamley
@@ -245,7 +265,7 @@ export function HelperWidget() {
             {msgs.map((m, i) =>
               m.role === "user" ? (
                 <div key={i} className="flex justify-end">
-                  <p className="max-w-[85%] rounded-2xl rounded-br-md bg-ink px-4 py-2.5 text-paper">{m.text}</p>
+                  <p className="max-w-[85%] rounded-2xl rounded-br-md bg-grad-brand px-4 py-2.5 text-white shadow-glow">{m.text}</p>
                 </div>
               ) : (
                 <div key={i} className="animate-rise max-w-[95%]">
@@ -292,7 +312,7 @@ export function HelperWidget() {
               <button
                 type="submit"
                 disabled={!input.trim() || busy}
-                className="grid size-11 shrink-0 place-items-center rounded-xl bg-brand text-paper disabled:opacity-40"
+                className="grid size-11 shrink-0 place-items-center rounded-xl bg-grad-brand text-white shadow-glow transition disabled:opacity-40 disabled:shadow-none"
                 aria-label="Send question"
               >
                 <ArrowUp className="size-5" aria-hidden />
@@ -300,8 +320,9 @@ export function HelperWidget() {
             </div>
             <p className="mt-2 px-1 text-[0.78rem] text-ink-2">Information and signposting only. Always check details with the provider.</p>
           </form>
-        </div>
+        </motion.div>
       )}
+      </AnimatePresence>
     </>
   );
 }

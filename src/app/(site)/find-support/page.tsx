@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Search, X } from "lucide-react";
-import { areas, getPublishedPage, searchListings, topics } from "@/lib/repo";
+import { approvedListings, areas, getPublishedPage, searchListings, topics } from "@/lib/repo";
 import type { Delivery, ProviderType } from "@/lib/types";
 import { DELIVERY_LABEL, PROVIDER_LABEL } from "@/lib/types";
-import { Breadcrumbs, Container, Disclaimer } from "@/components/site/bits";
+import { Container, Disclaimer } from "@/components/site/bits";
+import { Eyebrow, PageHero } from "@/components/site/PageHero";
+import { Stagger } from "@/components/fx/motion";
 import { ListingCard } from "@/components/site/ListingCard";
 import { AutoSubmitForm } from "@/components/site/AutoSubmit";
 import { FiltersPanel } from "@/components/site/FiltersPanel";
@@ -43,6 +45,7 @@ export default async function FindSupportPage({ searchParams }: { searchParams: 
     delivery: arr(sp.delivery) as Delivery[],
   };
   const results = searchListings({ q, ...sel });
+  const approvedCount = approvedListings().length;
   const page = getPublishedPage("find-support");
   const topicList = topics();
   const areaList = areas();
@@ -76,21 +79,21 @@ export default async function FindSupportPage({ searchParams }: { searchParams: 
 
   return (
     <>
-      <header className="grain border-b border-line">
-        <Container className="pb-10 pt-8">
-          <Breadcrumbs items={[{ label: "Find Support" }]} />
-          <h1 className="mt-8 text-[2.4rem] font-semibold leading-tight sm:text-[3rem]">{page?.title ?? "Find Support"}</h1>
-          <p className="mt-3 max-w-2xl text-[1.12rem] text-ink-2">{page?.summary}</p>
-        </Container>
-      </header>
+      <PageHero
+        crumbs={[{ label: "Find Support" }]}
+        eyebrow={<Eyebrow>{approvedCount} services, each checked and dated</Eyebrow>}
+        title={page?.title ?? "Find Support"}
+        summary={page?.summary}
+      />
 
       <AutoSubmitForm className="group">
-        <Container className="pt-8">
-          <div role="search" className="flex max-w-3xl gap-2 rounded-2xl border-2 border-ink/80 bg-surface p-1.5 shadow-soft focus-within:border-brand">
+        <Container className="pt-0">
+          <div role="search" className="conic-border relative z-10 -mt-8 max-w-3xl rounded-[1.4rem] p-[2px] shadow-glow">
+            <div className="flex items-center gap-2 rounded-[1.3rem] bg-surface p-2">
             <label htmlFor="dir-q" className="sr-only">
               Search services
             </label>
-            <Search className="ml-2 mt-3 size-5 shrink-0 text-ink-2" aria-hidden />
+            <Search className="ml-3 size-5 shrink-0 text-brand" aria-hidden />
             <input
               id="dir-q"
               name="q"
@@ -99,9 +102,10 @@ export default async function FindSupportPage({ searchParams }: { searchParams: 
               placeholder="Search by service name, condition or need"
               className="min-h-12 w-full min-w-0 bg-transparent px-2 text-[1.05rem] outline-none placeholder:text-ink-2/80 focus-visible:shadow-none focus-visible:outline-none"
             />
-            <button type="submit" className="min-h-12 shrink-0 rounded-xl bg-brand px-5 font-bold text-paper hover:bg-brand-strong">
+            <button type="submit" className="min-h-12 shrink-0 rounded-2xl bg-grad-brand px-6 font-bold text-white shadow-glow transition hover:brightness-110">
               Search
             </button>
+            </div>
           </div>
         </Container>
 
@@ -131,7 +135,7 @@ export default async function FindSupportPage({ searchParams }: { searchParams: 
               <ul className="mt-3 flex flex-wrap gap-2" aria-label="Active filters">
                 {chips.map((c) => (
                   <li key={c.href + c.label}>
-                    <Link href={c.href} scroll={false} className="inline-flex min-h-9 items-center gap-1.5 rounded-full bg-brand-soft py-1 pl-3 pr-2 text-[0.9rem] font-bold text-brand-strong hover:bg-brand hover:text-paper">
+                    <Link href={c.href} scroll={false} className="inline-flex min-h-9 items-center gap-1.5 rounded-full bg-grad-brand py-1 pl-3.5 pr-2 text-[0.9rem] font-bold text-white shadow-glow transition hover:brightness-110">
                       {c.label}
                       <X className="size-4" aria-hidden />
                       <span className="sr-only">Remove filter</span>
@@ -142,13 +146,11 @@ export default async function FindSupportPage({ searchParams }: { searchParams: 
             )}
 
             {results.length > 0 ? (
-              <ul className="mt-6 grid gap-5 md:grid-cols-2">
+              <Stagger key={results.map((r) => r.id).join()} className="mt-6 grid gap-5 md:grid-cols-2">
                 {results.map((l) => (
-                  <li key={l.id}>
-                    <ListingCard listing={l} />
-                  </li>
+                  <ListingCard key={l.id} listing={l} />
                 ))}
-              </ul>
+              </Stagger>
             ) : (
               <div className="mt-6 rounded-2xl border border-dashed border-line-strong bg-surface px-6 py-12 text-center">
                 <p className="font-display text-2xl font-semibold">No services match those filters</p>

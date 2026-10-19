@@ -130,19 +130,23 @@ export const SECTION_ICON: Record<string, LucideIcon> = {
   accessibility: Accessibility,
 };
 
-export const SECTION_TONE: Record<string, string> = {
-  "chronic-illness-support": "bg-brand-soft text-brand-strong",
-  "mental-health-support": "bg-ok-soft text-ok",
-  "mobility-daily-living-transport": "bg-accent-soft text-accent",
-  "find-support": "bg-[#e6eef8] text-[#0b3d77] dark:bg-[#15263b] dark:text-[#a9c8f0]",
-  resources: "bg-[#efe8f6] text-[#4b2a78] dark:bg-[#271d36] dark:text-[#cdb6ef]",
+export const SECTION_GRADIENT: Record<string, string> = {
+  "chronic-illness-support": "linear-gradient(135deg,#0b5458 0%,#13857a 55%,#2a95b8 100%)",
+  "mental-health-support": "linear-gradient(135deg,#1c9c83 0%,#36b48f 60%,#8fd18a 100%)",
+  "mobility-daily-living-transport": "linear-gradient(135deg,#e2804a 0%,#f0a065 55%,#f6c27d 100%)",
+  "find-support": "linear-gradient(135deg,#2f6fc4 0%,#4a7fdc 50%,#6c6ad8 100%)",
+  resources: "linear-gradient(135deg,#7a62d9 0%,#a274e0 50%,#d77eb0 100%)",
 };
 
 export function SectionIcon({ section, className = "size-12" }: { section: string; className?: string }) {
   const Icon = SECTION_ICON[section] ?? Info;
   return (
-    <span className={`grid shrink-0 place-items-center rounded-2xl ${SECTION_TONE[section] ?? "bg-sand-2 text-ink"} ${className}`}>
-      <Icon className="size-[55%]" aria-hidden strokeWidth={1.75} />
+    <span
+      className={`relative grid shrink-0 place-items-center rounded-[28%] text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.45),0_12px_28px_-10px_rgba(11,84,88,0.55)] ${className}`}
+      style={{ background: SECTION_GRADIENT[section] ?? "var(--grad-brand)" }}
+    >
+      <span aria-hidden="true" className="absolute inset-0 rounded-[inherit] bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.4),transparent_55%)]" />
+      <Icon className="relative size-[50%]" aria-hidden strokeWidth={1.9} />
     </span>
   );
 }

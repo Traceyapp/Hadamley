@@ -17,7 +17,7 @@ export default async function AdminAppLayout({ children }: { children: React.Rea
 
   return (
     <div className="lg:grid lg:min-h-dvh lg:grid-cols-[16.5rem_1fr]">
-      <aside className="border-b border-line bg-sand lg:sticky lg:top-0 lg:flex lg:h-dvh lg:flex-col lg:border-b-0 lg:border-r">
+      <aside className="relative overflow-hidden border-b border-line bg-sand lg:sticky lg:top-0 lg:flex lg:h-dvh lg:flex-col lg:border-b-0 lg:border-r">
         <div className="flex items-center justify-between gap-3 px-5 py-4 lg:py-6">
           <Link href="/admin" className="flex items-center gap-2.5">
             <LogoMark className="size-9" />

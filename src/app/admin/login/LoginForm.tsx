@@ -8,7 +8,7 @@ import { btn, input } from "@/components/admin/ui";
 export function LoginForm() {
   const [state, action, pending] = useActionState<ActionState, FormData>(login, null);
   return (
-    <form action={action} className="space-y-5 rounded-3xl border border-line bg-surface p-7 shadow-lift">
+    <form action={action} className="glass space-y-5 rounded-[2rem] p-8 shadow-lift">
       <div>
         <label htmlFor="email" className="mb-1.5 block font-bold">
           Email
