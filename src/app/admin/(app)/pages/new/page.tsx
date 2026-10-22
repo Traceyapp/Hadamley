@@ -12,7 +12,7 @@ export default function NewPage() {
   return (
     <>
       <AdminHeader title="New page" back={{ href: "/admin/pages", label: "All pages" }} description="New pages start as drafts. Preview them, then publish when ready." />
-      <PageForm parents={parents} topics={topics()} />
+      <PageForm parents={parents} topics={topics()} resources={readDb().resources.map((r) => ({ id: r.id, title: r.title }))} />
     </>
   );
 }

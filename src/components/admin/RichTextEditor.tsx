@@ -79,7 +79,7 @@ function Toolbar({ editor, onImage }: { editor: Editor; onImage: () => void }) {
   );
 }
 
-export function RichTextEditor({ name, initial, labelId }: { name: string; initial: string; labelId: string }) {
+export function RichTextEditor({ name, initial, labelId, onChange, minHeight }: { name?: string; initial: string; labelId: string; onChange?: (html: string) => void; minHeight?: string }) {
   const [html, setHtml] = useState(initial);
   const [imgError, setImgError] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
@@ -92,9 +92,13 @@ export function RichTextEditor({ name, initial, labelId }: { name: string; initi
     ],
     content: initial,
     editorProps: {
-      attributes: { class: "tiptap prose-h max-w-none px-5 py-4", "aria-labelledby": labelId, role: "textbox", "aria-multiline": "true" },
+      attributes: { class: `tiptap prose-h max-w-none px-5 py-4 ${minHeight ?? ""}`, "aria-labelledby": labelId, role: "textbox", "aria-multiline": "true" },
     },
-    onUpdate: ({ editor }) => setHtml(editor.getHTML()),
+    onUpdate: ({ editor }) => {
+      const next = editor.getHTML();
+      setHtml(next);
+      onChange?.(next);
+    },
   });
 
   async function onFile(e: React.ChangeEvent<HTMLInputElement>) {
@@ -117,7 +121,7 @@ export function RichTextEditor({ name, initial, labelId }: { name: string; initi
       {editor && <Toolbar editor={editor} onImage={() => fileRef.current?.click()} />}
       <EditorContent editor={editor} />
       {!editor && <div className="min-h-[320px] px-5 py-4 text-ink-2">Loading editor...</div>}
-      <input type="hidden" name={name} value={html} />
+      {name && <input type="hidden" name={name} value={html} />}
       <input ref={fileRef} type="file" accept="image/png,image/jpeg,image/webp,image/gif" className="hidden" onChange={onFile} />
       {imgError && <p className="border-t border-line px-5 py-2 text-sm font-bold text-urgent">{imgError}</p>}
     </div>

@@ -5,6 +5,7 @@ import { hashPassword } from "./password";
 import { makePdf } from "./pdf";
 import { buildAllChunks } from "./ai/chunks";
 import { UPLOAD_DIR } from "./db";
+import { migrate } from "./migrate";
 
 /**
  * Starter content.
@@ -801,6 +802,8 @@ export function buildSeed(): Database {
 
   const db: Database = {
     version: 1,
+    posts: [],
+    events: [],
     pages,
     listings,
     taxa,
@@ -830,6 +833,7 @@ export function buildSeed(): Database {
     },
   };
   const started = Date.now();
+  migrate(db);
   db.chunks = buildAllChunks(db);
   db.settings.aiLastIndexedAt = new Date().toISOString();
   db.settings.aiLastIndexMs = Date.now() - started;

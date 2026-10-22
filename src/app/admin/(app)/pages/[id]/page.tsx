@@ -35,7 +35,7 @@ export default async function EditPage({ params, searchParams }: { params: Promi
           ) : undefined
         }
       />
-      <PageForm page={page} parents={parents} topics={topics()} flash={saved} />
+      <PageForm page={page} parents={parents} topics={topics()} resources={readDb().resources.map((r) => ({ id: r.id, title: r.title }))} flash={saved} />
     </>
   );
 }

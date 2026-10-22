@@ -2,13 +2,14 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Bot, FileText, FolderOpen, Inbox, LayoutDashboard, ListChecks, Settings, Tags } from "lucide-react";
+import { Bot, FileText, FolderOpen, Inbox, LayoutDashboard, ListChecks, Pin, Settings, Tags } from "lucide-react";
 
 const ITEMS = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard, exact: true },
   { href: "/admin/pages", label: "Pages", icon: FileText },
   { href: "/admin/listings", label: "Directory listings", icon: ListChecks, count: "due" as const },
   { href: "/admin/resources", label: "Downloads", icon: FolderOpen },
+  { href: "/admin/noticeboard", label: "Noticeboard", icon: Pin },
   { href: "/admin/taxonomy", label: "Topics, areas, menu", icon: Tags },
   { href: "/admin/inbox", label: "Inbox", icon: Inbox, count: "inbox" as const },
   { href: "/admin/ai", label: "AI helper", icon: Bot },

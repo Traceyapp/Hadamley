@@ -25,7 +25,7 @@ export function LogoMark({ className = "size-10" }: { className?: string }) {
 export function Logo() {
   return (
     <Link href="/" className="group inline-flex shrink-0 items-center gap-2 rounded-lg no-underline sm:gap-3" aria-label="Hadamley, go to homepage">
-      <span className="relative">
+      <span className="relative max-[359px]:hidden">
         <LogoMark className="relative size-9 transition-transform duration-500 group-hover:-rotate-6 sm:size-11" />
       </span>
       <span className="flex flex-col leading-none">

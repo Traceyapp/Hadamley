@@ -19,9 +19,48 @@ export interface Page {
   body: string;
   /** Approved listings tagged with any of these topic slugs are embedded on the page. */
   listingTopics: string[];
+  /** Fold-out accordion sections shown after the body. */
+  sections?: PageSection[];
   status: PageStatus;
   updatedAt: string;
   updatedBy: string;
+}
+
+export interface PageSection {
+  id: string;
+  heading: string;
+  /** Sanitised HTML. */
+  body: string;
+  /** Resources (downloads) attached to this section. */
+  resourceIds: string[];
+}
+
+export interface Post {
+  id: string;
+  slug: string;
+  title: string;
+  summary: string;
+  body: string;
+  status: PageStatus;
+  publishedAt: string;
+  updatedAt: string;
+}
+
+export interface NoticeEvent {
+  id: string;
+  slug: string;
+  title: string;
+  summary: string;
+  body: string;
+  /** Local date-time, "YYYY-MM-DDTHH:mm" (Europe/London). */
+  startsAt: string;
+  endsAt: string;
+  location: string;
+  online: boolean;
+  cost: string;
+  bookingUrl: string;
+  status: PageStatus;
+  updatedAt: string;
 }
 
 export type ProviderType = "nhs" | "council" | "charity" | "private";
@@ -117,7 +156,7 @@ export interface ContactMessage {
 
 export interface AiChunk {
   id: string;
-  sourceType: "page" | "listing";
+  sourceType: "page" | "listing" | "post" | "event";
   sourceId: string;
   title: string;
   url: string;
@@ -154,6 +193,8 @@ export interface Upload {
 export interface Database {
   version: number;
   pages: Page[];
+  posts: Post[];
+  events: NoticeEvent[];
   listings: Listing[];
   taxa: Taxon[];
   resources: Resource[];

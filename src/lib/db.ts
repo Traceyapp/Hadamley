@@ -2,6 +2,8 @@ import fs from "node:fs";
 import path from "node:path";
 import type { Database } from "./types";
 import { buildSeed } from "./seed";
+import { migrate } from "./migrate";
+import { buildAllChunks } from "./ai/chunks";
 
 /**
  * Local file-backed store used for development and demos.
@@ -33,6 +35,11 @@ export function readDb(): Database {
   const mtime = fs.statSync(DB_FILE).mtimeMs;
   if (g.__hadamleyDb && g.__hadamleyDb.mtime === mtime) return g.__hadamleyDb.db;
   const db = JSON.parse(fs.readFileSync(DB_FILE, "utf8")) as Database;
+  if (migrate(db)) {
+    db.chunks = buildAllChunks(db);
+    writeDb(db);
+    return db;
+  }
   g.__hadamleyDb = { db, mtime };
   return db;
 }

@@ -52,11 +52,11 @@ const WAYS: Opt[] = [
 function Blank({ id, label, value, options, onChange }: { id: string; label: string; value: string; options: Opt[]; onChange: (v: string) => void }) {
   const current = options.find((o) => o.value === value)?.label ?? options[0].label;
   return (
-    <span className="relative inline-flex items-baseline gap-[0.12em] rounded-lg whitespace-nowrap focus-within:outline focus-within:outline-[3px] focus-within:outline-[var(--focus)] focus-within:outline-offset-2">
-      <span aria-hidden="true" className="font-display italic text-sec underline decoration-[0.07em] decoration-dotted underline-offset-[0.16em]">
+    <span className="relative inline-flex items-baseline gap-[0.12em] max-w-full rounded-lg focus-within:outline focus-within:outline-[3px] focus-within:outline-[var(--focus)] focus-within:outline-offset-2">
+      <span aria-hidden="true" className="min-w-0 font-display italic text-sec underline decoration-[0.07em] decoration-dotted underline-offset-[0.16em]">
         {current}
       </span>
-      <ChevronDown aria-hidden="true" className="size-[0.55em] self-center text-sec" strokeWidth={2.75} />
+      <ChevronDown aria-hidden="true" className="size-[0.55em] shrink-0 self-center text-sec" strokeWidth={2.75} />
       <label htmlFor={id} className="sr-only">
         {label}
       </label>
@@ -131,21 +131,22 @@ export function SentenceFinder({
 
   return (
     <form action="/find-support" className="sec-find">
-      <p className="max-w-5xl font-display text-[2rem] font-medium leading-[1.35] tracking-[-0.02em] text-ink sm:text-[2.6rem] lg:text-[3.1rem]">
+      <p className="mb-3 text-sm text-ink-2">Choose what you need, where, and what works for you.</p>
+      <p className="max-w-5xl font-display text-[1.55rem] font-medium leading-[1.4] tracking-[-0.02em] text-ink sm:text-[2.6rem] lg:text-[3.1rem]">
         I&apos;m looking for <Blank id="topic" label="What kind of support" value={need} options={needOpts} onChange={setNeed} />
         {" near "}
         <Blank id="area" label="Where" value={place} options={placeOpts} onChange={setPlace} />
         {" that "}
-        <Blank id="way" label="What matters to you" value={way} options={WAYS} onChange={setWay} />.
+        <Blank id="way" label="What matters to you" value={way} options={WAYS} onChange={setWay} />
       </p>
 
       {scene}
-      <div className="mt-8 flex flex-wrap items-center gap-x-5 gap-y-3" aria-live="polite">
+      <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-3" aria-live="polite">
         <p className="text-lg">
           <span className="font-display text-[2.2rem] font-semibold leading-none text-sec">{matches.length}</span>{" "}
           <span className="font-bold">{matches.length === 1 ? "service matches" : "services match"}</span>
         </p>
-        <Link href={allHref} className="card-print card-print-hover inline-flex min-h-12 items-center gap-2 rounded-full bg-ink px-5 font-bold text-paper">
+        <Link href={matches.length ? allHref : "/find-support"} className="card-print card-print-hover inline-flex min-h-12 items-center gap-2 rounded-full bg-ink px-5 font-bold text-paper">
           {matches.length ? "See them all" : "Browse every service"} <ArrowRight className="size-4" aria-hidden />
         </Link>
         {touched && (

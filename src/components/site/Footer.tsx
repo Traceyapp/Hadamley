@@ -27,7 +27,7 @@ export function Footer() {
             <nav aria-label="Sections">
               <h2 className="kicker text-ink-2">The guide</h2>
               <ul className="mt-4 space-y-2.5">
-                {items.map((i) => (
+                {[...items, { label: "Noticeboard", href: "/noticeboard" }].map((i) => (
                   <li key={i.href}>
                     <Link href={i.href} className="link text-ink">
                       {i.label}

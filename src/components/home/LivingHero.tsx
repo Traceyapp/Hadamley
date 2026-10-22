@@ -40,10 +40,10 @@ export function LivingHero({ listings, topics, areas, summary }: { listings: Fin
   }, [place]);
 
   const scene = (
-          <div ref={frame} className="relative mx-[calc(50%-50vw)] mt-14 overflow-x-clip border-b-[1.5px] border-ink">
+          <div ref={frame} className="relative mx-[calc(50%-50vw)] mt-6 overflow-x-clip sm:mt-12 border-b-[1.5px] border-ink">
             <div
               ref={stage}
-              className="relative w-full min-w-[760px] transition-transform duration-700 ease-[cubic-bezier(0.2,0.8,0.2,1)]"
+              className="relative w-full min-w-[640px] sm:min-w-[760px] transition-transform duration-450 ease-[cubic-bezier(0.2,0.8,0.2,1)]"
               style={{ transform: `translateX(${shift}px)` }}
             >
               <Skyline draw lit={lit} className="block h-auto w-full translate-y-[2px]" />
@@ -72,14 +72,14 @@ export function LivingHero({ listings, topics, areas, summary }: { listings: Fin
 
   return (
     <section aria-labelledby="hero-title" className="relative overflow-hidden border-b-[1.5px] border-ink pb-14">
-      <Container className="relative pt-10 sm:pt-14">
+      <Container className="relative pt-6 sm:pt-14">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <p className="kicker text-ink-2">A local guide · Havering, Romford, Brentwood and nearby</p>
           <motion.p
             aria-hidden="true"
             initial={reduce ? false : { opacity: 0, rotate: -12, scale: 0.8 }}
             animate={{ opacity: 1, rotate: -3, scale: 1 }}
-            transition={{ delay: 2.6, type: "spring", stiffness: 200, damping: 14 }}
+            transition={{ delay: reduce ? 0 : 1.2, type: "spring", stiffness: 200, damping: 14 }}
             className="hidden font-hand text-[1.6rem] leading-none text-accent md:block"
           >
             every listing checked &amp; dated ✓
@@ -89,14 +89,14 @@ export function LivingHero({ listings, topics, areas, summary }: { listings: Fin
           Find local support in Havering, Romford and Brentwood
         </h1>
         <motion.div
-          className="mt-8"
+          className="mt-5 sm:mt-8"
           initial={reduce ? false : { opacity: 0, y: 14 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, ease: [0.21, 0.7, 0.2, 1] }}
+          transition={{ duration: 0.45, ease: [0.21, 0.7, 0.2, 1] }}
         >
           <SentenceFinder listings={listings} topics={topics} areas={areas} onFocusChange={onFocusChange} scene={scene} />
         </motion.div>
-        {summary && <p className="mt-10 max-w-2xl text-[1.08rem] text-ink-2">{summary}</p>}
+        {summary && <p className="mt-6 max-w-2xl sm:mt-10 text-[1.08rem] text-ink-2">{summary}</p>}
       </Container>
 
     </section>

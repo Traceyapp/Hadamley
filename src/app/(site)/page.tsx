@@ -13,6 +13,8 @@ import { type FinderListing } from "@/components/home/SentenceFinder";
 import { LivingHero } from "@/components/home/LivingHero";
 import { Morph } from "@/components/fx/Morph";
 import { Stamp } from "@/components/fx/Stamp";
+import { publishedPosts, upcomingEvents } from "@/lib/notice";
+import { EventTicket, PostNote } from "@/components/notice/Cards";
 
 const CHAPTERS = [
   { slug: "chronic-illness-support", blurb: "Therapy, rehabilitation, hospitals, and living well with a long term condition or disability." },
@@ -30,6 +32,8 @@ export default function HomePage() {
   const listings = approvedListings();
   const areaList = areas();
   const resources = publishedResources();
+  const nextEvents = upcomingEvents().slice(0, 2);
+  const latestPost = publishedPosts()[0];
   const areaSlug = (id: string) => areaList.find((a) => a.id === id)?.slug ?? "";
 
   const finderListings: FinderListing[] = listings.map((l) => ({
@@ -172,6 +176,37 @@ export default function HomePage() {
           </Reveal>
         </Container>
       </section>
+
+      {/* ------------------------------------------------------------ Noticeboard */}
+      {(nextEvents.length > 0 || latestPost) && (
+        <section aria-labelledby="board-title" className="border-y-[1.5px] border-ink bg-paper-2 bg-[radial-gradient(var(--line-strong)_1px,transparent_1px)] [background-size:18px_18px] py-20 sm:py-24">
+          <Container>
+            <div className="flex flex-wrap items-end justify-between gap-4">
+              <div>
+                <p className="kicker text-accent">On the noticeboard</p>
+                <h2 id="board-title" className="mt-3 text-[2.4rem] font-semibold leading-[1.08] sm:text-[3rem]">
+                  What&apos;s on <span className="scribble">locally</span>
+                </h2>
+              </div>
+              <Link href="/noticeboard" className="inline-flex items-center gap-2 font-bold hover:underline">
+                See the whole board <ArrowRight className="size-4" aria-hidden />
+              </Link>
+            </div>
+            <ul className="mt-12 grid gap-x-6 gap-y-10 lg:grid-cols-3">
+              {nextEvents.map((e, i) => (
+                <li key={e.id}>
+                  <EventTicket e={e} i={i} />
+                </li>
+              ))}
+              {latestPost && (
+                <li>
+                  <PostNote p={latestPost} i={2} />
+                </li>
+              )}
+            </ul>
+          </Container>
+        </section>
+      )}
 
       {/* ------------------------------------------------------------ Trust */}
       <section aria-labelledby="trust-title" className="border-y-[1.5px] border-ink bg-[#1d1b16] py-20 text-[#f1ebdd] sm:py-24">

@@ -6,6 +6,7 @@ import { childPages, getPageAnyStatus, getSettings, listingsForTopics, published
 import { Container, Disclaimer } from "./bits";
 import { sectionClass } from "@/components/art/Landmarks";
 import { PageHero } from "./PageHero";
+import { Accordions } from "./Accordions";
 import { Stagger } from "@/components/fx/motion";
 import { ListingCard } from "./ListingCard";
 import { ResourceCard } from "./ResourceCard";
@@ -63,6 +64,7 @@ export function PageView({ page, preview = false }: { page: Page; preview?: bool
       <Container className="grid gap-12 pt-12 lg:grid-cols-[minmax(0,1fr)_18rem] lg:gap-16">
         <div className="min-w-0">
           {html.trim() && <div className="prose-h" dangerouslySetInnerHTML={{ __html: html }} />}
+          <Accordions sections={page.sections ?? []} />
           {page.slug === "contact" && (
             <div className="mt-10 max-w-2xl">
               <ContactForm />

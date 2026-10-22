@@ -29,7 +29,7 @@ describe("AI helper answers", () => {
     if (r.kind === "funeral") expect(r.url).toBe(readDb().settings.funeralCompanionUrl);
   });
 
-  it.each(["What is the best pizza in Romford?", "football scores today", "weather tomorrow"])("says it can't find off-topic questions: %j", async (q) => {
+  it.each(["What is the best pizza in Romford?", "football scores today", "train times to London Bridge"])("says it can't find off-topic questions: %j", async (q) => {
     expect((await answer(q)).kind).toBe("not_found");
   });
 });

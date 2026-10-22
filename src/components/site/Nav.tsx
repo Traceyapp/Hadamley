@@ -4,7 +4,6 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ArrowRight, ChevronDown, ExternalLink, Menu, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import { createPortal } from "react-dom";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import type { NavItem } from "@/lib/repo";
 
@@ -151,17 +150,31 @@ export function MobileNav({ items, funeralUrl }: { items: NavItem[]; funeralUrl:
   const reduce = useReducedMotion();
   const path = usePathname();
   useEffect(() => setOpen(false), [path]);
+  const dialogRef = useRef<HTMLDialogElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
   useEffect(() => {
-    document.body.style.overflow = open ? "hidden" : "";
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
-    document.addEventListener("keydown", onKey);
+    const dialog = dialogRef.current;
+    if (!dialog) return;
+    if (!open) {
+      if (dialog.open) dialog.close();
+      return;
+    }
+    dialog.showModal();
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const desktop = window.matchMedia("(min-width: 1280px)");
+    const onResize = () => { if (desktop.matches) setOpen(false); };
+    desktop.addEventListener("change", onResize);
     return () => {
-      document.body.style.overflow = "";
-      document.removeEventListener("keydown", onKey);
+      desktop.removeEventListener("change", onResize);
+      document.body.style.overflow = previousOverflow;
+      dialog.close();
+      if (triggerRef.current?.getClientRects().length) triggerRef.current.focus();
     };
   }, [open]);
 
   const extra = [
+    { label: "Noticeboard: news and events", href: "/noticeboard" },
     { label: "About Hadamley", href: "/about" },
     { label: "Contact", href: "/contact" },
   ];
@@ -170,6 +183,7 @@ export function MobileNav({ items, funeralUrl }: { items: NavItem[]; funeralUrl:
     <div className="xl:hidden">
       <button
         type="button"
+        ref={triggerRef}
         onClick={() => setOpen(true)}
         aria-expanded={open}
         aria-controls="mobile-menu"
@@ -178,20 +192,33 @@ export function MobileNav({ items, funeralUrl }: { items: NavItem[]; funeralUrl:
         <Menu className="size-5" aria-hidden />
         <span className="sr-only sm:not-sr-only">Menu</span>
       </button>
-      {typeof document !== "undefined" &&
-        createPortal(
-      <AnimatePresence>
+      <dialog
+        ref={dialogRef}
+        id="mobile-menu"
+        aria-label="Site menu"
+        onKeyDown={(event) => {
+          if (event.key !== "Tab") return;
+          const items = Array.from(event.currentTarget.querySelectorAll<HTMLElement>('a[href], button:not([disabled]), [tabindex="0"]'));
+          const first = items[0];
+          const last = items[items.length - 1];
+          if (event.shiftKey && document.activeElement === first) {
+            event.preventDefault();
+            last?.focus();
+          } else if (!event.shiftKey && document.activeElement === last) {
+            event.preventDefault();
+            first?.focus();
+          }
+        }}
+        onCancel={() => setOpen(false)}
+        onClose={() => setOpen(false)}
+        className="fixed inset-0 m-0 h-dvh max-h-none w-full max-w-none overflow-hidden border-0 bg-paper p-0 text-ink backdrop:bg-paper"
+      >
         {open && (
           <motion.div
-            id="mobile-menu"
-            role="dialog"
-            aria-modal="true"
-            aria-label="Site menu"
-            className="fixed inset-0 z-50 flex flex-col overflow-hidden bg-paper"
-            initial={reduce ? false : { opacity: 0, clipPath: "circle(0% at 92% 4%)" }}
-            animate={{ opacity: 1, clipPath: "circle(150% at 92% 4%)" }}
-            exit={reduce ? undefined : { opacity: 0, clipPath: "circle(0% at 92% 4%)" }}
-            transition={{ duration: 0.55, ease: [0.21, 0.7, 0.2, 1] }}
+            className="flex h-full flex-col"
+            initial={reduce ? false : { opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: reduce ? 0 : 0.22, ease: [0.21, 0.7, 0.2, 1] }}
           >
             <div className="relative z-10 flex items-center justify-between border-b border-line px-4 py-3">
               <span className="font-display text-2xl font-semibold">Menu</span>
@@ -207,9 +234,9 @@ export function MobileNav({ items, funeralUrl }: { items: NavItem[]; funeralUrl:
             <nav aria-label="Main" className="relative z-10 flex-1 overflow-y-auto px-4 py-5">
               <motion.ul
                 className="space-y-3"
-                initial="hidden"
+                initial={reduce ? false : "hidden"}
                 animate="show"
-                variants={{ hidden: {}, show: { transition: { staggerChildren: reduce ? 0 : 0.05, delayChildren: reduce ? 0 : 0.15 } } }}
+                variants={{ hidden: {}, show: { transition: { staggerChildren: reduce ? 0 : 0.025, delayChildren: 0 } } }}
               >
                 {items.map((item) => (
                   <motion.li
@@ -255,9 +282,7 @@ export function MobileNav({ items, funeralUrl }: { items: NavItem[]; funeralUrl:
             </nav>
           </motion.div>
         )}
-      </AnimatePresence>,
-          document.body,
-        )}
+      </dialog>
     </div>
   );
 }

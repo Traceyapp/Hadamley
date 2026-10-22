@@ -10,7 +10,7 @@ import { cleanBody } from "@/lib/sanitize";
 import { buildAllChunks, reindexRecord } from "@/lib/ai/chunks";
 import { clientKey, rateLimit } from "@/lib/ratelimit";
 import { headers } from "next/headers";
-import type { Delivery, Listing, ListingStatus, Page, ProviderType, ResourceKind, Template, TriState } from "@/lib/types";
+import type { Delivery, Listing, ListingStatus, Page, PageSection, ProviderType, ResourceKind, Template, TriState } from "@/lib/types";
 
 export type ActionState = { ok: boolean; message: string; id?: string } | null;
 
@@ -47,6 +47,26 @@ export async function logout() {
 
 const SLUG_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*(?:\/[a-z0-9]+(?:-[a-z0-9]+)*)*$/;
 const isReserved = (slug: string) => /^(admin|api|files)(\/|$)|^find-support\//.test(slug);
+
+/** Reads accordion sections from the editor's JSON, cleaning every field. */
+function parseSections(raw: FormDataEntryValue | null, fallback: PageSection[]): PageSection[] {
+  if (typeof raw !== "string") return fallback;
+  try {
+    const arr = JSON.parse(raw);
+    if (!Array.isArray(arr)) return fallback;
+    return arr
+      .slice(0, 40)
+      .map((s) => ({
+        id: /^[a-z0-9-]{1,40}$/i.test(String(s?.id)) ? String(s.id) : `s-${uid()}`,
+        heading: String(s?.heading ?? "").trim().slice(0, 200),
+        body: cleanBody(String(s?.body ?? "")),
+        resourceIds: Array.isArray(s?.resourceIds) ? s.resourceIds.map(String).slice(0, 20) : [],
+      }))
+      .filter((s) => s.heading);
+  } catch {
+    return fallback;
+  }
+}
 
 export async function savePage(_prev: ActionState, form: FormData): Promise<ActionState> {
   const user = await requireAdmin();
@@ -85,6 +105,7 @@ export async function savePage(_prev: ActionState, form: FormData): Promise<Acti
     summary: str(form, "summary", 400),
     body: cleanBody(String(form.get("body") ?? "")),
     listingTopics: list(form, "listingTopics"),
+    sections: parseSections(form.get("sections"), existing?.sections ?? []),
     status,
     updatedAt: nowIso(),
     updatedBy: user.name,
@@ -470,4 +491,101 @@ export async function removeAdmin(form: FormData) {
     d.admins = d.admins.filter((a) => a.email !== email || a.role === "owner");
   });
   revalidatePath("/admin/settings");
+}
+
+/* ------------------------------------------------------------- noticeboard */
+
+const LOCAL_DT = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/;
+
+function uniqueSlug(base: string, taken: string[], own?: string) {
+  let slug = base || "item";
+  let n = 2;
+  while (taken.includes(slug) && slug !== own) slug = `${base}-${n++}`;
+  return slug;
+}
+
+export async function savePost(_prev: ActionState, form: FormData): Promise<ActionState> {
+  await requireAdmin();
+  const id = str(form, "id");
+  const intent = str(form, "intent");
+  const title = str(form, "title", 200);
+  if (!title) return { ok: false, message: "Please give the post a title." };
+  const db = readDb();
+  const existing = db.posts.find((p) => p.id === id);
+  const status = intent === "publish" ? "published" : intent === "unpublish" ? "draft" : existing?.status ?? "draft";
+  const next = {
+    id: existing?.id ?? uid("post-"),
+    slug: existing?.slug ?? uniqueSlug(slugify(title), db.posts.map((p) => p.slug)),
+    title,
+    summary: str(form, "summary", 400),
+    body: cleanBody(String(form.get("body") ?? "")),
+    status: status as "draft" | "published",
+    publishedAt: str(form, "publishedAt") || existing?.publishedAt || new Date().toISOString().slice(0, 10),
+    updatedAt: nowIso(),
+  };
+  mutate((d) => {
+    const i = d.posts.findIndex((p) => p.id === next.id);
+    if (i >= 0) d.posts[i] = next;
+    else d.posts.unshift(next);
+    reindexRecord(d, "post", next.id);
+  });
+  refreshSite();
+  const msg = intent === "publish" ? "Post published on the noticeboard." : intent === "unpublish" ? "Post taken down." : "Draft saved.";
+  if (!existing) redirect(`/admin/noticeboard/posts/${next.id}?saved=${encodeURIComponent(msg)}`);
+  return { ok: true, message: msg, id: next.id };
+}
+
+export async function saveEvent(_prev: ActionState, form: FormData): Promise<ActionState> {
+  await requireAdmin();
+  const id = str(form, "id");
+  const intent = str(form, "intent");
+  const title = str(form, "title", 200);
+  const startsAt = str(form, "startsAt");
+  const endsAt = str(form, "endsAt");
+  if (!title) return { ok: false, message: "Please give the event a title." };
+  if (!LOCAL_DT.test(startsAt)) return { ok: false, message: "Please choose a start date and time." };
+  if (endsAt && (!LOCAL_DT.test(endsAt) || endsAt < startsAt)) return { ok: false, message: "The end time must be after the start time." };
+  const bookingUrl = str(form, "bookingUrl", 500);
+  if (bookingUrl && !/^https?:\/\//.test(bookingUrl)) return { ok: false, message: "The booking link must start with https://" };
+  const db = readDb();
+  const existing = db.events.find((e) => e.id === id);
+  const status = intent === "publish" ? "published" : intent === "unpublish" ? "draft" : existing?.status ?? "draft";
+  const next = {
+    id: existing?.id ?? uid("event-"),
+    slug: existing?.slug ?? uniqueSlug(slugify(title), db.events.map((e) => e.slug)),
+    title,
+    summary: str(form, "summary", 400),
+    body: cleanBody(String(form.get("body") ?? "")),
+    startsAt,
+    endsAt,
+    location: str(form, "location", 200),
+    online: form.get("online") === "on",
+    cost: str(form, "cost", 100),
+    bookingUrl,
+    status: status as "draft" | "published",
+    updatedAt: nowIso(),
+  };
+  mutate((d) => {
+    const i = d.events.findIndex((e) => e.id === next.id);
+    if (i >= 0) d.events[i] = next;
+    else d.events.unshift(next);
+    reindexRecord(d, "event", next.id);
+  });
+  refreshSite();
+  const msg = intent === "publish" ? "Event pinned to the noticeboard." : intent === "unpublish" ? "Event taken down." : "Draft saved.";
+  if (!existing) redirect(`/admin/noticeboard/events/${next.id}?saved=${encodeURIComponent(msg)}`);
+  return { ok: true, message: msg, id: next.id };
+}
+
+export async function deleteNotice(form: FormData) {
+  await requireAdmin();
+  const id = str(form, "id");
+  const kind = str(form, "kind") === "event" ? "event" : "post";
+  mutate((d) => {
+    if (kind === "event") d.events = d.events.filter((e) => e.id !== id);
+    else d.posts = d.posts.filter((p) => p.id !== id);
+    d.chunks = d.chunks.filter((c) => !(c.sourceType === kind && c.sourceId === id));
+  });
+  refreshSite();
+  redirect("/admin/noticeboard?saved=Removed+from+the+noticeboard");
 }

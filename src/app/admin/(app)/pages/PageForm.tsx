@@ -6,6 +6,7 @@ import { useActionState } from "react";
 import { savePage, type ActionState } from "../../actions";
 import type { Page, Taxon } from "@/lib/types";
 import { RichTextEditor } from "@/components/admin/RichTextEditor";
+import { SectionsEditor } from "@/components/admin/SectionsEditor";
 import { ActionMessage, SubmitButton } from "@/components/admin/client";
 import { btn, Card, CheckGroup, Field, input, PageStatusBadge } from "@/components/admin/ui";
 
@@ -14,7 +15,7 @@ const TEMPLATES = [
   { value: "section", label: "Section landing", hint: "Shows its child pages as cards" },
 ];
 
-export function PageForm({ page, parents, topics, flash }: { page?: Page; parents: { id: string; title: string }[]; topics: Taxon[]; flash?: string }) {
+export function PageForm({ page, parents, topics, resources = [], flash }: { page?: Page; parents: { id: string; title: string }[]; topics: Taxon[]; resources?: { id: string; title: string }[]; flash?: string }) {
   const [state, action] = useActionState<ActionState, FormData>(savePage, flash ? { ok: true, message: flash } : null);
   const isHome = page?.template === "home";
   const isSpecial = page && ["home", "directory", "resources"].includes(page.template);
@@ -42,6 +43,12 @@ export function PageForm({ page, parents, topics, flash }: { page?: Page; parent
           <RichTextEditor name="body" initial={page?.body ?? ""} labelId="body-label" />
           <p className="mt-2 text-sm text-ink-2">Use headings to break the page into sections. Each heading appears in the &ldquo;On this page&rdquo; menu.</p>
         </div>
+
+        {!isSpecial && (
+          <Card title="Fold-out sections" description="Accordion sections shown after the main content. Visitors can open them one at a time, link to them, or print them.">
+            <SectionsEditor initial={page?.sections ?? []} resources={resources} />
+          </Card>
+        )}
 
         {!isSpecial && (
           <Card title="Embedded listings" description="Approved listings with any of these topics appear at the bottom of the page.">

@@ -127,9 +127,11 @@ export function HelperWidget() {
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const launcherRef = useRef<HTMLButtonElement>(null);
   const reduce = useReducedMotion();
+  const returnFocusRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
     const onOpen = (e: Event) => {
+      returnFocusRef.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
       setOpen(true);
       const q = (e as CustomEvent<string | undefined>).detail;
       if (q) setTimeout(() => send(q), 50);
@@ -144,8 +146,8 @@ export function HelperWidget() {
   }, [open]);
 
   useEffect(() => {
-    listRef.current?.scrollTo({ top: listRef.current.scrollHeight, behavior: "smooth" });
-  }, [msgs, busy]);
+    listRef.current?.scrollTo({ top: listRef.current.scrollHeight, behavior: reduce ? "instant" : "smooth" });
+  }, [msgs, busy, reduce]);
 
   const send = useCallback(
     async (text: string) => {
@@ -176,7 +178,11 @@ export function HelperWidget() {
 
   function close() {
     setOpen(false);
-    launcherRef.current?.focus();
+    requestAnimationFrame(() => {
+      const target = returnFocusRef.current;
+      if (target?.isConnected && target.getClientRects().length) target.focus();
+      else launcherRef.current?.focus();
+    });
   }
 
   return (
@@ -186,14 +192,17 @@ export function HelperWidget() {
           <motion.button
             ref={launcherRef}
             type="button"
-            onClick={() => setOpen(true)}
-            initial={reduce ? false : { opacity: 0, scale: 0.6, y: 20 }}
+            onClick={() => {
+              returnFocusRef.current = launcherRef.current;
+              setOpen(true);
+            }}
+            initial={reduce ? false : { opacity: 0, scale: 0.96, y: 8 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={reduce ? undefined : { opacity: 0, scale: 0.6 }}
+            exit={reduce ? undefined : { opacity: 0, scale: 0.96 }}
             whileHover={reduce ? undefined : { y: -3 }}
             whileTap={reduce ? undefined : { scale: 0.96 }}
             transition={{ type: "spring", stiffness: 380, damping: 26 }}
-            className="fixed bottom-4 right-4 z-40 inline-flex min-h-14 items-center gap-2.5 rounded-full border-[1.5px] border-ink bg-ink py-3 pl-3 pr-5 font-bold text-paper shadow-[4px_4px_0_0_var(--accent)] sm:bottom-6 sm:right-6"
+            className="fixed bottom-4 right-4 z-40 hidden min-h-14 items-center gap-2.5 rounded-full border-[1.5px] border-ink bg-ink py-3 pl-3 pr-5 font-bold text-paper shadow-[4px_4px_0_0_var(--accent)] sm:bottom-6 sm:right-6 sm:inline-flex"
             aria-haspopup="dialog"
           >
             <span className="grid size-9 place-items-center rounded-full bg-paper text-ink">
@@ -215,7 +224,7 @@ export function HelperWidget() {
           exit={reduce ? undefined : { opacity: 0, scale: 0.9, y: 30, filter: "blur(6px)" }}
           transition={{ type: "spring", stiffness: 300, damping: 28 }}
           style={{ transformOrigin: "bottom right" }}
-          className="card-print fixed inset-x-2 bottom-2 top-16 z-50 flex flex-col overflow-hidden !bg-paper sm:inset-auto sm:bottom-6 sm:right-6 sm:top-auto sm:h-[min(44rem,calc(100dvh-7rem))] sm:w-[27rem]"
+          className="card-print fixed inset-x-2 bottom-2 top-16 z-50 flex flex-col overflow-hidden !bg-paper sm:inset-auto sm:bottom-6 sm:right-6 sm:inline-flex sm:top-auto sm:h-[min(44rem,calc(100dvh-7rem))] sm:w-[27rem]"
         >
           <div className="flex items-start justify-between gap-3 border-b-[1.5px] border-ink bg-sand px-5 py-4 text-ink">
             <div>

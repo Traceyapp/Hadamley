@@ -8,7 +8,7 @@ export type ChatTurn = { role: "user" | "assistant"; content: string };
 export interface Source {
   title: string;
   url: string;
-  type: "page" | "listing";
+  type: "page" | "listing" | "post" | "event";
 }
 
 export type HelperReply =

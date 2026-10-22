@@ -1,4 +1,5 @@
-import type { AiChunk, Database, Listing, Page } from "../types";
+import type { AiChunk, Database, Listing, NoticeEvent, Page, Post } from "../types";
+import { htmlToText } from "../html";
 import { DELIVERY_LABEL, PROVIDER_LABEL } from "../types";
 import { splitSections } from "../html";
 import { formatDate } from "../format";
@@ -30,6 +31,17 @@ export function pageChunks(page: Page): AiChunk[] {
       updatedAt: now,
     });
   });
+  for (const sec of page.sections ?? []) {
+    chunks.push({
+      id: `page:${page.id}:s:${sec.id}`,
+      sourceType: "page",
+      sourceId: page.id,
+      title: `${page.title}: ${sec.heading}`,
+      url: `${url}#${sec.id}`,
+      text: `${sec.heading}\n${htmlToText(sec.body)}`,
+      updatedAt: now,
+    });
+  }
   if (chunks.length === 0 && page.summary) {
     chunks.push({ id: `page:${page.id}:0`, sourceType: "page", sourceId: page.id, title: page.title, url, text: page.summary, updatedAt: now });
   }
@@ -76,7 +88,37 @@ export function listingChunk(l: Listing, db: Database): AiChunk[] {
   ];
 }
 
-export function chunksFor(db: Database, type: "page" | "listing", id: string): AiChunk[] {
+export function postChunks(p: Post): AiChunk[] {
+  if (p.status !== "published") return [];
+  return [{ id: `post:${p.id}`, sourceType: "post", sourceId: p.id, title: p.title, url: `/noticeboard/news/${p.slug}`, text: `${p.summary}\n${htmlToText(p.body)}`, updatedAt: new Date().toISOString() }];
+}
+
+/** Upcoming published events only: past events are dropped from the helper. */
+export function eventChunks(e: NoticeEvent, now = new Date()): AiChunk[] {
+  if (e.status !== "published" || new Date(e.endsAt || e.startsAt) < now) return [];
+  const when = new Date(e.startsAt).toLocaleString("en-GB", { weekday: "long", day: "numeric", month: "long", hour: "numeric", minute: "2-digit" });
+  return [
+    {
+      id: `event:${e.id}`,
+      sourceType: "event",
+      sourceId: e.id,
+      title: e.title,
+      url: `/noticeboard/events/${e.slug}`,
+      text: [`Event: ${e.title}`, e.summary, `When: ${when}`, `Where: ${e.location}`, e.cost && `Cost: ${e.cost}`, htmlToText(e.body)].filter(Boolean).join("\n"),
+      updatedAt: now.toISOString(),
+    },
+  ];
+}
+
+export function chunksFor(db: Database, type: AiChunk["sourceType"], id: string): AiChunk[] {
+  if (type === "post") {
+    const p = db.posts.find((x) => x.id === id);
+    return p ? postChunks(p) : [];
+  }
+  if (type === "event") {
+    const e = db.events.find((x) => x.id === id);
+    return e ? eventChunks(e) : [];
+  }
   if (type === "page") {
     const p = db.pages.find((x) => x.id === id);
     return p ? pageChunks(p) : [];
@@ -89,11 +131,13 @@ export function buildAllChunks(db: Database): AiChunk[] {
   return [
     ...db.pages.flatMap((p) => pageChunks(p)),
     ...db.listings.flatMap((l) => listingChunk(l, db)),
+    ...(db.posts ?? []).flatMap(postChunks),
+    ...(db.events ?? []).flatMap((e) => eventChunks(e)),
   ];
 }
 
 /** Replace one record's chunks in place. Removes them if it is no longer public. */
-export function reindexRecord(db: Database, type: "page" | "listing", id: string) {
+export function reindexRecord(db: Database, type: AiChunk["sourceType"], id: string) {
   db.chunks = db.chunks.filter((c) => !(c.sourceType === type && c.sourceId === id));
   db.chunks.push(...chunksFor(db, type, id));
   db.settings.aiLastIndexedAt = new Date().toISOString();
