@@ -123,6 +123,31 @@ function Bus({ x, y = 210, animate = true }: { x: number; y?: number; animate?: 
   );
 }
 
+function BusStop({ x, y = 210 }: { x: number; y?: number }) {
+  // A London bus stop: glass shelter with a canopy, bench and timetable, and a roundel flag on a pole.
+  // Drawn behind the bus at its stop, so the shelter shows whenever the bus is away.
+  return (
+    <g transform={`translate(${x} ${y})`}>
+      {/* Shelter */}
+      <rect className="riso" x="22" y="-78" width="124" height="62" fill={C.lake} transform="translate(5 5)" />
+      <rect className="ln-thin fill-paper" x="22" y="-78" width="124" height="62" />
+      <path className="ln-thin" d="M36 -72 L52 -24 M62 -72 L78 -24 M96 -72 L104 -50" />
+      <rect className="ln-thin win" x="114" y="-66" width="22" height="30" />
+      <path className="ln-thin" d="M118 -58 h14 M118 -52 h14 M118 -46 h10" />
+      <path className="ln" d="M38 -28 H102 M44 -28 V-14 M96 -28 V-14" />
+      <path className="ln" d="M18 0 V-86 M150 0 V-86" />
+      <rect className="riso" x="10" y="-94" width="148" height="9" fill={C.navy} transform="translate(4 4)" />
+      <rect className="ln fill-paper" x="10" y="-94" width="148" height="9" rx="2" />
+      {/* Bus stop flag */}
+      <path className="ln" d="M-16 0 V-112" />
+      <circle cx="-16" cy="-102" r="9.5" fill="none" stroke="var(--sec-mob)" strokeWidth="3.5" />
+      <rect x="-29" y="-105" width="26" height="6" rx="1" fill="var(--sec-find)" />
+      <rect className="ln-thin fill-paper" x="-24" y="-88" width="16" height="9" rx="1" />
+      <path className="ln-thin" d="M-21 -84 h10" />
+    </g>
+  );
+}
+
 function Spire({ x, y = 210 }: { x: number; y?: number }) {
   // St Edward the Confessor, Romford Market Place.
   return (
@@ -278,6 +303,7 @@ export function Skyline({
         <Spire x={818} />
       </g>
       <g className={on("bus")} style={d(0.8)}>
+        <BusStop x={860} />
         <Bus x={860} animate={animate} />
       </g>
       <g className={on("brentwood")} style={d(0.95)}>
