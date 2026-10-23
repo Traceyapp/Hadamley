@@ -3,8 +3,9 @@ import type { Database, NoticeEvent, Post } from "./types";
 /**
  * Brings older data files up to date. Version 2 adds accordion sections,
  * news posts and events (with sample content so the noticeboard isn't empty).
+ * Version 3 adds the cookie notice page.
  */
-export const DB_VERSION = 2;
+export const DB_VERSION = 3;
 
 const T = "2026-10-20T09:00:00.000Z";
 
@@ -97,6 +98,29 @@ export function migrate(db: Database): boolean {
       ];
     }
     db.version = 2;
+    changed = true;
+  }
+  if ((db.version ?? 1) < 3) {
+    if (!db.pages.some((p) => p.slug === "cookies")) {
+      db.pages.push({
+        id: "p-cookies",
+        slug: "cookies",
+        title: "Cookies",
+        template: "information",
+        section: "cookies",
+        parentId: null,
+        navOrder: 10,
+        showInNav: false,
+        summary: "The small files this website stores on your device, and why.",
+        body: `<h2>Summary</h2><p>Hadamley uses only the cookies and storage needed to make the website work. We do not use advertising, tracking or analytics cookies, so we don't ask you to accept them.</p><h2>What we store</h2><ul><li><strong>Your text size and theme choice</strong> are saved in your browser so the site looks the way you set it next time. They never leave your device.</li><li><strong>An admin sign-in cookie</strong> is set only for people who manage the website, and only after they sign in.</li></ul><h2>The Hadamley helper</h2><p>The helper does not use cookies. Your questions are not linked to you.</p><h2>Changing your mind</h2><p>You can clear these at any time in your browser settings. The website still works without them; it just won't remember your text size or theme.</p><p><em>[Draft for Tracey to approve.]</em></p>`,
+        listingTopics: [],
+        sections: [],
+        status: "published",
+        updatedAt: new Date().toISOString(),
+        updatedBy: "Seed content",
+      });
+    }
+    db.version = 3;
     changed = true;
   }
   return changed;

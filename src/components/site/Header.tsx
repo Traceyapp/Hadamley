@@ -6,6 +6,7 @@ import { DesktopNav, HeaderShell, MobileNav } from "./Nav";
 import { TextSizeControl } from "./TextSize";
 import { ThemeToggle } from "./ThemeToggle";
 import { UrgentHelpButton } from "./UrgentHelp";
+import { SearchPanel } from "./SearchPanel";
 
 export function Header() {
   const items = navigation();
@@ -37,14 +38,18 @@ export function Header() {
           <Logo />
           <DesktopNav items={items} />
           <div className="flex items-center gap-2">
+            <SearchPanel />
             <UrgentHelpButton />
             <MobileNav items={items} funeralUrl={funeralCompanionUrl} />
           </div>
         </div>
-        <AskButton className="flex min-h-11 w-full items-center justify-center gap-2 border-t border-line bg-surface px-4 text-sm font-bold text-brand sm:hidden">
-          <MessageCircleQuestion className="size-4" aria-hidden /> Ask Hadamley
-          <ArrowRight className="size-4" aria-hidden />
-        </AskButton>
+        <div className="flex divide-x divide-line border-t border-line bg-surface sm:hidden">
+          <SearchPanel variant="bar" />
+          <AskButton className="flex min-h-11 flex-1 items-center justify-center gap-2 px-4 text-sm font-bold text-brand">
+            <MessageCircleQuestion className="size-4" aria-hidden /> Ask Hadamley
+            <ArrowRight className="size-4" aria-hidden />
+          </AskButton>
+        </div>
       </HeaderShell>
     </>
   );

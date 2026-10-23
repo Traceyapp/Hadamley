@@ -6,6 +6,7 @@ import { removeAdmin } from "../../actions";
 import { AdminHeader, btn, Card } from "@/components/admin/ui";
 import { ConfirmButton } from "@/components/admin/client";
 import { SettingsForm } from "./SettingsForm";
+import { AccountForm } from "./AccountForm";
 
 export const metadata = { title: "Settings" };
 
@@ -16,9 +17,14 @@ export default async function SettingsPage() {
     <>
       <AdminHeader title="Settings" />
       <div className="grid gap-6 lg:grid-cols-2">
+        <div className="space-y-6">
+        <Card title="Your account" description="Change your name, login email or password.">
+          <AccountForm name={me.name} email={me.email} />
+        </Card>
         <Card title="Site settings">
           <SettingsForm funeralUrl={db.settings.funeralCompanionUrl} keepQuestions={db.settings.keepAnonymisedQuestions} />
         </Card>
+        </div>
         <div className="space-y-6">
           <Card title="Admin accounts" description="The owner can remove the developer support account at any time." aside={<ShieldCheck className="size-5 text-brand" aria-hidden />}>
             <ul className="divide-y divide-line">
@@ -44,10 +50,15 @@ export default async function SettingsPage() {
               ))}
             </ul>
           </Card>
-          <Card title="Export content" description="Download every page, listing, topic and download record as one file, for backup or moving hosts.">
-            <a href="/admin/export" className={btn.secondary}>
-              <Download className="size-4" aria-hidden /> Download content export
-            </a>
+          <Card title="Export content" description="A full copy of the website: every page, listing, post, event and setting, plus all uploaded files. Keep it as a backup or use it to move hosts.">
+            <div className="flex flex-wrap gap-2">
+              <a href="/admin/export?format=zip" className={btn.secondary}>
+                <Download className="size-4" aria-hidden /> Download everything (.zip)
+              </a>
+              <a href="/admin/export" className={btn.ghost}>
+                Content only (.json)
+              </a>
+            </div>
           </Card>
         </div>
       </div>

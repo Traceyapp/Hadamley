@@ -24,7 +24,7 @@ export function PageView({ page, preview = false }: { page: Page; preview?: bool
   const totalListings = page.listingTopics.length ? searchListings({ topic: page.listingTopics }).length : 0;
   const resources = page.listingTopics.length ? publishedResources(topicIdsForSlugs(page.listingTopics)).slice(0, 3) : [];
   const { funeralCompanionUrl } = getSettings();
-  const isLegal = ["privacy", "accessibility", "about", "contact"].includes(page.section);
+  const isLegal = ["privacy", "accessibility", "about", "contact", "cookies"].includes(page.section);
 
   const crumbs = [...(parent ? [{ label: parent.navLabel || parent.title, href: `/${parent.slug}` }] : []), { label: page.navLabel || page.title }];
   const sectionNav = parent ? siblings : kids;

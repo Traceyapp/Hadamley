@@ -5,6 +5,7 @@ import path from "node:path";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { checkCredentials, createSession, destroySession, requireAdmin } from "@/lib/auth";
+import { hashPassword, verifyPassword } from "@/lib/password";
 import { mutate, nowIso, readDb, slugify, uid, UPLOAD_DIR } from "@/lib/db";
 import { cleanBody } from "@/lib/sanitize";
 import { buildAllChunks, reindexRecord } from "@/lib/ai/chunks";
@@ -273,9 +274,10 @@ export async function saveResource(_prev: ActionState, form: FormData): Promise<
 
   let fileMeta = existing ? { fileName: existing.fileName, storedName: existing.storedName, mime: existing.mime, size: existing.size } : null;
   if (hasFile) {
-    const { storedName, clean } = storeFile(file);
+    const { storedName: fresh, clean } = storeFile(file);
+    // Replacing keeps the same stored name, so any link to the file keeps working.
+    const storedName = existing?.storedName ?? fresh;
     fs.writeFileSync(path.join(UPLOAD_DIR, storedName), Buffer.from(await file.arrayBuffer()));
-    if (existing) fs.rmSync(path.join(UPLOAD_DIR, existing.storedName), { force: true });
     fileMeta = { fileName: clean, storedName, mime: file.type || "application/octet-stream", size: file.size };
   }
   const newId = existing?.id ?? uid("r-");
@@ -481,6 +483,37 @@ export async function saveSettings(_prev: ActionState, form: FormData): Promise<
   });
   refreshSite();
   return { ok: true, message: "Settings saved." };
+}
+
+/** The signed-in admin updates their own name, email and password. */
+export async function updateAccount(_prev: ActionState, form: FormData): Promise<ActionState> {
+  const me = await requireAdmin();
+  const name = str(form, "name", 80);
+  const email = str(form, "email", 200).toLowerCase();
+  const current = String(form.get("current") ?? "");
+  const next = String(form.get("password") ?? "");
+  const confirm = String(form.get("confirm") ?? "");
+  if (!name) return { ok: false, message: "Please enter your name." };
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return { ok: false, message: "Please enter a valid email address." };
+  const db = readDb();
+  const user = db.admins.find((a) => a.email === me.email);
+  if (!user || !verifyPassword(current, user.passwordHash)) return { ok: false, message: "Your current password isn't right." };
+  if (email !== me.email && db.admins.some((a) => a.email === email)) return { ok: false, message: "Another admin already uses that email." };
+  if (next || confirm) {
+    if (next.length < 10) return { ok: false, message: "Choose a new password of at least 10 characters." };
+    if (next !== confirm) return { ok: false, message: "The new passwords don't match." };
+  }
+  mutate((d) => {
+    const u = d.admins.find((a) => a.email === me.email);
+    if (!u) return;
+    u.name = name;
+    u.email = email;
+    if (next) u.passwordHash = hashPassword(next);
+  });
+  // The session is tied to the email, so re-issue it if the email changed.
+  if (email !== me.email) await createSession(email);
+  revalidatePath("/admin", "layout");
+  return { ok: true, message: next ? "Account and password updated." : "Account updated." };
 }
 
 export async function removeAdmin(form: FormData) {

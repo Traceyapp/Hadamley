@@ -1,0 +1,56 @@
+import { execFileSync } from "node:child_process";
+import fs from "node:fs";
+import os from "node:os";
+import path from "node:path";
+import { describe, expect, it } from "vitest";
+import { siteSearch } from "@/lib/site-search";
+import { crc32, makeZip } from "@/lib/zip";
+import { readDb } from "@/lib/db";
+
+describe("site-wide search", () => {
+  it("finds services, guide pages and sections by partial words", () => {
+    const kinds = new Set(siteSearch("physio").map((r) => r.kind));
+    expect(kinds.has("service")).toBe(true);
+    expect(kinds.has("page")).toBe(true);
+    expect(siteSearch("HCPC").some((r) => r.url === "/physiotherapy#s-physio-private")).toBe(true);
+  });
+
+  it("finds downloads, news and upcoming events", () => {
+    expect(siteSearch("appointment checklist").some((r) => r.kind === "download")).toBe(true);
+    expect(siteSearch("winter").some((r) => r.kind === "news")).toBe(true);
+    expect(siteSearch("drop-in").some((r) => r.kind === "event")).toBe(true);
+  });
+
+  it("never returns hidden content", () => {
+    const urls = [...siteSearch("OT at Home"), ...siteSearch("Havering Talking Therapies")].map((r) => r.url);
+    expect(urls).not.toContain("/find-support/ot-at-home-practice");
+    expect(urls).not.toContain("/find-support/havering-talking-therapies");
+  });
+
+  it("needs every word to match and returns nothing for nonsense", () => {
+    expect(siteSearch("zzzz")).toHaveLength(0);
+    expect(siteSearch("physio zzzz")).toHaveLength(0);
+  });
+});
+
+describe("export zip", () => {
+  it("writes a valid zip that standard tools can read", () => {
+    const zip = makeZip([
+      { name: "content.json", data: Buffer.from('{"ok":true}') },
+      { name: "files/a.txt", data: Buffer.from("hello") },
+    ]);
+    const file = path.join(fs.mkdtempSync(path.join(os.tmpdir(), "zip-")), "t.zip");
+    fs.writeFileSync(file, zip);
+    const out = execFileSync("unzip", ["-t", file]).toString();
+    expect(out).toMatch(/No errors detected/);
+    expect(crc32(Buffer.from("hello"))).toBe(0x3610a686);
+  });
+});
+
+describe("cookie notice", () => {
+  it("is added by the data migration and published", () => {
+    const p = readDb().pages.find((x) => x.slug === "cookies");
+    expect(p?.status).toBe("published");
+    expect(readDb().version).toBeGreaterThanOrEqual(3);
+  });
+});

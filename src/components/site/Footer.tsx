@@ -44,6 +44,7 @@ export function Footer() {
                   ["/contact", "Contact"],
                   ["/privacy", "Privacy"],
                   ["/accessibility", "Accessibility"],
+                  ["/cookies", "Cookies"],
                 ].map(([href, label]) => (
                   <li key={href}>
                     <Link href={href} className="link text-ink">
