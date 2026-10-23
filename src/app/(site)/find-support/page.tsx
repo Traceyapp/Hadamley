@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Search, X } from "lucide-react";
+import { PoundSterling, Search, X } from "lucide-react";
 import { approvedListings, areas, getPublishedPage, searchListings, topics } from "@/lib/repo";
 import type { Delivery, ProviderType } from "@/lib/types";
 import { DELIVERY_LABEL, PROVIDER_LABEL } from "@/lib/types";
@@ -171,7 +171,10 @@ export default async function FindSupportPage({ searchParams }: { searchParams: 
                 </Link>
               </div>
             )}
-            <Disclaimer className="mt-10" />
+            <p className="mt-10 flex items-start gap-2.5 text-[0.95rem] text-ink-2">
+              <PoundSterling className="mt-0.5 size-4 shrink-0" aria-hidden /> Hadamley is free to use. Services run by other organisations may have their own charges, so please check costs with them.
+            </p>
+            <Disclaimer className="mt-4" />
           </section>
         </Container>
       </AutoSubmitForm>

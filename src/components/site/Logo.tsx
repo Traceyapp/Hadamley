@@ -24,13 +24,13 @@ export function LogoMark({ className = "size-10" }: { className?: string }) {
 
 export function Logo() {
   return (
-    <Link href="/" className="group inline-flex shrink-0 items-center gap-2 rounded-lg no-underline sm:gap-3" aria-label="Hadamley, go to homepage">
+    <Link href="/" className="group inline-flex shrink-0 items-center gap-2 rounded-lg no-underline sm:gap-3" aria-label="Hadamley Information Services, go to homepage">
       <span className="relative max-[359px]:hidden">
         <LogoMark className="relative size-9 transition-transform duration-500 group-hover:-rotate-6 sm:size-11" />
       </span>
       <span className="flex flex-col leading-none">
         <span className="font-display text-[1.3rem] font-semibold tracking-tight text-ink sm:text-[1.65rem]">Hadamley</span>
-        <span className="mt-1 hidden text-[0.72rem] font-bold uppercase tracking-[0.14em] text-ink-2 sm:block">Local support, clearly</span>
+        <span className="mt-1 hidden text-[0.72rem] font-bold uppercase tracking-[0.14em] text-ink-2 sm:block">Information Services</span>
       </span>
     </Link>
   );

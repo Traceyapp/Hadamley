@@ -3,6 +3,7 @@
 import { headers } from "next/headers";
 import { mutate, nowIso, readDb, uid } from "@/lib/db";
 import { clientKey, rateLimit } from "@/lib/ratelimit";
+import type { ContactTopic } from "@/lib/types";
 
 export type FormState = { ok: boolean; message: string } | null;
 
@@ -36,6 +37,8 @@ export async function sendContact(_prev: FormState, form: FormData): Promise<For
   const name = String(form.get("name") ?? "").trim().slice(0, 120);
   const email = String(form.get("email") ?? "").trim().slice(0, 200);
   const message = String(form.get("message") ?? "").trim().slice(0, 4000);
+  const rawTopic = String(form.get("topic") ?? "general");
+  const topic: ContactTopic = rawTopic === "resource" || rawTopic === "link" ? rawTopic : "general";
   if (!message || message.length < 5) return { ok: false, message: "Please write a message." };
   if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return { ok: false, message: "Please check your email address." };
   if (!rateLimit(clientKey({ headers: await headers() }, "contact"), 5, 60 * 60_000)) {
@@ -43,7 +46,7 @@ export async function sendContact(_prev: FormState, form: FormData): Promise<For
   }
   if (looksLikeSpam(form)) return { ok: true, message: "Thank you, your message has been sent." };
   mutate((db) => {
-    db.messages.unshift({ id: uid("msg-"), name, email, message, createdAt: nowIso(), handled: false });
+    db.messages.unshift({ id: uid("msg-"), topic, name, email, message, createdAt: nowIso(), handled: false });
   });
   return { ok: true, message: "Thank you, your message has been sent. We aim to reply within five working days." };
 }

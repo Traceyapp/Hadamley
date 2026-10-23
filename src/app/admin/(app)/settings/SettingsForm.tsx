@@ -5,7 +5,7 @@ import { saveSettings, type ActionState } from "../../actions";
 import { ActionMessage, SubmitButton } from "@/components/admin/client";
 import { btn, Field, input } from "@/components/admin/ui";
 
-export function SettingsForm({ funeralUrl, keepQuestions }: { funeralUrl: string; keepQuestions: boolean }) {
+export function SettingsForm({ funeralUrl, keepQuestions, contactEmail }: { funeralUrl: string; keepQuestions: boolean; contactEmail?: string }) {
   const [state, action] = useActionState<ActionState, FormData>(saveSettings, null);
   const placeholder = funeralUrl.includes("example.com");
   return (
@@ -16,6 +16,9 @@ export function SettingsForm({ funeralUrl, keepQuestions }: { funeralUrl: string
         hint={placeholder ? <strong className="text-warn">Still a placeholder. Add the real address before launch.</strong> : "Used in the header, footer, relevant pages and the AI helper redirect."}
       >
         <input id="fc" name="funeralCompanionUrl" type="url" required defaultValue={funeralUrl} className={input} />
+      </Field>
+      <Field label="Contact email" htmlFor="ce" hint="Shown on the Contact page. Leave empty to hide it.">
+        <input id="ce" name="contactEmail" type="email" defaultValue={contactEmail} className={input} />
       </Field>
       <label className="flex items-start gap-2.5 rounded-xl border border-line p-3">
         <input type="checkbox" name="keepAnonymisedQuestions" defaultChecked={keepQuestions} className="mt-1 size-[1.1rem] accent-[var(--brand)]" />

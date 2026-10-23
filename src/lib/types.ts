@@ -119,7 +119,7 @@ export interface Taxon {
   order: number;
 }
 
-export type ResourceKind = "guide" | "checklist" | "worksheet" | "leaflet";
+export type ResourceKind = "guide" | "checklist" | "worksheet" | "activity" | "leaflet";
 
 export interface Resource {
   id: string;
@@ -145,8 +145,17 @@ export interface OutdatedReport {
   handledAt: string | null;
 }
 
+export type ContactTopic = "general" | "resource" | "link";
+
+export const CONTACT_TOPIC_LABEL: Record<ContactTopic, string> = {
+  general: "General enquiry",
+  resource: "Suggest a useful resource",
+  link: "Report an incorrect or broken link",
+};
+
 export interface ContactMessage {
   id: string;
+  topic?: ContactTopic;
   name: string;
   email: string;
   message: string;
@@ -178,6 +187,8 @@ export interface Settings {
   aiLastIndexMs: number | null;
   aiSpend: { month: string; usd: number; requests: number };
   keepAnonymisedQuestions: boolean;
+  /** Public contact email shown on the Contact page. */
+  contactEmail?: string;
 }
 
 export interface Upload {
@@ -232,5 +243,6 @@ export const KIND_LABEL: Record<ResourceKind, string> = {
   guide: "Guide",
   checklist: "Checklist",
   worksheet: "Worksheet",
+  activity: "Activity",
   leaflet: "Leaflet",
 };

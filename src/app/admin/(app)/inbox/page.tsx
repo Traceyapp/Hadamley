@@ -2,18 +2,19 @@ import Link from "next/link";
 import { Check, Flag, Mail, RotateCcw, Trash2 } from "lucide-react";
 import { readDb } from "@/lib/db";
 import { formatDateTime } from "@/lib/format";
+import { CONTACT_TOPIC_LABEL } from "@/lib/types";
 import { deleteMessage, toggleMessage, toggleReport } from "../../actions";
 import { AdminHeader, btn, Card, Empty } from "@/components/admin/ui";
 import { ConfirmButton, SubmitButton } from "@/components/admin/client";
 
 export const metadata = { title: "Inbox" };
 
-export default async function InboxPage({ searchParams }: { searchParams: Promise<{ show?: string }> }) {
-  const { show } = await searchParams;
+export default async function InboxPage({ searchParams }: { searchParams: Promise<{ show?: string; topic?: string }> }) {
+  const { show, topic } = await searchParams;
   const showHandled = show === "all";
   const db = readDb();
   const reports = db.reports.filter((r) => showHandled || !r.handled);
-  const messages = db.messages.filter((m) => showHandled || !m.handled);
+  const messages = db.messages.filter((m) => showHandled || !m.handled).filter((m) => (topic ? (m.topic ?? "general") === topic : true));
 
   return (
     <>
@@ -69,6 +70,18 @@ export default async function InboxPage({ searchParams }: { searchParams: Promis
           )}
         </Card>
         <Card title="Contact messages" aside={<Mail className="size-5 text-brand" aria-hidden />}>
+          <nav aria-label="Filter messages" className="-mt-2 mb-4 flex flex-wrap gap-1.5 text-sm">
+            {[["", "All"], ...Object.entries(CONTACT_TOPIC_LABEL)].map(([k, label]) => (
+              <Link
+                key={k}
+                href={`/admin/inbox?${new URLSearchParams({ ...(showHandled ? { show: "all" } : {}), ...(k ? { topic: k } : {}) })}`}
+                aria-current={(topic ?? "") === k ? "page" : undefined}
+                className="rounded-full border border-line px-3 py-1 font-bold aria-[current=page]:border-ink aria-[current=page]:bg-ink aria-[current=page]:text-paper"
+              >
+                {label}
+              </Link>
+            ))}
+          </nav>
           {messages.length === 0 ? (
             <Empty>No new messages.</Empty>
           ) : (
@@ -76,7 +89,10 @@ export default async function InboxPage({ searchParams }: { searchParams: Promis
               {messages.map((m) => (
                 <li key={m.id} className={`rounded-xl border p-4 ${m.handled ? "border-line bg-sand opacity-75" : "border-line-strong bg-surface"}`}>
                   <div className="flex flex-wrap items-start justify-between gap-2">
-                    <span className="font-bold">{m.name || "No name given"}</span>
+                    <span className="font-bold">
+                      {m.name || "No name given"}
+                      <span className="ml-2 rounded-full bg-accent-soft px-2 py-0.5 text-xs font-bold text-accent">{CONTACT_TOPIC_LABEL[m.topic ?? "general"]}</span>
+                    </span>
                     <span className="text-xs text-ink-2">{formatDateTime(m.createdAt)}</span>
                   </div>
                   {m.email && (

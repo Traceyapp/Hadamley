@@ -2,7 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import type { Database } from "./types";
 import { buildSeed } from "./seed";
-import { migrate } from "./migrate";
+import { DB_VERSION, migrate } from "./migrate";
 import { buildAllChunks } from "./ai/chunks";
 
 /**
@@ -33,7 +33,9 @@ export function readDb(): Database {
     return db;
   }
   const mtime = fs.statSync(DB_FILE).mtimeMs;
-  if (g.__hadamleyDb && g.__hadamleyDb.mtime === mtime) return g.__hadamleyDb.db;
+  // Trust the in-memory copy only if it is already on the latest data version,
+  // so a code update that adds a migration applies it without a restart.
+  if (g.__hadamleyDb && g.__hadamleyDb.mtime === mtime && (g.__hadamleyDb.db.version ?? 1) >= DB_VERSION) return g.__hadamleyDb.db;
   const db = JSON.parse(fs.readFileSync(DB_FILE, "utf8")) as Database;
   if (migrate(db)) {
     db.chunks = buildAllChunks(db);

@@ -21,7 +21,9 @@ export function ResourceCard({ r }: { r: Resource }) {
           <span className="absolute -bottom-2 left-1.5 rounded bg-ink px-1.5 py-px text-[0.6rem] font-bold tracking-wide text-paper">{ext}</span>
         </span>
         <div className="min-w-0">
-          <p className="kicker text-sec">{KIND_LABEL[r.kind]}</p>
+          <p className="kicker text-sec">
+            {KIND_LABEL[r.kind]} <span className="text-ink-2">· Free</span>
+          </p>
           <h3 className="mt-1.5 text-[1.25rem] font-semibold leading-snug">{r.title}</h3>
         </div>
       </div>

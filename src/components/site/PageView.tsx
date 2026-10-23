@@ -23,7 +23,7 @@ export function PageView({ page, preview = false }: { page: Page; preview?: bool
   const listings = listingsForTopics(page.listingTopics, 6);
   const totalListings = page.listingTopics.length ? searchListings({ topic: page.listingTopics }).length : 0;
   const resources = page.listingTopics.length ? publishedResources(topicIdsForSlugs(page.listingTopics)).slice(0, 3) : [];
-  const { funeralCompanionUrl } = getSettings();
+  const { funeralCompanionUrl, contactEmail } = getSettings();
   const isLegal = ["privacy", "accessibility", "about", "contact", "cookies"].includes(page.section);
 
   const crumbs = [...(parent ? [{ label: parent.navLabel || parent.title, href: `/${parent.slug}` }] : []), { label: page.navLabel || page.title }];
@@ -67,6 +67,14 @@ export function PageView({ page, preview = false }: { page: Page; preview?: bool
           <Accordions sections={page.sections ?? []} />
           {page.slug === "contact" && (
             <div className="mt-10 max-w-2xl">
+              {contactEmail && (
+                <p className="mb-6 flex flex-wrap items-center gap-x-3 gap-y-1 rounded-[var(--radius-card)] border-[1.5px] border-ink bg-surface px-5 py-4">
+                  <span className="kicker text-ink-2">Email</span>
+                  <a href={`mailto:${contactEmail}`} className="font-display text-xl font-semibold underline-offset-4 hover:underline">
+                    {contactEmail}
+                  </a>
+                </p>
+              )}
               <ContactForm />
             </div>
           )}

@@ -58,8 +58,7 @@ export function Disclaimer({ className = "" }: { className?: string }) {
     <aside className={`flex gap-3 rounded-[var(--radius-card)] border-[1.5px] border-dashed border-line-strong px-5 py-4 text-[0.95rem] text-ink-2 ${className}`} aria-label="About this information">
       <Info className="mt-0.5 size-5 shrink-0 text-brand" aria-hidden />
       <p>
-        Hadamley provides information and signposting. It is not medical, legal or financial advice. Including a service does not mean we recommend it or
-        work in partnership with it. Please check details with the provider.
+        General information and signposting only. Health information does not replace advice from a qualified healthcare professional. Including a service does not mean we recommend it or work in partnership with it. Please check details with the provider.
       </p>
     </aside>
   );

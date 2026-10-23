@@ -54,3 +54,19 @@ describe("cookie notice", () => {
     expect(readDb().version).toBeGreaterThanOrEqual(3);
   });
 });
+
+describe("Tracey's wording (migration v4)", () => {
+  it("brings in her About text, founder story and contact email", () => {
+    const db = readDb();
+    const about = db.pages.find((p) => p.id === "p-about")!;
+    expect(about.body).toContain("Tracey Finch");
+    expect(about.body).toContain("About the founder");
+    expect(db.pages.find((p) => p.id === "p-contact")!.title).toBe("Contact us");
+    expect(db.settings.contactEmail).toBe("support@hadamley.com");
+    expect(db.version).toBeGreaterThanOrEqual(4);
+  });
+
+  it("indexes her About page for the helper and search", () => {
+    expect(siteSearch("founder").some((r) => r.url.startsWith("/about"))).toBe(true);
+  });
+});

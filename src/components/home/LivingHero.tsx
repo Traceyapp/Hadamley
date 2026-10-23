@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
+import Link from "next/link";
+import { ArrowRight } from "lucide-react";
 import { Container } from "@/components/site/bits";
 import { SKYLINE_PLACES, Skyline, sceneFor } from "@/components/art/Landmarks";
 import { SentenceFinder, type FinderListing } from "./SentenceFinder";
@@ -97,6 +99,14 @@ export function LivingHero({ listings, topics, areas, summary }: { listings: Fin
           <SentenceFinder listings={listings} topics={topics} areas={areas} onFocusChange={onFocusChange} scene={scene} />
         </motion.div>
         {summary && <p className="mt-6 max-w-2xl sm:mt-10 text-[1.08rem] text-ink-2">{summary}</p>}
+        <div className="mt-6 flex flex-wrap gap-3">
+          <Link href="/resources" className="card-print card-print-hover inline-flex min-h-12 items-center gap-2 rounded-full bg-ink px-5 font-bold text-paper">
+            Explore the resources <ArrowRight className="size-4" aria-hidden />
+          </Link>
+          <Link href="/about" className="inline-flex min-h-12 items-center gap-2 rounded-full border-[1.5px] border-ink bg-surface px-5 font-bold hover:bg-sand">
+            About Hadamley
+          </Link>
+        </div>
       </Container>
 
     </section>

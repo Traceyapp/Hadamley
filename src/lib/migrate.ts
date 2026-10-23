@@ -4,8 +4,10 @@ import type { Database, NoticeEvent, Post } from "./types";
  * Brings older data files up to date. Version 2 adds accordion sections,
  * news posts and events (with sample content so the noticeboard isn't empty).
  * Version 3 adds the cookie notice page.
+ * Version 4 brings in Tracey's own About and Contact wording (only where the
+ * page still holds our seed draft) and her contact email.
  */
-export const DB_VERSION = 3;
+export const DB_VERSION = 4;
 
 const T = "2026-10-20T09:00:00.000Z";
 
@@ -65,6 +67,10 @@ export const SAMPLE_EVENTS: NoticeEvent[] = [
   },
 ];
 
+const ABOUT_V4 = `<p>Hadamley Information Services was founded by Tracey Finch, drawing on personal experience of living with chronic illness and trying to find the right information and support.</p><p>Our aim is to make that search easier. We bring together information about mental health, chronic illness and everyday wellbeing, alongside free printable resources for individuals, families and professionals.</p><p>We signpost to NHS services, charities, community organisations and private providers. Our resources are free to access; services offered by other organisations may have their own charges.</p><p>Hadamley provides information and practical resources. We do not provide counselling, diagnosis or medical treatment.</p><h2>About the founder</h2><p>My name is Tracey Finch, and I founded Hadamley Information Services.</p><p>Living with chronic illness has shown me how difficult it can be to find information and support, particularly when you're tired, in pain or unsure where to start. Finding out what is available can take energy you simply haven't got.</p><p>My work on The Funeral Companion helped shape the idea for Hadamley: a place bringing together clear information, useful resources and links to support across mental health, chronic illness and everyday wellbeing.</p><p>I wanted everything on Hadamley to be free to access, including practical resources people can download and print for themselves or use when supporting others.</p><blockquote><p>I'm building Hadamley from lived experience, with the aim of making the search for information a little easier.</p><p><strong>Tracey Finch, founder</strong></p></blockquote><h2>How we check information</h2><p>Every service in our directory is checked against the provider's own published information before it appears on the site. Each listing shows the date it was last checked, and you can tell us if something has changed using the report link on any listing.</p><h2 id="funeral-companion">Bereavement and funeral support</h2><p>Information about grief, bereavement and funerals is on our sister site, The Funeral Companion.</p>`;
+
+const CONTACT_V4 = `<p>For general enquiries, to suggest a useful resource or to let us know about an incorrect or broken link, please get in touch using the form below.</p><p>This inbox is not monitored continuously. <strong>We cannot provide medical advice or urgent support.</strong> If you need help now, call NHS 111. In an emergency, call 999.</p>`;
+
 export function migrate(db: Database): boolean {
   let changed = false;
   if (!Array.isArray(db.posts)) ((db.posts = []), (changed = true));
@@ -121,6 +127,27 @@ export function migrate(db: Database): boolean {
       });
     }
     db.version = 3;
+    changed = true;
+  }
+
+  if ((db.version ?? 1) < 4) {
+    const seeded = (id: string) => db.pages.find((p) => p.id === id && p.updatedBy === "Seed content");
+    const about = seeded("p-about");
+    if (about) {
+      about.title = "About Hadamley";
+      about.summary = "Founded by Tracey Finch from lived experience, to make finding information and support a little easier.";
+      about.body = ABOUT_V4;
+    }
+    const contact = seeded("p-contact");
+    if (contact) {
+      contact.title = "Contact us";
+      contact.summary = "Get in touch with a general enquiry, to suggest a useful resource, or to report an incorrect or broken link.";
+      contact.body = CONTACT_V4;
+    }
+    const home = seeded("p-home");
+    if (home) home.summary = "Free, independent information and printable resources for mental health, chronic illness and everyday wellbeing, with local support in Havering, Romford, Brentwood and nearby.";
+    db.settings.contactEmail ??= "support@hadamley.com";
+    db.version = 4;
     changed = true;
   }
   return changed;

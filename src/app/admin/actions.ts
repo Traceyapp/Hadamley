@@ -476,9 +476,12 @@ export async function saveSettings(_prev: ActionState, form: FormData): Promise<
   await requireAdmin();
   const url = str(form, "funeralCompanionUrl", 300);
   if (!/^https?:\/\/[^\s]+$/.test(url)) return { ok: false, message: "Enter a full web address starting with https://" };
+  const contactEmail = str(form, "contactEmail", 200);
+  if (contactEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contactEmail)) return { ok: false, message: "Please check the contact email address." };
   mutate((d) => {
     d.settings.funeralCompanionUrl = url;
     d.settings.keepAnonymisedQuestions = form.get("keepAnonymisedQuestions") === "on";
+    d.settings.contactEmail = contactEmail;
     if (!d.settings.keepAnonymisedQuestions) d.questions = [];
   });
   refreshSite();

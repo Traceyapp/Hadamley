@@ -104,7 +104,12 @@ export default async function ListingPage({ params }: Props) {
                   <DeliveryList delivery={l.delivery} />
                 </Row>
               )}
-              {l.feeConfirmed && l.fees && <Row label="Cost">{l.fees}</Row>}
+              {l.feeConfirmed && l.fees && (
+                <Row label="Cost">
+                  {l.fees}
+                  <span className="mt-1 block text-[0.88rem] text-ink-2">Set by the provider. Hadamley itself is free to use.</span>
+                </Row>
+              )}
               {!l.feeConfirmed && <Row label="Cost">Please check the cost with the provider.</Row>}
               {l.accessibility && <Row label="Accessibility">{l.accessibility}</Row>}
               {isMobility && l.extras.deliveryCollection && <Row label="Delivery or collection">{l.extras.deliveryCollection}</Row>}

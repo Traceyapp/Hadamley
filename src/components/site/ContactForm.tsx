@@ -3,6 +3,7 @@
 import { useActionState } from "react";
 import { sendContact, type FormState } from "@/app/(site)/actions";
 import { FormMessage, inputCls, SpamFields } from "./forms";
+import { CONTACT_TOPIC_LABEL, type ContactTopic } from "@/lib/types";
 
 export function ContactForm() {
   const [state, action, pending] = useActionState<FormState, FormData>(sendContact, null);
@@ -11,6 +12,17 @@ export function ContactForm() {
     <form action={action} className="relative space-y-5 rounded-[var(--radius-card)] border border-line bg-surface p-6 shadow-soft sm:p-8">
       <h2 className="text-2xl font-semibold">Send us a message</h2>
       <SpamFields />
+      <fieldset>
+        <legend className="mb-2 font-bold">What&apos;s this about?</legend>
+        <div className="grid gap-2 sm:grid-cols-3">
+          {(Object.keys(CONTACT_TOPIC_LABEL) as ContactTopic[]).map((t, i) => (
+            <label key={t} className="flex min-h-12 cursor-pointer items-center gap-2.5 rounded-xl border-[1.5px] border-line-strong px-3 py-2 has-[:checked]:border-ink has-[:checked]:bg-accent-soft">
+              <input type="radio" name="topic" value={t} defaultChecked={i === 0} className="size-4 accent-[var(--accent)]" />
+              <span className="text-[0.95rem] font-bold leading-snug">{CONTACT_TOPIC_LABEL[t]}</span>
+            </label>
+          ))}
+        </div>
+      </fieldset>
       <div className="grid gap-5 sm:grid-cols-2">
         <div>
           <label htmlFor="c-name" className="mb-1.5 block font-bold">

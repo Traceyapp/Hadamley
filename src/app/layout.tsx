@@ -9,9 +9,9 @@ const display = Fraunces({ subsets: ["latin"], axes: ["SOFT", "opsz"], variable:
 const hand = Caveat({ subsets: ["latin"], weight: ["500", "700"], variable: "--font-hand", display: "swap" });
 
 export const metadata: Metadata = {
-  title: { default: "Hadamley | Local support for long term conditions", template: "%s | Hadamley" },
+  title: { default: "Hadamley Information Services | Free Independent Resources", template: "%s | Hadamley" },
   description:
-    "Clear, local information for people living with long term conditions, disability and mental health needs in Havering, Romford, Brentwood and nearby.",
+    "Free, independent information and printable resources for mental health, chronic illness and everyday wellbeing, with local support in Havering, Romford, Brentwood and nearby.",
   icons: { icon: "/icon.svg" },
 };
 

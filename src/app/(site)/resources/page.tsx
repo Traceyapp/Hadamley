@@ -38,6 +38,10 @@ export default async function ResourcesPage({ searchParams }: { searchParams: SP
         summary={page?.summary}
       />
       <Container className="pt-10">
+        <p className="mb-6 inline-flex flex-wrap items-center gap-x-3 gap-y-1 rounded-full border-[1.5px] border-ink bg-surface px-4 py-2 font-bold">
+          <span className="sec-res text-sec">Free to download and print</span>
+          <span className="font-normal text-ink-2">For individuals, families and professionals</span>
+        </p>
         <nav aria-label="Filter resources" className="space-y-3">
           <ul className="flex flex-wrap gap-2">
             <li>

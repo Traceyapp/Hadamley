@@ -22,7 +22,7 @@ export default async function SettingsPage() {
           <AccountForm name={me.name} email={me.email} />
         </Card>
         <Card title="Site settings">
-          <SettingsForm funeralUrl={db.settings.funeralCompanionUrl} keepQuestions={db.settings.keepAnonymisedQuestions} />
+          <SettingsForm funeralUrl={db.settings.funeralCompanionUrl} keepQuestions={db.settings.keepAnonymisedQuestions} contactEmail={db.settings.contactEmail} />
         </Card>
         </div>
         <div className="space-y-6">

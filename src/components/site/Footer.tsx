@@ -18,10 +18,14 @@ export function Footer() {
             <div>
               <div className="flex items-center gap-3">
                 <LogoMark className="size-11" />
-                <span className="font-display text-2xl font-semibold">Hadamley</span>
+                <span className="leading-tight">
+                  <span className="block font-display text-2xl font-semibold">Hadamley</span>
+                  <span className="kicker block text-ink-2">Information Services</span>
+                </span>
               </div>
-              <p className="mt-5 max-w-sm text-ink-2">
-                A local guide for people living with long term conditions, disability and mental health needs in Havering, Romford, Brentwood and nearby.
+              <p className="mt-4 font-display text-lg italic text-brand">Free Independent Resources</p>
+              <p className="mt-2 max-w-sm text-ink-2">
+                Free information and printable resources for mental health, chronic illness and everyday wellbeing, with local support in Havering, Romford, Brentwood and nearby.
               </p>
             </div>
             <nav aria-label="Sections">
@@ -77,10 +81,9 @@ export function Footer() {
           </div>
           <div className="mt-14 flex flex-col gap-3 border-t-[1.5px] border-ink pt-6 text-sm text-ink-2 sm:flex-row sm:items-start sm:justify-between">
             <p className="max-w-3xl">
-              Hadamley provides information and signposting only. We do not give medical, legal or financial advice. Including a service does not mean we recommend it or
-              work in partnership with it.
+              General information and signposting only. Health information does not replace advice from a qualified healthcare professional. Hadamley does not provide counselling, diagnosis or medical treatment. Including a service does not mean we recommend it or work in partnership with it.
             </p>
-            <p className="shrink-0">© {new Date().getFullYear()} Hadamley</p>
+            <p className="shrink-0">© {new Date().getFullYear()} Hadamley Information Services</p>
           </div>
         </div>
       </div>
