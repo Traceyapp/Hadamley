@@ -313,7 +313,7 @@ a:focus-visible { background: var(--focus); color: #0b0c0c !important; box-shado
 .art .fill-paper { fill: var(--surface); }
 
 @keyframes sails { to { transform: rotate(360deg); } }
-.sails { transform-box: fill-box; transform-origin: center; animation: sails 4.8s ease-in-out 1; }
+.sails { transform-box: fill-box; transform-origin: center; animation: sails 28s linear infinite; }
 @keyframes bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-2px); } }
 .bob { animation: bob 4s ease-in-out 1; }
 @keyframes drive { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(6px); } }
