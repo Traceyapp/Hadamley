@@ -316,8 +316,21 @@ a:focus-visible { background: var(--focus); color: #0b0c0c !important; box-shado
 .sails { transform-box: fill-box; transform-origin: center; animation: sails 28s linear infinite; }
 @keyframes bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-2px); } }
 .bob { animation: bob 4s ease-in-out infinite; }
-@keyframes drive { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(6px); } }
-.drive { animation: drive 6s ease-in-out infinite alternate; }
+/*
+ * The bus route: a 44 second round trip along the high street.
+ * Distances are in the skyline's own units (the bus parks at x 860 of 1200).
+ * It only turns round while off the page, so it never spins in place.
+ */
+@keyframes bus-route {
+  0%, 6%   { transform: translateX(0) scaleX(1); }          /* parked, facing right */
+  18%      { transform: translateX(380px) scaleX(1); }      /* off the right edge */
+  18.01%   { transform: translateX(380px) scaleX(-1); }     /* turn round, out of sight */
+  30%, 38% { transform: translateX(0) scaleX(-1); }         /* back at the stop, facing left */
+  63%      { transform: translateX(-1060px) scaleX(-1); }   /* along the street and off the left edge */
+  63.01%   { transform: translateX(-1060px) scaleX(1); }    /* turn round, out of sight */
+  88%, 100% { transform: translateX(0) scaleX(1); }         /* back home, facing right */
+}
+.drive { transform-box: fill-box; transform-origin: center; animation: bus-route 44s ease-in-out infinite; }
 
 /* Legacy utility names, now calm and solid */
 .text-gradient { color: var(--sec, var(--brand)); }
@@ -393,7 +406,6 @@ a:focus-visible { background: var(--focus); color: #0b0c0c !important; box-shado
 .skyline .lm-park.on .tree { rotate: 0deg; transform-box: fill-box; transform-origin: 50% 100%; animation: sway 2.4s ease-in-out 2; }
 .skyline .lm-park.on .tree:nth-child(2n) { animation-delay: -1.3s; }
 @keyframes sway { 0%, 100% { rotate: -2.5deg; } 50% { rotate: 2.5deg; } }
-.skyline .lm-bus.on .drive { animation-duration: 1.4s; }
 .skyline .lm-upminster.on .sails { animation-duration: 6s; }
 .skyline .lm-upminster:hover .sails { animation-duration: 4s; }
 
