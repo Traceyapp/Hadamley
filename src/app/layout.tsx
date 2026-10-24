@@ -12,7 +12,6 @@ export const metadata: Metadata = {
   title: { default: "Hadamley Information Services | Free Independent Resources", template: "%s | Hadamley" },
   description:
     "Free, independent information and printable resources for mental health, chronic illness and everyday wellbeing, with local support in Havering, Romford, Brentwood and nearby.",
-  icons: { icon: "/icon.svg" },
 };
 
 export const viewport: Viewport = {
