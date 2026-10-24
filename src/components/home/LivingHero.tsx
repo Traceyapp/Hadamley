@@ -99,6 +99,7 @@ export function LivingHero({ listings, topics, areas, summary }: { listings: Fin
           <SentenceFinder listings={listings} topics={topics} areas={areas} onFocusChange={onFocusChange} scene={scene} />
         </motion.div>
         {summary && <p className="mt-6 max-w-2xl sm:mt-10 text-[1.08rem] text-ink-2">{summary}</p>}
+        <p className="mt-3 text-[0.95rem] font-bold text-ink">Independent information. Not a counselling or clinical service.</p>
         <div className="mt-6 flex flex-wrap gap-3">
           <Link href="/resources" className="card-print card-print-hover inline-flex min-h-12 items-center gap-2 rounded-full bg-ink px-5 font-bold text-paper">
             Explore the resources <ArrowRight className="size-4" aria-hidden />

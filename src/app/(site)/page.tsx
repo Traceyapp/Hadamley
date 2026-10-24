@@ -17,11 +17,11 @@ import { publishedPosts, upcomingEvents } from "@/lib/notice";
 import { EventTicket, PostNote } from "@/components/notice/Cards";
 
 const CHAPTERS = [
-  { slug: "chronic-illness-support", blurb: "Therapy, rehabilitation, hospitals, and living well with a long term condition or disability." },
+  { slug: "mental-health-support", blurb: "Information about support and practical wellbeing resources." },
+  { slug: "chronic-illness-support", blurb: "Resources to help organise and manage everyday life, plus therapy, rehabilitation and hospital care." },
+  { slug: "resources", blurb: "Journals, trackers, colouring and puzzles to download and print." },
   { slug: "mobility-daily-living-transport", blurb: "Equipment, accessible transport, assessments and help with costs." },
-  { slug: "mental-health-support", blurb: "Talking therapies, community groups and support you can contact yourself." },
   { slug: "find-support", blurb: "Every checked service in one place, searchable by need, area and how you want to be seen." },
-  { slug: "resources", blurb: "Free checklists, guides and worksheets to print or fill in on screen." },
 ];
 
 const QUESTIONS = ["Can I refer myself for physiotherapy?", "Where can I hire a wheelchair for a week?", "Who can help with anxiety?", "Is there help paying for a stairlift?"];

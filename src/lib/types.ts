@@ -119,7 +119,7 @@ export interface Taxon {
   order: number;
 }
 
-export type ResourceKind = "guide" | "checklist" | "worksheet" | "activity" | "leaflet";
+export type ResourceKind = "guide" | "checklist" | "worksheet" | "journal" | "tracker" | "colouring" | "puzzle" | "activity" | "leaflet";
 
 export interface Resource {
   id: string;
@@ -243,6 +243,22 @@ export const KIND_LABEL: Record<ResourceKind, string> = {
   guide: "Guide",
   checklist: "Checklist",
   worksheet: "Worksheet",
+  journal: "Journal",
+  tracker: "Tracker",
+  colouring: "Colouring",
+  puzzle: "Puzzle",
   activity: "Activity",
   leaflet: "Leaflet",
+};
+
+export const KIND_PLURAL: Record<ResourceKind, string> = {
+  guide: "Guides",
+  checklist: "Checklists",
+  worksheet: "Worksheets",
+  journal: "Journals",
+  tracker: "Trackers",
+  colouring: "Colouring",
+  puzzle: "Puzzles",
+  activity: "Activities",
+  leaflet: "Leaflets",
 };

@@ -4,11 +4,11 @@ import { Breadcrumbs, Container } from "./bits";
 import { Morph } from "@/components/fx/Morph";
 
 const CHAPTER: Record<string, { n: string; name: string }> = {
-  "chronic-illness-support": { n: "01", name: "Long term conditions" },
+  "chronic-illness-support": { n: "01", name: "Living with chronic illness" },
   "mobility-daily-living-transport": { n: "02", name: "Mobility and transport" },
   "mental-health-support": { n: "03", name: "Mental health" },
   "find-support": { n: "04", name: "Find support" },
-  resources: { n: "05", name: "Resources" },
+  resources: { n: "05", name: "Printable library" },
 };
 
 /**

@@ -24,8 +24,9 @@ export function Footer() {
                 </span>
               </div>
               <p className="mt-4 font-display text-lg italic text-brand">Free Independent Resources</p>
+              <p className="mt-2 font-bold">Independent information. Not a counselling or clinical service.</p>
               <p className="mt-2 max-w-sm text-ink-2">
-                Free information and printable resources for mental health, chronic illness and everyday wellbeing, with local support in Havering, Romford, Brentwood and nearby.
+                Information and resources, freely available: mental health, living with chronic illness, and printable journals, trackers, colouring and puzzles, with local support in Havering, Romford, Brentwood and nearby.
               </p>
             </div>
             <nav aria-label="Sections">

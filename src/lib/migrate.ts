@@ -6,8 +6,10 @@ import type { Database, NoticeEvent, Post } from "./types";
  * Version 3 adds the cookie notice page.
  * Version 4 brings in Tracey's own About and Contact wording (only where the
  * page still holds our seed draft) and her contact email.
+ * Version 6 follows her print materials: "Living with chronic illness" and the
+ * "Free printable library" (again only on untouched seed pages).
  */
-export const DB_VERSION = 4;
+export const DB_VERSION = 6;
 
 const T = "2026-10-20T09:00:00.000Z";
 
@@ -148,6 +150,25 @@ export function migrate(db: Database): boolean {
     if (home) home.summary = "Free, independent information and printable resources for mental health, chronic illness and everyday wellbeing, with local support in Havering, Romford, Brentwood and nearby.";
     db.settings.contactEmail ??= "support@hadamley.com";
     db.version = 4;
+    changed = true;
+  }
+
+  if ((db.version ?? 1) < 6) {
+    const seeded = (id: string) => db.pages.find((p) => p.id === id && p.updatedBy === "Seed content");
+    const chronic = db.pages.find((p) => p.slug === "chronic-illness-support" && p.updatedBy === "Seed content");
+    if (chronic) {
+      chronic.title = "Living with Chronic Illness";
+      chronic.navLabel = "Chronic illness";
+    }
+    const library = db.pages.find((p) => p.slug === "resources" && p.updatedBy === "Seed content") ?? seeded("p-resources");
+    if (library) {
+      library.title = "Free printable library";
+      library.navLabel = "Printables";
+      library.summary = "Journals, trackers, colouring, puzzles, guides and checklists to download and print. Free for individuals, families and professionals.";
+    }
+    const topic = db.taxa.find((t) => t.slug === "long-term-conditions" && t.name === "Long term conditions");
+    if (topic) topic.name = "Chronic illness";
+    db.version = 6;
     changed = true;
   }
   return changed;

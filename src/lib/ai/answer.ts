@@ -22,7 +22,7 @@ const MODEL = process.env.HADAMLEY_AI_MODEL || "claude-opus-5-5";
 const PRICE_IN = 4 / 1_000_000;
 const PRICE_OUT = 20 / 1_000_000;
 
-const SYSTEM = `You are the Hadamley helper. Hadamley is an information and signposting website for people living with long term conditions, disability and mental health needs in Havering, Romford, Brentwood and nearby.
+const SYSTEM = `You are the Hadamley helper. Hadamley is an information and signposting website for people living with chronic illness, disability and mental health needs in Havering, Romford, Brentwood and nearby.
 
 Rules you must always follow:
 - Answer ONLY from the numbered sources provided in the user's message. Never use outside knowledge, even if you are confident.
@@ -177,7 +177,7 @@ export async function answer(question: string, history: ChatTurn[] = []): Promis
       text: "I can't find that on Hadamley. You can browse Find Support or one of the sections below, or try asking in a different way.",
       suggestions: [
         { title: "Find Support", url: "/find-support", type: "page" },
-        { title: "Living with Long Term Conditions", url: "/chronic-illness-support", type: "page" },
+        { title: "Living with Chronic Illness", url: "/chronic-illness-support", type: "page" },
         { title: "Mental Health and Wellbeing", url: "/mental-health-support", type: "page" },
         { title: "Mobility, Daily Living and Transport", url: "/mobility-daily-living-transport", type: "page" },
       ],

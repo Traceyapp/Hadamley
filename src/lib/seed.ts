@@ -34,7 +34,7 @@ function page(p: Partial<Page> & Pick<Page, "id" | "slug" | "title" | "template"
 }
 
 const taxa: Taxon[] = [
-  ["long-term-conditions", "Long term conditions"],
+  ["long-term-conditions", "Chronic illness"],
   ["disability-rehab", "Disability and rehabilitation"],
   ["physiotherapy", "Physiotherapy and movement"],
   ["occupational-therapy", "Occupational therapy"],
@@ -73,8 +73,8 @@ const pages: Page[] = [
   page({
     id: "p-ltc",
     slug: "chronic-illness-support",
-    title: "Living with Long Term Conditions",
-    navLabel: "Long term conditions",
+    title: "Living with Chronic Illness",
+    navLabel: "Chronic illness",
     template: "section",
     section: "chronic-illness-support",
     navOrder: 1,
@@ -319,13 +319,13 @@ const pages: Page[] = [
   page({
     id: "p-res",
     slug: "resources",
-    title: "Resources and Downloads",
-    navLabel: "Resources",
+    title: "Free printable library",
+    navLabel: "Printables",
     template: "resources",
     section: "resources",
     navOrder: 5,
     showInNav: true,
-    summary: "Free guides, checklists and worksheets to help you prepare for appointments and organise your care.",
+    summary: "Journals, trackers, colouring, puzzles, guides and checklists to download and print. Free for individuals, families and professionals.",
     body: "<p>All downloads are free. You can print them or fill them in on screen.</p>",
   }),
   page({
