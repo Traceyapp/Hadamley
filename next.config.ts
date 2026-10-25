@@ -2,6 +2,8 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   distDir: process.env.NEXT_DIST_DIR || ".next",
+  // Pin the project root: a stray lockfile higher up the folder tree otherwise confuses Next.
+  outputFileTracingRoot: process.cwd(),
   experimental: {
     viewTransition: true,
     serverActions: { bodySizeLimit: "12mb" },
