@@ -1,3 +1,4 @@
+import { ensureDb } from "@/lib/db";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Eye } from "lucide-react";
@@ -11,6 +12,7 @@ export const metadata = { title: "Preview" };
 
 /** Draft preview: visible to signed-in admins only. Lives outside the admin shell so it looks exactly like the site. */
 export default async function PreviewPage({ params }: { params: Promise<{ id: string }> }) {
+  await ensureDb();
   await requireAdmin();
   const { id } = await params;
   const page = getPageAnyStatus(id);

@@ -1,3 +1,4 @@
+import { ensureDb } from "@/lib/db";
 import type { Metadata } from "next";
 import { CalendarDays, Newspaper } from "lucide-react";
 import { pastEvents, publishedPosts, upcomingEvents } from "@/lib/notice";
@@ -9,7 +10,8 @@ import Link from "next/link";
 
 export const metadata: Metadata = { title: "Noticeboard", description: "Local events and news from Hadamley." };
 
-export default function NoticeboardPage() {
+export default async function NoticeboardPage() {
+  await ensureDb();
   const events = upcomingEvents();
   const posts = publishedPosts();
   const past = pastEvents(4);

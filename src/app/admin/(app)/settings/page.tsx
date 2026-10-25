@@ -1,3 +1,4 @@
+import { ensureDb } from "@/lib/db";
 import { Download, ShieldCheck, Trash2 } from "lucide-react";
 import { requireAdmin } from "@/lib/auth";
 import { readDb } from "@/lib/db";
@@ -11,6 +12,7 @@ import { AccountForm } from "./AccountForm";
 export const metadata = { title: "Settings" };
 
 export default async function SettingsPage() {
+  await ensureDb();
   const me = await requireAdmin();
   const db = readDb();
   return (

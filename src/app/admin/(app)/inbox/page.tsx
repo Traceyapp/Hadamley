@@ -1,3 +1,4 @@
+import { ensureDb } from "@/lib/db";
 import Link from "next/link";
 import { Check, Flag, Mail, RotateCcw, Trash2 } from "lucide-react";
 import { readDb } from "@/lib/db";
@@ -10,6 +11,7 @@ import { ConfirmButton, SubmitButton } from "@/components/admin/client";
 export const metadata = { title: "Inbox" };
 
 export default async function InboxPage({ searchParams }: { searchParams: Promise<{ show?: string; topic?: string }> }) {
+  await ensureDb();
   const { show, topic } = await searchParams;
   const showHandled = show === "all";
   const db = readDb();

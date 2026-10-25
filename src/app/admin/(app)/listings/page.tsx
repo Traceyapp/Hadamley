@@ -1,3 +1,4 @@
+import { ensureDb } from "@/lib/db";
 import Link from "next/link";
 import { Plus, Search } from "lucide-react";
 import { readDb } from "@/lib/db";
@@ -8,6 +9,7 @@ import { AdminHeader, btn, Empty, Flash, input, ListingStatusBadge } from "@/com
 export const metadata = { title: "Directory listings" };
 
 export default async function ListingsAdmin({ searchParams }: { searchParams: Promise<{ status?: string; q?: string; saved?: string; due?: string }> }) {
+  await ensureDb();
   const { status, q = "", saved, due } = await searchParams;
   const db = readDb();
   const all = db.listings;

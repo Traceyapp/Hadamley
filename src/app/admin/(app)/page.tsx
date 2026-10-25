@@ -1,3 +1,4 @@
+import { ensureDb } from "@/lib/db";
 import Link from "next/link";
 import { ArrowRight, Bot, CalendarClock, FilePlus2, Flag, ListPlus, Upload } from "lucide-react";
 import { requireAdmin } from "@/lib/auth";
@@ -10,6 +11,7 @@ import { RefreshAiButton } from "./ai/RefreshAiButton";
 export const metadata = { title: "Dashboard" };
 
 export default async function Dashboard() {
+  await ensureDb();
   const user = await requireAdmin();
   const db = readDb();
   const byStatus = (s: ListingStatus) => db.listings.filter((l) => l.status === s).length;

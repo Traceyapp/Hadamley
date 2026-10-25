@@ -1,3 +1,4 @@
+import { ensureDb } from "@/lib/db";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -10,11 +11,13 @@ import { PageHero } from "@/components/site/PageHero";
 type Props = { params: Promise<{ slug: string }> };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  await ensureDb();
   const p = getPost((await params).slug);
   return p ? { title: p.title, description: p.summary } : {};
 }
 
 export default async function PostPage({ params }: Props) {
+  await ensureDb();
   const p = getPost((await params).slug);
   if (!p) notFound();
   return (

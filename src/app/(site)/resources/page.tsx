@@ -1,3 +1,4 @@
+import { ensureDb } from "@/lib/db";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { getPublishedPage, publishedResources, topics } from "@/lib/repo";
@@ -12,6 +13,7 @@ export const metadata: Metadata = { title: "Free printable library", description
 type SP = Promise<{ kind?: string; topic?: string }>;
 
 export default async function ResourcesPage({ searchParams }: { searchParams: SP }) {
+  await ensureDb();
   const { kind, topic } = await searchParams;
   const page = getPublishedPage("resources");
   const all = publishedResources();

@@ -1,3 +1,4 @@
+import { ensureDb } from "@/lib/db";
 import { notFound } from "next/navigation";
 import { Trash2 } from "lucide-react";
 import { readDb } from "@/lib/db";
@@ -9,6 +10,7 @@ import { PostForm } from "../../NoticeForms";
 export const metadata = { title: "Post" };
 
 export default async function EditPost({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ saved?: string }> }) {
+  await ensureDb();
   const { id } = await params;
   const { saved } = await searchParams;
   const item = id === "new" ? undefined : readDb().posts.find((x) => x.id === id);

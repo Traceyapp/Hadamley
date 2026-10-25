@@ -1,3 +1,4 @@
+import { ensureDb } from "@/lib/db";
 import Link from "next/link";
 import { Plus } from "lucide-react";
 import { readDb } from "@/lib/db";
@@ -8,6 +9,7 @@ import { AdminHeader, btn, Card, Empty, Flash, PageStatusBadge } from "@/compone
 export const metadata = { title: "Noticeboard" };
 
 export default async function NoticeboardAdmin({ searchParams }: { searchParams: Promise<{ saved?: string }> }) {
+  await ensureDb();
   const { saved } = await searchParams;
   const db = readDb();
   const now = londonNow();

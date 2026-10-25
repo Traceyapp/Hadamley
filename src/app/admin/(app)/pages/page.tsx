@@ -1,3 +1,4 @@
+import { ensureDb } from "@/lib/db";
 import Link from "next/link";
 import { ExternalLink, Plus } from "lucide-react";
 import { readDb } from "@/lib/db";
@@ -16,6 +17,7 @@ const TEMPLATE_LABEL: Record<Page["template"], string> = {
 };
 
 export default async function PagesList({ searchParams }: { searchParams: Promise<{ saved?: string }> }) {
+  await ensureDb();
   const { saved } = await searchParams;
   const pages = readDb().pages;
   const roots = pages.filter((p) => !p.parentId).sort((a, b) => (a.template === "home" ? -1 : b.template === "home" ? 1 : a.navOrder - b.navOrder));

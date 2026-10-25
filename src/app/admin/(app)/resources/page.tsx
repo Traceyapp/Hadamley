@@ -1,3 +1,4 @@
+import { ensureDb } from "@/lib/db";
 import { ExternalLink, FileText, Trash2 } from "lucide-react";
 import { readDb } from "@/lib/db";
 import { topics } from "@/lib/repo";
@@ -11,6 +12,7 @@ import { ResourceForm } from "./ResourceForm";
 export const metadata = { title: "Downloads" };
 
 export default async function ResourcesAdmin({ searchParams }: { searchParams: Promise<{ saved?: string }> }) {
+  await ensureDb();
   const { saved } = await searchParams;
   const db = readDb();
   const t = topics();

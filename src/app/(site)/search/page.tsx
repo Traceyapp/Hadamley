@@ -1,3 +1,4 @@
+import { ensureDb } from "@/lib/db";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Search } from "lucide-react";
@@ -12,6 +13,7 @@ const ORDER: SearchKind[] = ["service", "page", "event", "news", "download"];
 
 /** Full results page: works without JavaScript, and is where the panel's Enter goes. */
 export default async function SearchPage({ searchParams }: { searchParams: Promise<{ q?: string }> }) {
+  await ensureDb();
   const q = ((await searchParams).q ?? "").slice(0, 120);
   const results = q ? siteSearch(q, 60) : [];
   return (

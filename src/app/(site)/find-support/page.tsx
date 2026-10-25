@@ -1,3 +1,4 @@
+import { ensureDb } from "@/lib/db";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { PoundSterling, Search, X } from "lucide-react";
@@ -36,6 +37,7 @@ function Fieldset({ legend, name, options, selected }: { legend: string; name: s
 }
 
 export default async function FindSupportPage({ searchParams }: { searchParams: SP }) {
+  await ensureDb();
   const sp = await searchParams;
   const q = typeof sp.q === "string" ? sp.q : "";
   const sel = {

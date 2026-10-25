@@ -1,3 +1,4 @@
+import { ensureDb } from "@/lib/db";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -9,11 +10,13 @@ import { PageHero } from "@/components/site/PageHero";
 type Props = { params: Promise<{ slug: string }> };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  await ensureDb();
   const e = getEvent((await params).slug);
   return e ? { title: e.title, description: e.summary } : {};
 }
 
 export default async function EventPage({ params }: Props) {
+  await ensureDb();
   const e = getEvent((await params).slug);
   if (!e) notFound();
   const s = eventParts(e.startsAt);

@@ -1,3 +1,4 @@
+import { ensureDb } from "@/lib/db";
 import { redirect } from "next/navigation";
 import { currentAdmin } from "@/lib/auth";
 import { LoginForm } from "./LoginForm";
@@ -7,6 +8,7 @@ import { Skyline } from "@/components/art/Landmarks";
 export const metadata = { title: "Sign in" };
 
 export default async function LoginPage() {
+  await ensureDb();
   if (await currentAdmin()) redirect("/admin");
   return (
     <div className="relative grid min-h-dvh place-items-center overflow-hidden px-4 pb-48 pt-12">

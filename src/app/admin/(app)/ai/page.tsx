@@ -1,3 +1,4 @@
+import { ensureDb } from "@/lib/db";
 import { Bot, ShieldCheck } from "lucide-react";
 import { readDb } from "@/lib/db";
 import { formatDateTime } from "@/lib/format";
@@ -7,7 +8,8 @@ import { TestConsole } from "./TestConsole";
 
 export const metadata = { title: "AI helper" };
 
-export default function AiAdmin() {
+export default async function AiAdmin() {
+  await ensureDb();
   const db = readDb();
   const pages = new Set(db.chunks.filter((c) => c.sourceType === "page").map((c) => c.sourceId)).size;
   const listings = db.chunks.filter((c) => c.sourceType === "listing").length;

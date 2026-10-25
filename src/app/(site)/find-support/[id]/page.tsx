@@ -1,3 +1,4 @@
+import { ensureDb } from "@/lib/db";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -13,6 +14,7 @@ import { ListingCard } from "@/components/site/ListingCard";
 type Props = { params: Promise<{ id: string }> };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  await ensureDb();
   const l = getApprovedListing((await params).id);
   return l ? { title: l.name, description: l.summary } : {};
 }
@@ -27,6 +29,7 @@ function Row({ label, children }: { label: string; children: React.ReactNode }) 
 }
 
 export default async function ListingPage({ params }: Props) {
+  await ensureDb();
   const l = getApprovedListing((await params).id);
   if (!l) notFound();
 

@@ -1,3 +1,4 @@
+import { ensureDb } from "@/lib/db";
 import { readDb } from "@/lib/db";
 import { topics } from "@/lib/repo";
 import { AdminHeader } from "@/components/admin/ui";
@@ -5,7 +6,8 @@ import { PageForm } from "../PageForm";
 
 export const metadata = { title: "New page" };
 
-export default function NewPage() {
+export default async function NewPage() {
+  await ensureDb();
   const parents = readDb()
     .pages.filter((p) => p.template === "section")
     .map((p) => ({ id: p.id, title: p.title }));

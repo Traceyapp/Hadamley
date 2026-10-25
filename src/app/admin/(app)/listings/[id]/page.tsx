@@ -1,3 +1,4 @@
+import { ensureDb } from "@/lib/db";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { CalendarCheck, Flag, Trash2 } from "lucide-react";
@@ -12,6 +13,7 @@ import { ListingForm } from "../ListingForm";
 export const metadata = { title: "Edit listing" };
 
 export default async function EditListing({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ saved?: string }> }) {
+  await ensureDb();
   const { id } = await params;
   const { saved } = await searchParams;
   const db = readDb();

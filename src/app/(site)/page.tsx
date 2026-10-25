@@ -1,3 +1,4 @@
+import { ensureDb } from "@/lib/db";
 import Link from "next/link";
 import { ArrowRight, ExternalLink } from "lucide-react";
 import { approvedListings, areas, childPages, getPublishedPage, getSettings, publishedResources, topics } from "@/lib/repo";
@@ -26,7 +27,8 @@ const CHAPTERS = [
 
 const QUESTIONS = ["Can I refer myself for physiotherapy?", "Where can I hire a wheelchair for a week?", "Who can help with anxiety?", "Is there help paying for a stairlift?"];
 
-export default function HomePage() {
+export default async function HomePage() {
+  await ensureDb();
   const home = getPublishedPage("");
   const { funeralCompanionUrl } = getSettings();
   const listings = approvedListings();

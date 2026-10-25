@@ -1,3 +1,4 @@
+import { ensureDb } from "@/lib/db";
 import { notFound } from "next/navigation";
 import { Trash2 } from "lucide-react";
 import { readDb } from "@/lib/db";
@@ -10,6 +11,7 @@ import { PageForm } from "../PageForm";
 export const metadata = { title: "Edit page" };
 
 export default async function EditPage({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ saved?: string }> }) {
+  await ensureDb();
   const { id } = await params;
   const { saved } = await searchParams;
   const db = readDb();
