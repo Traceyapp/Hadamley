@@ -12,7 +12,7 @@ export function Footer() {
       <div className="overflow-hidden">
         <Skyline animate={false} className="block h-auto w-full min-w-[720px] translate-y-[2px]" />
       </div>
-      <div className="border-t-[1.5px] border-ink bg-paper-2">
+      <div className="border-t-4 border-champagne bg-paper-2">
         <div className="mx-auto max-w-7xl px-4 pb-10 pt-14 sm:px-6">
           <div className="grid gap-12 lg:grid-cols-[1.3fr_1fr_1fr_1.3fr]">
             <div>
@@ -23,7 +23,7 @@ export function Footer() {
                   <span className="kicker block text-ink-2">Information Services</span>
                 </span>
               </div>
-              <p className="mt-4 font-display text-lg italic text-brand">Free Independent Resources</p>
+              <p className="mt-4 font-display text-lg italic text-accent">Free Independent Resources</p>
               <p className="mt-2 font-bold">Independent information. Not a counselling or clinical service.</p>
               <p className="mt-2 max-w-sm text-ink-2">
                 Information and resources, freely available: mental health, living with chronic illness, and printable journals, trackers, colouring and puzzles, with local support in Havering, Romford, Brentwood and nearby.

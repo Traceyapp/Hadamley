@@ -1,8 +1,9 @@
 import Link from "next/link";
-import { ChevronDown, Download } from "lucide-react";
+import { AlertTriangle, CalendarCheck, ChevronDown, Download, ExternalLink, Info } from "lucide-react";
 import type { PageSection } from "@/lib/types";
 import { readDb } from "@/lib/db";
-import { formatBytes } from "@/lib/format";
+import { formatBytes, formatDate } from "@/lib/format";
+import { HEALTH_DISCLAIMER } from "./bits";
 import { AccordionTools, SectionActions } from "./AccordionTools";
 
 /**
@@ -34,6 +35,12 @@ export function Accordions({ sections }: { sections: PageSection[] }) {
                 </span>
               </summary>
               <div className="fold-body border-t border-dashed border-line-strong px-5 pb-5 pt-4">
+                {s.urgent && (
+                  <div role="note" className="mb-5 flex gap-3 rounded-xl border-2 border-urgent bg-urgent-soft p-4">
+                    <AlertTriangle className="mt-0.5 size-5 shrink-0 text-urgent" aria-hidden />
+                    <p className="whitespace-pre-line font-bold text-ink">{s.urgent}</p>
+                  </div>
+                )}
                 <div className="prose-h" dangerouslySetInnerHTML={{ __html: s.body }} />
                 {files.length > 0 && (
                   <ul className="mt-5 space-y-2">
@@ -46,6 +53,36 @@ export function Accordions({ sections }: { sections: PageSection[] }) {
                       </li>
                     ))}
                   </ul>
+                )}
+                {(s.sources?.length || s.reviewedAt) && (
+                  <div className="mt-6 border-t border-dashed border-line-strong pt-4 text-[0.92rem]">
+                    {!!s.sources?.length && (
+                      <>
+                        <p className="kicker text-ink-2">Sources</p>
+                        <ul className="mt-2 space-y-1">
+                          {s.sources.map((src) => (
+                            <li key={src.url}>
+                              <a href={src.url} target="_blank" rel="noopener" className="link inline-flex items-center gap-1.5 break-all">
+                                {src.label || src.url} <ExternalLink className="size-3.5 shrink-0" aria-hidden />
+                                <span className="sr-only">(opens in a new tab)</span>
+                              </a>
+                            </li>
+                          ))}
+                        </ul>
+                      </>
+                    )}
+                    {s.reviewedAt && (
+                      <p className="mt-3 inline-flex items-center gap-1.5 text-ink-2">
+                        <CalendarCheck className="size-4 text-ok" aria-hidden /> Last reviewed {formatDate(s.reviewedAt)}
+                      </p>
+                    )}
+                  </div>
+                )}
+                {s.health && (
+                  <p className="mt-5 flex gap-3 rounded-xl border-[1.5px] border-dashed border-line-strong px-4 py-3 text-[0.9rem] text-ink-2">
+                    <Info className="mt-0.5 size-4 shrink-0 text-brand" aria-hidden />
+                    {HEALTH_DISCLAIMER}
+                  </p>
                 )}
                 <SectionActions id={s.id} heading={s.heading} />
               </div>

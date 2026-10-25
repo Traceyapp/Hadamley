@@ -8,6 +8,19 @@ import { btn, input } from "./ui";
 
 const newId = () => `s-${Math.random().toString(36).slice(2, 8)}`;
 
+/** One source per line: "Label | https://..." or just the address. */
+const sourcesToText = (s?: PageSection["sources"]) => (s ?? []).map((x) => (x.label && x.label !== x.url ? `${x.label} | ${x.url}` : x.url)).join("\n");
+const textToSources = (t: string) =>
+  t
+    .split("\n")
+    .map((line) => {
+      const i = line.lastIndexOf("|");
+      const label = i >= 0 ? line.slice(0, i).trim() : "";
+      const url = (i >= 0 ? line.slice(i + 1) : line).trim();
+      return { label: label || url, url };
+    })
+    .filter((x) => x.url);
+
 /**
  * Add, edit, reorder and delete a page's fold-out sections. Everything is
  * saved with the page, as JSON in a hidden field.
@@ -71,6 +84,47 @@ export function SectionsEditor({ initial, resources }: { initial: PageSection[];
                     </p>
                     <RichTextEditor initial={s.body} labelId={`b-${s.id}`} onChange={(html) => update(s.id, { body: html })} minHeight="!min-h-[160px]" />
                   </div>
+                  <label className="flex items-start gap-2.5 rounded-lg border border-line p-3">
+                    <input type="checkbox" checked={!!s.health} onChange={(e) => update(s.id, { health: e.target.checked })} className="mt-1 size-[1.1rem] accent-[var(--brand)]" />
+                    <span>
+                      <span className="font-bold">Health information</span>
+                      <span className="block text-sm text-ink-2">Adds the full medical disclaimer at the end of this section.</span>
+                    </span>
+                  </label>
+                  <div>
+                    <label htmlFor={`u-${s.id}`} className="mb-1.5 block text-[0.95rem] font-bold">
+                      Urgent warning <span className="font-normal text-ink-2">(optional)</span>
+                    </label>
+                    <textarea
+                      id={`u-${s.id}`}
+                      value={s.urgent ?? ""}
+                      onChange={(e) => update(s.id, { urgent: e.target.value })}
+                      rows={3}
+                      className={input}
+                      placeholder="Shown in a red box above the content. For example, when to call 999 or NHS 111."
+                    />
+                  </div>
+                  <div className="grid gap-4 sm:grid-cols-[1fr_12rem]">
+                    <div>
+                      <label htmlFor={`src-${s.id}`} className="mb-1.5 block text-[0.95rem] font-bold">
+                        Sources
+                      </label>
+                      <textarea
+                        id={`src-${s.id}`}
+                        defaultValue={sourcesToText(s.sources)}
+                        onChange={(e) => update(s.id, { sources: textToSources(e.target.value) })}
+                        rows={3}
+                        className={input}
+                        placeholder={"One per line, for example:\nNHS: Fibromyalgia | https://www.nhs.uk/conditions/fibromyalgia/"}
+                      />
+                    </div>
+                    <div>
+                      <label htmlFor={`r-${s.id}`} className="mb-1.5 block text-[0.95rem] font-bold">
+                        Last reviewed
+                      </label>
+                      <input id={`r-${s.id}`} type="date" value={s.reviewedAt ?? ""} onChange={(e) => update(s.id, { reviewedAt: e.target.value })} className={input} />
+                    </div>
+                  </div>
                   {resources.length > 0 && (
                     <fieldset>
                       <legend className="mb-1.5 text-[0.95rem] font-bold">Downloads in this section</legend>
@@ -98,7 +152,7 @@ export function SectionsEditor({ initial, resources }: { initial: PageSection[];
       <button
         type="button"
         onClick={() => {
-          const s = { id: newId(), heading: "", body: "", resourceIds: [] };
+          const s: PageSection = { id: newId(), heading: "", body: "", resourceIds: [], health: true };
           setSections((all) => [...all, s]);
           setOpen(s.id);
         }}

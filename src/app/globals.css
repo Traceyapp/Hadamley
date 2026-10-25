@@ -16,22 +16,24 @@
    Text pairings meet WCAG 2.2 AA. Motion stops for reduced-motion users.
 ------------------------------------------------------------------- */
 :root {
-  --paper: #f7f3ea;
-  --paper-2: #efe8da;
-  --surface: #fffdf8;
-  --sand: #efe8da;
-  --sand-2: #e4dbc9;
-  --ink: #1d1b16;
-  --ink-2: #57524a;
-  --line: #ddd3c1;
-  --line-strong: #c4b8a2;
+  /* Tracey's brand: white backgrounds, navy lettering, champagne accents */
+  --paper: #ffffff;
+  --paper-2: #f8f5ef;
+  --surface: #ffffff;
+  --sand: #f4efe5;
+  --sand-2: #e9e0cf;
+  --ink: #142a52;
+  --ink-2: #4b5772;
+  --line: #e7e0d2;
+  --line-strong: #cdbb98;
 
-  --brand: #1f5c6b;
-  --brand-strong: #153f4a;
-  --brand-soft: #dcebee;
-  --brand-tint: #ecf4f5;
-  --accent: #a8461f;
-  --accent-soft: #f6e3d8;
+  --brand: #1b3a6b;
+  --brand-strong: #10264a;
+  --brand-soft: #e3e9f4;
+  --brand-tint: #f1f4fa;
+  --accent: #8a6a2f;
+  --accent-soft: #f5eddc;
+  --champagne: #c9a96e;
 
   --sec-ltc: #1f5c6b;
   --sec-ltc-soft: #dcebee;
@@ -39,8 +41,8 @@
   --sec-mob-soft: #f6e3d8;
   --sec-mh: #3b6e45;
   --sec-mh-soft: #e1eedf;
-  --sec-find: #26346a;
-  --sec-find-soft: #e2e5f2;
+  --sec-find: #1b3a6b;
+  --sec-find-soft: #e3e9f4;
   --sec-res: #8e3553;
   --sec-res-soft: #f4e1e7;
 
@@ -69,8 +71,8 @@
   --glass-line: var(--line);
   --hero-ink: var(--ink);
 
-  --shadow: 0 1px 0 rgb(29 27 22 / 0.04), 0 2px 8px -2px rgb(29 27 22 / 0.08);
-  --shadow-lg: 0 1px 0 rgb(29 27 22 / 0.05), 0 18px 40px -18px rgb(29 27 22 / 0.28);
+  --shadow: 0 1px 0 rgb(20 42 82 / 0.04), 0 2px 8px -2px rgb(20 42 82 / 0.08);
+  --shadow-lg: 0 1px 0 rgb(20 42 82 / 0.05), 0 18px 40px -18px rgb(20 42 82 / 0.28);
   --shadow-glow: var(--shadow-lg);
   --print: 4px 4px 0 0 var(--ink);
   color-scheme: light;
@@ -78,28 +80,29 @@
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --paper: #16150f;
-    --paper-2: #1d1b15;
-    --surface: #211f18;
-    --sand: #24211a;
-    --sand-2: #2e2a21;
-    --ink: #f1ebdd;
-    --ink-2: #b9b1a1;
-    --line: #37332a;
-    --line-strong: #4b4639;
-    --brand: #8cc7d3;
-    --brand-strong: #b6dfe7;
-    --brand-soft: #1d3439;
-    --brand-tint: #1a2a2d;
-    --accent: #f0a07a;
-    --accent-soft: #3a2519;
+    --paper: #0e1626;
+    --paper-2: #131d31;
+    --surface: #172238;
+    --sand: #1b263d;
+    --sand-2: #24304a;
+    --ink: #f3eee3;
+    --ink-2: #b7bccb;
+    --line: #2a3650;
+    --line-strong: #6b5d42;
+    --brand: #a9c1ea;
+    --brand-strong: #cddbf3;
+    --brand-soft: #1e2d4c;
+    --brand-tint: #1a2742;
+    --accent: #e3c78f;
+    --accent-soft: #3a3020;
+    --champagne: #b8975a;
     --sec-ltc: #8cc7d3;
     --sec-ltc-soft: #1d3439;
     --sec-mob: #f0a07a;
     --sec-mob-soft: #3a2519;
     --sec-mh: #9fd0a5;
     --sec-mh-soft: #1f3322;
-    --sec-find: #a9b6ee;
+    --sec-find: #a9c1ea;
     --sec-find-soft: #23284a;
     --sec-res: #eba3bb;
     --sec-res-soft: #3a1f29;
@@ -128,28 +131,29 @@
 }
 
 :root[data-theme="dark"] {
-  --paper: #16150f;
-  --paper-2: #1d1b15;
-  --surface: #211f18;
-  --sand: #24211a;
-  --sand-2: #2e2a21;
-  --ink: #f1ebdd;
-  --ink-2: #b9b1a1;
-  --line: #37332a;
-  --line-strong: #4b4639;
-  --brand: #8cc7d3;
-  --brand-strong: #b6dfe7;
-  --brand-soft: #1d3439;
-  --brand-tint: #1a2a2d;
-  --accent: #f0a07a;
-  --accent-soft: #3a2519;
+  --paper: #0e1626;
+  --paper-2: #131d31;
+  --surface: #172238;
+  --sand: #1b263d;
+  --sand-2: #24304a;
+  --ink: #f3eee3;
+  --ink-2: #b7bccb;
+  --line: #2a3650;
+  --line-strong: #6b5d42;
+  --brand: #a9c1ea;
+  --brand-strong: #cddbf3;
+  --brand-soft: #1e2d4c;
+  --brand-tint: #1a2742;
+  --accent: #e3c78f;
+  --accent-soft: #3a3020;
+    --champagne: #b8975a;
   --sec-ltc: #8cc7d3;
   --sec-ltc-soft: #1d3439;
   --sec-mob: #f0a07a;
   --sec-mob-soft: #3a2519;
   --sec-mh: #9fd0a5;
   --sec-mh-soft: #1f3322;
-  --sec-find: #a9b6ee;
+  --sec-find: #a9c1ea;
   --sec-find-soft: #23284a;
   --sec-res: #eba3bb;
   --sec-res-soft: #3a1f29;
@@ -192,6 +196,7 @@
   --color-brand-tint: var(--brand-tint);
   --color-accent: var(--accent);
   --color-accent-soft: var(--accent-soft);
+  --color-champagne: var(--champagne);
   --color-urgent: var(--urgent);
   --color-urgent-strong: var(--urgent-strong);
   --color-urgent-soft: var(--urgent-soft);

@@ -8,8 +8,10 @@ import type { Database, NoticeEvent, Post } from "./types";
  * page still holds our seed draft) and her contact email.
  * Version 6 follows her print materials: "Living with chronic illness" and the
  * "Free printable library" (again only on untouched seed pages).
+ * Version 7 marks accordion sections on the health pages as health information,
+ * so each one ends with the full medical disclaimer.
  */
-export const DB_VERSION = 6;
+export const DB_VERSION = 7;
 
 const T = "2026-10-20T09:00:00.000Z";
 
@@ -169,6 +171,15 @@ export function migrate(db: Database): boolean {
     const topic = db.taxa.find((t) => t.slug === "long-term-conditions" && t.name === "Long term conditions");
     if (topic) topic.name = "Chronic illness";
     db.version = 6;
+    changed = true;
+  }
+
+  if ((db.version ?? 1) < 7) {
+    for (const p of db.pages) {
+      if (p.section !== "chronic-illness-support" && p.section !== "mental-health-support") continue;
+      for (const s of p.sections ?? []) s.health ??= true;
+    }
+    db.version = 7;
     changed = true;
   }
   return changed;

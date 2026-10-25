@@ -53,6 +53,10 @@ export function Breadcrumbs({ items }: { items: { label: string; href?: string }
   );
 }
 
+/** Tracey's agreed wording, shown at the end of every health-information section. */
+export const HEALTH_DISCLAIMER =
+  "For general information only. Hadamley Information Services provides independently compiled information from publicly available sources. This content is not medical advice and should not be used to diagnose or treat a condition or replace advice from a qualified healthcare professional. Speak to your healthcare team about symptoms, treatment or changes to your health.";
+
 export function Disclaimer({ className = "" }: { className?: string }) {
   return (
     <aside className={`flex gap-3 rounded-[var(--radius-card)] border-[1.5px] border-dashed border-line-strong px-5 py-4 text-[0.95rem] text-ink-2 ${className}`} aria-label="About this information">

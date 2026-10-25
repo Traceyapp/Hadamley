@@ -7,7 +7,7 @@ import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 
 type Source = { title: string; url: string; type: "page" | "listing" };
 type Reply =
-  | { kind: "crisis"; title: string; lines: string[] }
+  | { kind: "crisis"; title: string; lines: string[]; calls?: ("999" | "111" | "116123")[] }
   | { kind: "funeral"; text: string; url: string }
   | { kind: "answer"; text: string; sources: Source[]; mode: "model" | "extract"; notice?: string }
   | { kind: "not_found"; text: string; suggestions: Source[] }
@@ -68,12 +68,15 @@ function AssistantBubble({ reply }: { reply: Reply }) {
           ))}
         </div>
         <div className="mt-3 grid grid-cols-2 gap-2">
-          <a href="tel:111" className="flex min-h-11 items-center justify-center gap-2 rounded-xl border-2 border-brand bg-surface font-bold text-brand">
-            <Phone className="size-4" aria-hidden /> NHS 111
-          </a>
-          <a href="tel:999" className="flex min-h-11 items-center justify-center gap-2 rounded-xl bg-urgent font-bold text-white dark:text-[#1b0b0a]">
-            <Phone className="size-4" aria-hidden /> 999
-          </a>
+          {(reply.calls ?? ["999", "111"]).map((c) => (
+            <a
+              key={c}
+              href={`tel:${c}`}
+              className={`flex min-h-11 items-center justify-center gap-2 rounded-xl font-bold ${c === "999" ? "bg-urgent text-white dark:text-[#1b0b0a]" : "border-2 border-brand bg-surface text-brand"}`}
+            >
+              <Phone className="size-4" aria-hidden /> {c === "999" ? "999" : c === "111" ? "NHS 111" : "Samaritans 116 123"}
+            </a>
+          ))}
         </div>
       </div>
     );

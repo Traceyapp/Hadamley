@@ -18,7 +18,7 @@ export function Logo() {
       </span>
       <span className="flex flex-col leading-none">
         <span className="font-display text-[1.3rem] font-semibold tracking-tight text-ink sm:text-[1.65rem]">Hadamley</span>
-        <span className="mt-1 hidden text-[0.72rem] font-bold uppercase tracking-[0.14em] text-ink-2 sm:block">Information Services</span>
+        <span className="mt-1 hidden text-[0.72rem] font-bold uppercase tracking-[0.14em] text-accent sm:block">Information Services</span>
       </span>
     </Link>
   );

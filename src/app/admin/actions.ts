@@ -62,6 +62,15 @@ function parseSections(raw: FormDataEntryValue | null, fallback: PageSection[]):
         heading: String(s?.heading ?? "").trim().slice(0, 200),
         body: cleanBody(String(s?.body ?? "")),
         resourceIds: Array.isArray(s?.resourceIds) ? s.resourceIds.map(String).slice(0, 20) : [],
+        health: s?.health === true,
+        urgent: String(s?.urgent ?? "").trim().slice(0, 1000) || undefined,
+        sources: Array.isArray(s?.sources)
+          ? s.sources
+              .slice(0, 20)
+              .map((x: { label?: unknown; url?: unknown }) => ({ label: String(x?.label ?? "").trim().slice(0, 200), url: String(x?.url ?? "").trim().slice(0, 500) }))
+              .filter((x: { url: string }) => /^https?:\/\//i.test(x.url))
+          : [],
+        reviewedAt: /^\d{4}-\d{2}-\d{2}$/.test(String(s?.reviewedAt)) ? String(s.reviewedAt) : undefined,
       }))
       .filter((s) => s.heading);
   } catch {

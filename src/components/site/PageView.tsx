@@ -12,6 +12,7 @@ import { ListingCard } from "./ListingCard";
 import { ResourceCard } from "./ResourceCard";
 import { AskButton } from "./HelperWidget";
 import { ContactForm } from "./ContactForm";
+import { HealthUrgentBox } from "./HealthUrgentBox";
 
 const FUNERAL_LINK_SECTIONS = new Set(["chronic-illness-support", "mental-health-support"]);
 
@@ -63,6 +64,8 @@ export function PageView({ page, preview = false }: { page: Page; preview?: bool
 
       <Container className="grid gap-12 pt-12 lg:grid-cols-[minmax(0,1fr)_18rem] lg:gap-16">
         <div className="min-w-0">
+          {page.section === "mental-health-support" && <HealthUrgentBox kind="mental" />}
+          {page.section === "chronic-illness-support" && <HealthUrgentBox kind="physical" />}
           {html.trim() && <div className="prose-h" dangerouslySetInnerHTML={{ __html: html }} />}
           <Accordions sections={page.sections ?? []} />
           {page.slug === "contact" && (

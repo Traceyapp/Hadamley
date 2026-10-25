@@ -33,6 +33,14 @@ export interface PageSection {
   body: string;
   /** Resources (downloads) attached to this section. */
   resourceIds: string[];
+  /** Health information: ends with the full medical disclaimer. */
+  health?: boolean;
+  /** Condition-specific urgent warning, shown above the ordinary content. Plain text. */
+  urgent?: string;
+  /** Where the information comes from. */
+  sources?: { label: string; url: string }[];
+  /** "YYYY-MM-DD" the content was last reviewed. */
+  reviewedAt?: string;
 }
 
 export interface Post {

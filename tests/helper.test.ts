@@ -20,7 +20,11 @@ describe("AI helper answers", () => {
   it("shows the fixed crisis message for urgent wording", async () => {
     const r = await answer("I can't keep myself safe");
     expect(r.kind).toBe("crisis");
-    if (r.kind === "crisis") expect(r.lines.join(" ")).toMatch(/NHS 111.*999/s);
+    if (r.kind === "crisis") {
+      expect(r.lines.join(" ")).toMatch(/999/);
+      expect(r.lines.join(" ")).toMatch(/NHS 111/);
+      expect(r.calls).toContain("116123");
+    }
   });
 
   it("redirects funeral questions to The Funeral Companion URL from settings", async () => {

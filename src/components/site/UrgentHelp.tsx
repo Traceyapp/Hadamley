@@ -7,12 +7,15 @@ export function UrgentHelpPanel({ compact = false }: { compact?: boolean }) {
   return (
     <div className={compact ? "space-y-3" : "space-y-4"}>
       <p className="text-ink">
-        For urgent mental health help, call <strong>NHS 111</strong> and choose the mental health option.
-      </p>
-      <p className="text-ink">
         If a life is at risk, or you or someone else cannot stay safe, call <strong>999</strong> or go to A&amp;E now.
       </p>
-      <div className="grid gap-3 sm:grid-cols-2">
+      <p className="text-ink">
+        For urgent mental health help in England, call <strong>NHS 111</strong> and choose the mental health option.
+      </p>
+      <p className="text-ink">
+        To talk to someone without judgement, day or night, call <strong>Samaritans free on 116 123</strong>.
+      </p>
+      <div className="grid gap-3 sm:grid-cols-3">
         <a
           href="tel:111"
           className="flex min-h-14 items-center justify-center gap-2 rounded-xl border-2 border-brand bg-surface px-4 font-bold text-brand hover:bg-brand-tint"
@@ -24,6 +27,12 @@ export function UrgentHelpPanel({ compact = false }: { compact?: boolean }) {
           className="flex min-h-14 items-center justify-center gap-2 rounded-xl bg-urgent px-4 font-bold text-white hover:bg-urgent-strong dark:text-[#1b0b0a]"
         >
           <Phone className="size-5" aria-hidden /> Call 999
+        </a>
+        <a
+          href="tel:116123"
+          className="flex min-h-14 items-center justify-center gap-2 rounded-xl border-2 border-brand bg-surface px-4 font-bold text-brand hover:bg-brand-tint"
+        >
+          <Phone className="size-5" aria-hidden /> Samaritans
         </a>
       </div>
     </div>

@@ -1,6 +1,6 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { readDb, mutate } from "../db";
-import { checkGuards, CRISIS_MESSAGE } from "./guard";
+import { checkGuards, EMERGENCY_MESSAGES, type CallButton } from "./guard";
 import { search, RELEVANCE_FLOOR, tokenize, type SearchHit } from "./search";
 
 export type ChatTurn = { role: "user" | "assistant"; content: string };
@@ -12,7 +12,7 @@ export interface Source {
 }
 
 export type HelperReply =
-  | { kind: "crisis"; title: string; lines: string[] }
+  | { kind: "crisis"; title: string; lines: string[]; calls: CallButton[] }
   | { kind: "funeral"; text: string; url: string }
   | { kind: "answer"; text: string; sources: Source[]; mode: "model" | "extract"; notice?: string }
   | { kind: "not_found"; text: string; suggestions: Source[] };
@@ -148,8 +148,8 @@ export async function answer(question: string, history: ChatTurn[] = []): Promis
   // 2. Grief and funerals: redirect to The Funeral Companion.
   const guard = checkGuards(question);
   if (guard?.kind === "crisis") {
-    logQuestion("[crisis rule]", "crisis");
-    return { kind: "crisis", ...CRISIS_MESSAGE };
+    logQuestion(`[${guard.topic} rule]`, "crisis");
+    return { kind: "crisis", ...EMERGENCY_MESSAGES[guard.topic] };
   }
   if (guard?.kind === "funeral") {
     logQuestion(question, "funeral");
