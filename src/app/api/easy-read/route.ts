@@ -1,3 +1,4 @@
+import { ensureDb } from "@/lib/db";
 import { NextResponse } from "next/server";
 import { getPageAnyStatus } from "@/lib/repo";
 import { currentAdmin } from "@/lib/auth";
@@ -9,6 +10,7 @@ export const runtime = "nodejs";
 const UNAVAILABLE = "The easy read version isn't available right now. Please try again later, or use the text size buttons at the top of the page.";
 
 export async function POST(req: Request) {
+  await ensureDb();
   if (!rateLimit(clientKey(req, "easy-read"), 10, 10 * 60_000)) {
     return NextResponse.json({ error: "Please wait a few minutes before asking for another easy read version." }, { status: 429 });
   }

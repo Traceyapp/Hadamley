@@ -1,3 +1,4 @@
+import { ensureDb } from "@/lib/db";
 import { NextResponse } from "next/server";
 import { answer, type ChatTurn } from "@/lib/ai/answer";
 import { rateLimit, clientKey } from "@/lib/ratelimit";
@@ -5,6 +6,7 @@ import { rateLimit, clientKey } from "@/lib/ratelimit";
 export const runtime = "nodejs";
 
 export async function POST(req: Request) {
+  await ensureDb();
   const key = clientKey(req, "helper");
   if (!rateLimit(key, 20, 10 * 60_000)) {
     return NextResponse.json(

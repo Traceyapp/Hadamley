@@ -1,7 +1,7 @@
 "use server";
 
 import { headers } from "next/headers";
-import { mutate, nowIso, readDb, uid } from "@/lib/db";
+import { mutate, nowIso, readDb, uid, ensureDb } from "@/lib/db";
 import { clientKey, rateLimit } from "@/lib/ratelimit";
 import type { ContactTopic } from "@/lib/types";
 
@@ -15,6 +15,7 @@ function looksLikeSpam(form: FormData) {
 }
 
 export async function reportOutdated(_prev: FormState, form: FormData): Promise<FormState> {
+  await ensureDb();
   const listingId = String(form.get("listingId") ?? "");
   const message = String(form.get("message") ?? "").trim().slice(0, 2000);
   const contact = String(form.get("contact") ?? "").trim().slice(0, 200);
@@ -34,6 +35,7 @@ export async function reportOutdated(_prev: FormState, form: FormData): Promise<
 }
 
 export async function sendContact(_prev: FormState, form: FormData): Promise<FormState> {
+  await ensureDb();
   const name = String(form.get("name") ?? "").trim().slice(0, 120);
   const email = String(form.get("email") ?? "").trim().slice(0, 200);
   const message = String(form.get("message") ?? "").trim().slice(0, 4000);

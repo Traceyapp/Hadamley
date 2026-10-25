@@ -1,12 +1,14 @@
 import type { MetadataRoute } from "next";
 import { SITE_URL } from "@/lib/site-url";
+import { ensureDb } from "@/lib/db";
 import { approvedListings, publishedPages } from "@/lib/repo";
 import { publishedPosts, upcomingEvents } from "@/lib/notice";
 
 export const dynamic = "force-dynamic";
 
 /** Every public page: published pages, approved listings, news and upcoming events. */
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  await ensureDb();
   const u = (p: string) => `${SITE_URL}${p}`;
   return [
     ...publishedPages().map((p) => ({ url: u(`/${p.slug}`), lastModified: p.updatedAt })),

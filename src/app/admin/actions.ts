@@ -33,7 +33,7 @@ export async function login(_prev: ActionState, form: FormData): Promise<ActionS
   if (!rateLimit(clientKey({ headers: await headers() }, "login"), 8, 15 * 60_000)) {
     return { ok: false, message: "Too many attempts. Please wait 15 minutes and try again." };
   }
-  const user = checkCredentials(str(form, "email", 200), String(form.get("password") ?? ""));
+  const user = await checkCredentials(str(form, "email", 200), String(form.get("password") ?? ""));
   if (!user) return { ok: false, message: "That email and password don't match an admin account." };
   await createSession(user.email);
   redirect("/admin");

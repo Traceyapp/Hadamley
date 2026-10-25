@@ -1,3 +1,4 @@
+import { ensureDb } from "@/lib/db";
 import { getEvent } from "@/lib/notice";
 
 export const runtime = "nodejs";
@@ -7,6 +8,7 @@ const esc = (s: string) => s.replace(/\\/g, "\\\\").replace(/;/g, "\;").replace(
 
 /** A calendar file (.ics) for one event, in UK time. */
 export async function GET(req: Request, { params }: { params: Promise<{ slug: string }> }) {
+  await ensureDb();
   const e = getEvent((await params).slug);
   if (!e) return new Response("Not found", { status: 404 });
   const url = new URL(`/noticeboard/events/${e.slug}`, req.url).toString();

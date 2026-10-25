@@ -57,6 +57,16 @@ export async function loadDb(): Promise<Database> {
   return g.__hadamleyLoading;
 }
 
+/**
+ * Makes sure the data is in memory before a request reads it. On Vercel each
+ * route can run as its own small server that may get a request before start-up
+ * loading has finished, so every entry point that reads data awaits this first.
+ */
+export async function ensureDb(): Promise<void> {
+  if (!useSupabase() || g.__hadamleyDb) return;
+  await loadDb();
+}
+
 /** Read, change and save in one step. Returns whatever the callback returns. Changes run one at a time. */
 export function mutate<T>(fn: (db: Database) => T): Promise<T> {
   const run = async () => {

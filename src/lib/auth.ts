@@ -1,7 +1,7 @@
 import crypto from "node:crypto";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { readDb } from "./db";
+import { ensureDb, readDb } from "./db";
 import { verifyPassword } from "./password";
 import type { AdminUser } from "./types";
 
@@ -42,6 +42,7 @@ export async function destroySession() {
 }
 
 export async function currentAdmin(): Promise<Omit<AdminUser, "passwordHash"> | null> {
+  await ensureDb();
   const raw = (await cookies()).get(COOKIE)?.value;
   if (!raw) return null;
   const [payload, sig] = raw.split(".");
@@ -66,7 +67,8 @@ export async function requireAdmin() {
   return user;
 }
 
-export function checkCredentials(email: string, password: string) {
+export async function checkCredentials(email: string, password: string) {
+  await ensureDb();
   const user = readDb().admins.find((a) => a.email === email.trim().toLowerCase());
   // Always run a hash comparison to keep timing similar for unknown emails.
   const ok = verifyPassword(password, user?.passwordHash ?? "scrypt$00$00");

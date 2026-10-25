@@ -1,3 +1,4 @@
+import { ensureDb } from "@/lib/db";
 import path from "node:path";
 import { readDb } from "@/lib/db";
 import { getFile } from "@/lib/files";
@@ -7,6 +8,7 @@ export const runtime = "nodejs";
 
 /** Serves uploaded files. Unpublished downloads are visible to admins only. */
 export async function GET(_req: Request, { params }: { params: Promise<{ name: string }> }) {
+  await ensureDb();
   const { name } = await params;
   const safe = path.basename(name);
   const db = readDb();
