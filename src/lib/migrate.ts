@@ -1,3 +1,5 @@
+import fs from "node:fs";
+import path from "node:path";
 import type { Database, NoticeEvent, Post } from "./types";
 import { UPLOAD_DIR } from "./db";
 import { importLibrary } from "./library";
@@ -14,8 +16,10 @@ import { importLibrary } from "./library";
  * so each one ends with the full medical disclaimer.
  * Version 8 loads Tracey's printable library and takes down our one-page
  * placeholder downloads (only if they are still the untouched placeholders).
+ * Version 9 removes the mortuary signpost colouring page, which was in the
+ * collection by mistake.
  */
-export const DB_VERSION = 8;
+export const DB_VERSION = 9;
 
 const T = "2026-10-20T09:00:00.000Z";
 
@@ -192,6 +196,17 @@ export function migrate(db: Database): boolean {
     const placeholders = new Set(["r-appointment", "r-symptoms", "r-home-safety", "r-transport"]);
     for (const r of db.resources) if (placeholders.has(r.id) && r.size < 5000) r.status = "draft";
     db.version = 8;
+    changed = true;
+  }
+
+  if ((db.version ?? 1) < 9) {
+    const r = db.resources.find((x) => x.id === "lib-signpost-mortuary");
+    if (r) {
+      fs.rmSync(path.join(UPLOAD_DIR, path.basename(r.storedName)), { force: true });
+      db.resources = db.resources.filter((x) => x.id !== r.id);
+      for (const p of db.pages) for (const s of p.sections ?? []) s.resourceIds = s.resourceIds.filter((id) => id !== r.id);
+    }
+    db.version = 9;
     changed = true;
   }
   return changed;
