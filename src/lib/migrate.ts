@@ -3,6 +3,7 @@ import path from "node:path";
 import type { Database, NoticeEvent, Post } from "./types";
 import { UPLOAD_DIR } from "./db";
 import { importLibrary } from "./library";
+import { HEALTH_DRAFTS } from "./content";
 
 /**
  * Brings older data files up to date. Version 2 adds accordion sections,
@@ -18,8 +19,11 @@ import { importLibrary } from "./library";
  * placeholder downloads (only if they are still the untouched placeholders).
  * Version 9 removes the mortuary signpost colouring page, which was in the
  * collection by mistake.
+ * Version 10 adds the health content drafted from Tracey's content brief, as
+ * drafts for her to review: conditions A to Z, fibromyalgia, lupus, arthritis,
+ * mental health, your rights, and benefits. Pages already present are left alone.
  */
-export const DB_VERSION = 9;
+export const DB_VERSION = 10;
 
 const T = "2026-10-20T09:00:00.000Z";
 
@@ -207,6 +211,16 @@ export function migrate(db: Database): boolean {
       for (const p of db.pages) for (const s of p.sections ?? []) s.resourceIds = s.resourceIds.filter((id) => id !== r.id);
     }
     db.version = 9;
+    changed = true;
+  }
+
+  if ((db.version ?? 1) < 10) {
+    for (const p of HEALTH_DRAFTS) {
+      if (db.pages.some((x) => x.id === p.id || x.slug === p.slug)) continue;
+      const ok = !p.parentId || db.pages.some((x) => x.id === p.parentId);
+      db.pages.push(structuredClone({ ...p, parentId: ok ? p.parentId : null }));
+    }
+    db.version = 10;
     changed = true;
   }
   return changed;

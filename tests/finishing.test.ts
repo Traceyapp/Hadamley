@@ -86,3 +86,34 @@ describe("Tracey's printable library", () => {
     expect(db.resources.find((r) => r.id === "r-appointment")?.status).toBe("draft");
   });
 });
+
+describe("health content drafts", () => {
+  it("loads every drafted page as a draft, with health sections ending in the disclaimer setting", async () => {
+    const { readDb } = await import("@/lib/db");
+    const { HEALTH_DRAFTS } = await import("@/lib/content");
+    const db = readDb();
+    for (const d of HEALTH_DRAFTS) {
+      const p = db.pages.find((x) => x.id === d.id);
+      expect(p?.status, d.id).toBe("draft");
+      expect(p!.sections!.length, d.id).toBeGreaterThan(0);
+      for (const s of p!.sections!) expect(s.reviewedAt, `${d.id}/${s.id}`).toBe("2026-10-24");
+    }
+    const az = db.pages.find((p) => p.id === "p-conditions")!.sections!.map((s) => s.heading);
+    expect(az).toEqual([...az].sort((a, b) => a.localeCompare(b)));
+    expect(db.pages.find((p) => p.id === "p-fibro")!.sections!.every((s) => s.health)).toBe(true);
+  });
+
+  it("keeps drafts out of the AI helper and site search", async () => {
+    const { readDb } = await import("@/lib/db");
+    const { siteSearch } = await import("@/lib/site-search");
+    expect(readDb().chunks.some((c) => c.url.includes("understanding-fibromyalgia"))).toBe(false);
+    expect(siteSearch("tender points").some((r) => r.url.includes("fibromyalgia"))).toBe(false);
+  });
+
+  it("links only to downloads that exist in the library", async () => {
+    const { readDb } = await import("@/lib/db");
+    const { HEALTH_DRAFTS } = await import("@/lib/content");
+    const ids = new Set(readDb().resources.map((r) => r.id));
+    for (const d of HEALTH_DRAFTS) for (const s of d.sections ?? []) for (const r of s.resourceIds) expect(ids.has(r), `${d.id}/${s.id} -> ${r}`).toBe(true);
+  });
+});
