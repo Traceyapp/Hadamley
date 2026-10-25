@@ -67,7 +67,7 @@ export function PageView({ page, preview = false }: { page: Page; preview?: bool
           {page.section === "mental-health-support" && <HealthUrgentBox kind="mental" />}
           {page.section === "chronic-illness-support" && <HealthUrgentBox kind="physical" />}
           {html.trim() && <div className="prose-h" dangerouslySetInnerHTML={{ __html: html }} />}
-          <Accordions sections={page.sections ?? []} />
+          <Accordions sections={page.sections ?? []} preview={preview} />
           {page.slug === "contact" && (
             <div className="mt-10 max-w-2xl">
               {contactEmail && (

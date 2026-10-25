@@ -11,7 +11,9 @@ import { AccordionTools, SectionActions } from "./AccordionTools";
  * JavaScript; with it, they unfold like a leaflet, open from a link,
  * open all at once, and print one section on its own.
  */
-export function Accordions({ sections }: { sections: PageSection[] }) {
+export function Accordions({ sections: all, preview = false }: { sections: PageSection[]; preview?: boolean }) {
+  // A heading waiting for its wording stays hidden from visitors, so the page never looks unfinished.
+  const sections = preview ? all : all.filter((s) => s.body.replace(/<[^>]*>/g, "").trim());
   if (!sections.length) return null;
   const resources = readDb().resources.filter((r) => r.status === "published");
   return (
@@ -29,7 +31,10 @@ export function Accordions({ sections }: { sections: PageSection[] }) {
                 <span className="font-display text-[1.1rem] font-semibold text-sec" aria-hidden>
                   {String(i + 1).padStart(2, "0")}
                 </span>
-                <h3 className="soft-hover flex-1 text-[1.25rem] font-semibold leading-snug">{s.heading}</h3>
+                <h3 className="soft-hover flex-1 text-[1.25rem] font-semibold leading-snug">
+                  {s.heading}
+                  {preview && !s.body.replace(/<[^>]*>/g, "").trim() && <span className="ml-2 align-middle text-[0.8rem] font-bold uppercase tracking-wide text-warn">Wording to add · hidden from visitors</span>}
+                </h3>
                 <span className="grid size-9 shrink-0 place-items-center rounded-full border-[1.5px] border-ink transition-transform duration-300 group-open:rotate-180 group-open:bg-ink group-open:text-paper">
                   <ChevronDown className="size-4" aria-hidden />
                 </span>

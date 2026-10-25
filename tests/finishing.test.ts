@@ -130,3 +130,17 @@ describe("health content drafts", () => {
     for (const d of HEALTH_DRAFTS) for (const s of d.sections ?? []) for (const r of s.resourceIds) expect(ids.has(r), `${d.id}/${s.id} -> ${r}`).toBe(true);
   });
 });
+
+describe("Chronic Illness Support page (brief of 25 October)", () => {
+  it("has Tracey's introduction and the 22 condition headings in her order", async () => {
+    const { readDb } = await import("@/lib/db");
+    const { CONDITION_TITLES } = await import("@/lib/content/chronic-illness");
+    const p = readDb().pages.find((x) => x.id === "p-ltc")!;
+    expect(p.title).toBe("Chronic Illness Support");
+    expect(p.body).toMatch(/Select a condition below to read about its symptoms, treatment and available support\./);
+    expect(p.body).toMatch(/You do not need a confirmed diagnosis/);
+    expect(p.sections!.map((s) => s.heading)).toEqual(CONDITION_TITLES.map(([, h]) => h));
+    expect(p.sections!.every((s) => s.health)).toBe(true);
+    expect(CONDITION_TITLES).toHaveLength(22);
+  });
+});

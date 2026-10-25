@@ -5,6 +5,7 @@ import { UPLOAD_DIR } from "./db";
 import { importLibrary } from "./library";
 import { HEALTH_DRAFTS } from "./content";
 import { DRAFTED_BY } from "./content/helpers";
+import { CHRONIC_BODY, CHRONIC_SUMMARY, conditionHeadings } from "./content/chronic-illness";
 
 /**
  * Brings older data files up to date. Version 2 adds accordion sections,
@@ -29,8 +30,10 @@ import { DRAFTED_BY } from "./content/helpers";
  * the NHS pages instead of saying information is being prepared, and the
  * tender-point diagram is taken out until she supplies her own. It refreshes
  * every health draft she hasn't edited yet.
+ * Version 13 follows the Chronic Illness Support brief of 25 October: Tracey's
+ * introduction and the 22 condition accordion headings (wording to follow).
  */
-export const DB_VERSION = 12;
+export const DB_VERSION = 13;
 
 const T = "2026-10-20T09:00:00.000Z";
 
@@ -248,6 +251,21 @@ export function migrate(db: Database): boolean {
       page.sections = structuredClone(fresh.sections);
     }
     db.version = 12;
+    changed = true;
+  }
+
+  if ((db.version ?? 1) < 13) {
+    const page = db.pages.find((p) => p.id === "p-ltc");
+    if (page) {
+      if (page.updatedBy === "Seed content") {
+        page.title = "Chronic Illness Support";
+        page.summary = CHRONIC_SUMMARY;
+        page.body = CHRONIC_BODY;
+      }
+      const have = new Set((page.sections ?? []).map((s) => s.id));
+      page.sections = [...(page.sections ?? []), ...conditionHeadings().filter((s) => !have.has(s.id))];
+    }
+    db.version = 13;
     changed = true;
   }
   return changed;
