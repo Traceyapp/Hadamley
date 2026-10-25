@@ -16,7 +16,7 @@ describe("site-wide search", () => {
   });
 
   it("finds downloads, news and upcoming events", () => {
-    expect(siteSearch("appointment checklist").some((r) => r.kind === "download")).toBe(true);
+    expect(siteSearch("appointment notes").some((r) => r.kind === "download")).toBe(true);
     expect(siteSearch("winter").some((r) => r.kind === "news")).toBe(true);
     expect(siteSearch("drop-in").some((r) => r.kind === "event")).toBe(true);
   });
@@ -68,5 +68,21 @@ describe("Tracey's wording (migration v4)", () => {
 
   it("indexes her About page for the helper and search", () => {
     expect(siteSearch("founder").some((r) => r.url.startsWith("/about"))).toBe(true);
+  });
+});
+
+describe("Tracey's printable library", () => {
+  it("loads every library file as a published download with its file in uploads", async () => {
+    const { readDb, UPLOAD_DIR } = await import("@/lib/db");
+    const { LIBRARY } = await import("@/lib/library");
+    const fs = await import("node:fs");
+    const path = await import("node:path");
+    const db = readDb();
+    for (const e of LIBRARY) {
+      const r = db.resources.find((x) => x.id === e.id);
+      expect(r?.status, e.id).toBe("published");
+      expect(fs.existsSync(path.join(UPLOAD_DIR, r!.storedName)), e.id).toBe(true);
+    }
+    expect(db.resources.find((r) => r.id === "r-appointment")?.status).toBe("draft");
   });
 });

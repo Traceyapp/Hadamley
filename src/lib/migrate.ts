@@ -1,4 +1,6 @@
 import type { Database, NoticeEvent, Post } from "./types";
+import { UPLOAD_DIR } from "./db";
+import { importLibrary } from "./library";
 
 /**
  * Brings older data files up to date. Version 2 adds accordion sections,
@@ -10,8 +12,10 @@ import type { Database, NoticeEvent, Post } from "./types";
  * "Free printable library" (again only on untouched seed pages).
  * Version 7 marks accordion sections on the health pages as health information,
  * so each one ends with the full medical disclaimer.
+ * Version 8 loads Tracey's printable library and takes down our one-page
+ * placeholder downloads (only if they are still the untouched placeholders).
  */
-export const DB_VERSION = 7;
+export const DB_VERSION = 8;
 
 const T = "2026-10-20T09:00:00.000Z";
 
@@ -180,6 +184,14 @@ export function migrate(db: Database): boolean {
       for (const s of p.sections ?? []) s.health ??= true;
     }
     db.version = 7;
+    changed = true;
+  }
+
+  if ((db.version ?? 1) < 8) {
+    importLibrary(db, UPLOAD_DIR);
+    const placeholders = new Set(["r-appointment", "r-symptoms", "r-home-safety", "r-transport"]);
+    for (const r of db.resources) if (placeholders.has(r.id) && r.size < 5000) r.status = "draft";
+    db.version = 8;
     changed = true;
   }
   return changed;
