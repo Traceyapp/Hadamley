@@ -103,11 +103,11 @@ export function SearchPanel({ variant = "button" }: { variant?: "button" | "bar"
           type="button"
           onClick={() => setOpen(true)}
           aria-haspopup="dialog"
-          className="hidden min-h-11 min-w-11 items-center justify-center gap-2 rounded-full border-[1.5px] border-ink bg-surface font-bold sm:inline-flex lg:px-4"
+          title="Search (press / to open)"
+          className="hidden min-h-11 min-w-11 items-center justify-center gap-2 rounded-full border-[1.5px] border-ink bg-surface font-bold sm:inline-flex lg:px-4 xl:px-0"
         >
           <Search className="size-5" aria-hidden />
-          <span className="sr-only lg:not-sr-only">Search</span>
-          <kbd className="hidden rounded border border-line-strong px-1.5 text-xs font-bold text-ink-2 xl:inline">/</kbd>
+          <span className="sr-only lg:not-sr-only xl:sr-only">Search</span>
         </button>
       )}
       {open &&

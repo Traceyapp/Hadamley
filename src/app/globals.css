@@ -53,7 +53,8 @@
   --ok-soft: #e1eedf;
   --warn: #8a5300;
   --warn-soft: #f8ecd2;
-  --focus: #ffbf47;
+  --focus: var(--brand);
+  --focus-soft: var(--accent-soft);
   --art-lake: #a7d2db;
   --art-brick: #f3b38f;
   --art-meadow: #b4d6a9;
@@ -234,6 +235,13 @@
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
   }
+
+/* With a larger text size the desktop menu gets its own row under the logo
+   and buttons, rather than pushing the buttons onto a ragged second line. */
+@media (min-width: 80rem) {
+  html[data-text] .site-bar nav[aria-label="Main"] { order: 3; width: 100%; }
+  html[data-text] .site-bar-actions { order: 2; }
+}
   /* Faint paper tooth across the whole site */
   body::before {
     content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 0; opacity: 0.5; mix-blend-mode: multiply;
@@ -256,18 +264,35 @@
   :root:not([data-theme="light"]) body::before { mix-blend-mode: screen; opacity: 0.25; }
 }
 
-/* GOV.UK style focus: high visibility on any background. */
+@layer base {
+/* Keyboard focus: a clear brand ring with a gap, visible on any background
+   (navy by day, light blue at night). Meets WCAG 2.2 focus appearance. */
 :where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
   outline: 3px solid var(--focus);
-  outline-offset: 0;
-  box-shadow: 0 0 0 6px var(--ink);
-  border-radius: 6px;
+  outline-offset: 2px;
+  border-radius: 8px;
 }
-a:focus-visible { background: var(--focus); color: #0b0c0c !important; box-shadow: 0 4px 0 #0b0c0c; outline: none; }
+/* Text boxes already show a caret, so a tighter ring that hugs the field. */
+:where(input:not([type="checkbox"], [type="radio"]), select, textarea):focus-visible {
+  outline-offset: 0;
+  border-color: var(--focus);
+}
+/* Links in running text: a champagne highlight as well as the ring. */
+:where(.prose-h, .link, p, li) a:focus-visible, a.link:focus-visible {
+  background: var(--focus-soft);
+  color: var(--ink) !important;
+  text-decoration-thickness: 2px;
+}
+  /* A text box styled to sit inside a frame hides its own ring; the frame shows it instead. */
+  :where(div, form, label):has(> :is(input, textarea).outline-none:focus-visible) {
+    outline: 3px solid var(--focus);
+    outline-offset: -1px;
+  }
+}
 
 .skip-link {
   position: absolute; left: 1rem; top: -100px; z-index: 100;
-  background: var(--focus); color: #0b0c0c; padding: 0.75rem 1rem; font-weight: 700; border-radius: 0 0 8px 8px;
+  background: var(--brand); color: var(--paper); padding: 0.75rem 1rem; font-weight: 700; border-radius: 0 0 8px 8px;
 }
 .skip-link:focus { top: 0; }
 

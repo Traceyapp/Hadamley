@@ -57,7 +57,7 @@ export function UrgentHelpButton() {
       <button
         type="button"
         onClick={() => ref.current?.showModal()}
-        className="inline-flex min-h-11 items-center gap-1.5 whitespace-nowrap rounded-full border-[1.5px] border-urgent bg-urgent-soft px-2.5 text-[0.86rem] sm:gap-2 sm:px-4 sm:text-[0.95rem] font-bold text-urgent hover:bg-urgent hover:text-white dark:hover:text-[#1b0b0a]"
+        className="inline-flex min-h-11 items-center gap-1.5 whitespace-nowrap rounded-full border-[1.5px] border-urgent bg-urgent-soft px-2 text-[0.86rem] min-[400px]:px-2.5 sm:gap-2 sm:px-4 sm:text-[0.95rem] font-bold text-urgent hover:bg-urgent hover:text-white dark:hover:text-[#1b0b0a]"
         aria-haspopup="dialog"
       >
         <LifeBuoy className="size-4 sm:size-5" aria-hidden />
