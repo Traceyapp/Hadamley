@@ -41,7 +41,7 @@ export async function loadDb(): Promise<Database> {
   if (!useSupabase()) return readFileDb();
   g.__hadamleyLoading ??= (async () => {
     try {
-      const loaded = await loadFromSupabase();
+      const loaded = await withRetry(loadFromSupabase);
       if (!loaded) throw new Error("The Supabase database is empty. Copy the content across with: npm run db:push");
       const before = structuredClone(loaded);
       if (migrate(loaded)) {
@@ -62,6 +62,21 @@ export async function loadDb(): Promise<Database> {
  * route can run as its own small server that may get a request before start-up
  * loading has finished, so every entry point that reads data awaits this first.
  */
+/** Supabase can briefly fail or time out when a fresh server starts; try a few times before giving up. */
+async function withRetry<T>(fn: () => Promise<T>, attempts = 3): Promise<T> {
+  let last: unknown;
+  for (let i = 0; i < attempts; i++) {
+    try {
+      return await fn();
+    } catch (err) {
+      last = err;
+      console.error(`[hadamley] Supabase load attempt ${i + 1} of ${attempts} failed:`, err instanceof Error ? err.message : err);
+      if (i < attempts - 1) await new Promise((r) => setTimeout(r, 300 * (i + 1)));
+    }
+  }
+  throw last;
+}
+
 export async function ensureDb(): Promise<void> {
   if (!useSupabase() || g.__hadamleyDb) return;
   await loadDb();
