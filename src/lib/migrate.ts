@@ -4,6 +4,7 @@ import type { Database, NoticeEvent, Post } from "./types";
 import { UPLOAD_DIR } from "./db";
 import { importLibrary } from "./library";
 import { HEALTH_DRAFTS } from "./content";
+import { DRAFTED_BY } from "./content/helpers";
 
 /**
  * Brings older data files up to date. Version 2 adds accordion sections,
@@ -22,8 +23,10 @@ import { HEALTH_DRAFTS } from "./content";
  * Version 10 adds the health content drafted from Tracey's content brief, as
  * drafts for her to review: conditions A to Z, fibromyalgia, lupus, arthritis,
  * mental health, your rights, and benefits. Pages already present are left alone.
+ * Version 11 adds the tender-point explanation and diagram to the fibromyalgia
+ * draft, if Tracey hasn't edited that page yet.
  */
-export const DB_VERSION = 10;
+export const DB_VERSION = 11;
 
 const T = "2026-10-20T09:00:00.000Z";
 
@@ -221,6 +224,15 @@ export function migrate(db: Database): boolean {
       db.pages.push(structuredClone({ ...p, parentId: ok ? p.parentId : null }));
     }
     db.version = 10;
+    changed = true;
+  }
+
+  if ((db.version ?? 1) < 11) {
+    const page = db.pages.find((p) => p.id === "p-fibro" && p.updatedBy === DRAFTED_BY);
+    const fresh = HEALTH_DRAFTS.find((p) => p.id === "p-fibro")?.sections?.find((s) => s.id === "fibro-diagnosis");
+    const i = page?.sections?.findIndex((s) => s.id === "fibro-diagnosis") ?? -1;
+    if (page && fresh && i >= 0) page.sections![i] = structuredClone(fresh);
+    db.version = 11;
     changed = true;
   }
   return changed;

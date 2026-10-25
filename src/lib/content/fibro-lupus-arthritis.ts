@@ -88,7 +88,14 @@ export const fibroPage = draftPage({
       `<p>There is no established blood test or scan that confirms fibromyalgia. A diagnosis is based on:</p>
 <ul><li>your history and symptoms</li><li>a physical examination</li><li>where the pain is, how severe the symptoms are, and how long they have lasted</li></ul>
 <p>Tests may be used to look for other conditions that could cause similar symptoms, or that a person could have as well. Fibromyalgia can exist alongside other illnesses, so it is not simply what is left when every test is normal.</p>
-<p>Doctors may use assessment tools that score where you have pain and how severe your symptoms are. These are clinical aids for a professional to use, not a self-test. The older tender-point count is no longer required for a diagnosis, although a doctor may still examine for tenderness.</p>
+<p>Doctors may use assessment tools that score where you have pain and how severe your symptoms are. These are clinical aids for a professional to use, not a self-test.</p>
+<h4>Tender points</h4>
+<p>Some people are told a professional will examine particular points on the body that are sensitive to pressure. These are called tender points. They are not the same as acupuncture or acupressure points, or the trigger points sometimes mentioned in muscle pain.</p>
+<p>The 1990 classification criteria combined widespread pain for at least 3 months with pain at 11 or more of 18 tender points, shown below. Modern assessment does not need that count and looks at the wider pattern of symptoms. Tenderness can still be part of an examination, but a count on its own cannot confirm fibromyalgia.</p>
+<figure>
+<img src="/diagrams/fibromyalgia-tender-points.svg" width="1000" height="840" loading="lazy" alt="Front and back outlines of a body showing the 18 tender points used in the 1990 classification criteria. There are nine areas, each on both sides of the body: 1, occiput, at the base of the skull at the back. 2, low cervical, at the lower front of the neck. 3, trapezius, on top of the shoulder. 4, supraspinatus, above the shoulder blade. 5, second rib, on the upper chest beside the breastbone. 6, lateral epicondyle, just below the outer elbow. 7, gluteal, on the upper outer buttock. 8, greater trochanter, on the outer hip. 9, knee, on the inner side just above the joint." />
+<figcaption>The 18 tender points used in the historical 1990 classification criteria. The numbers mark areas, not a score, and positions are approximate. Modern diagnosis does not need a tender-point count, and this is not a self-test. Original Hadamley diagram, draft for clinical review.</figcaption>
+</figure>
 <p>UK guidance from the Royal College of Physicians says fibromyalgia can be diagnosed by suitably skilled clinicians, and a rheumatologist does not need to confirm it in every case.</p>`,
       [nhs("Fibromyalgia diagnosis", "conditions/fibromyalgia/diagnosis/"), RCP],
     ),

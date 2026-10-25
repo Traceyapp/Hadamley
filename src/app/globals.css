@@ -378,6 +378,9 @@ a:focus-visible { background: var(--focus); color: #0b0c0c !important; box-shado
 .prose-h strong { font-weight: 700; }
 .prose-h blockquote { border-left: 4px solid var(--sec, var(--brand)); background: var(--sec-soft, var(--brand-tint)); padding: 1.1rem 1.35rem; border-radius: 0 12px 12px 0; }
 .prose-h img { border-radius: 12px; max-width: 100%; height: auto; border: 1.5px solid var(--ink); }
+.prose-h figure { margin: 1.5rem 0; }
+.prose-h figure img { background: #fff; }
+.prose-h figcaption { margin-top: 0.6rem; font-size: 0.92rem; color: var(--ink-2); }
 .prose-h > :first-child { margin-top: 0; border-top: 0; padding-top: 0; }
 
 .tiptap { outline: none; min-height: 320px; }
