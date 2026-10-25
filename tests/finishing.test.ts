@@ -110,6 +110,19 @@ describe("health content drafts", () => {
     expect(siteSearch("tender points").some((r) => r.url.includes("fibromyalgia"))).toBe(false);
   });
 
+  it("never tells visitors that information is still being prepared, and has no diagram until Tracey supplies one", async () => {
+    const { readDb } = await import("@/lib/db");
+    const { HEALTH_DRAFTS } = await import("@/lib/content");
+    const db = readDb();
+    for (const d of HEALTH_DRAFTS) {
+      const p = db.pages.find((x) => x.id === d.id)!;
+      const all = [p.body, ...p.sections!.map((s) => s.body)].join(" ");
+      expect(all, d.id).not.toMatch(/being prepared|will be added|being developed/i);
+      expect(all, d.id).not.toMatch(/tender-points\.svg/);
+    }
+    expect(db.pages.find((p) => p.id === "p-conditions")!.sections!.every((s) => s.body.includes("nhs.uk/medicines/"))).toBe(true);
+  });
+
   it("links only to downloads that exist in the library", async () => {
     const { readDb } = await import("@/lib/db");
     const { HEALTH_DRAFTS } = await import("@/lib/content");

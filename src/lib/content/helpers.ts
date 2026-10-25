@@ -18,9 +18,9 @@ export const nhs = (label: string, path: string): Source => ({ label: `NHS: ${la
 export const SYMPTOM_NOTE =
   "<p><em>Everyone's experience is different. You may have some of these symptoms, and their severity can change. These summaries cannot diagnose a condition. Speak to a healthcare professional about new or changing symptoms.</em></p>";
 
-/** Placeholder until medicine-specific copy has been drafted and checked, as the brief requires. */
-export const TREATMENT_TO_FOLLOW = (what = "the options a healthcare professional may discuss with you") =>
-  `<h4>Treatment and medicines</h4><p>Information about treatments, medicines and possible side effects is being prepared and checked. Until then, the NHS page in the sources below explains ${what}. Your pharmacist or the person who prescribes your medicine can answer questions about side effects.</p>`;
+/** Points to the NHS page in the section's sources for treatments, medicines and side effects. */
+export const TREATMENT_NHS = (what = "the treatments a healthcare professional may discuss with you") =>
+  `<h4>Treatment and medicines</h4><p>The NHS page in the sources below explains ${what}, including medicines and their possible side effects. For more about a particular medicine, see the <a href="https://www.nhs.uk/medicines/" target="_blank" rel="noopener">NHS medicines A to Z</a>. Your pharmacist or the person who prescribes your medicine can answer questions about side effects.</p>`;
 
 export function section(id: string, heading: string, body: string, sources: Source[], opts: { files?: string[]; urgent?: string; health?: boolean } = {}): PageSection {
   return { id, heading, body, resourceIds: opts.files ?? [], health: opts.health ?? true, urgent: opts.urgent, sources, reviewedAt: REVIEWED };

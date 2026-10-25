@@ -25,8 +25,12 @@ import { DRAFTED_BY } from "./content/helpers";
  * mental health, your rights, and benefits. Pages already present are left alone.
  * Version 11 adds the tender-point explanation and diagram to the fibromyalgia
  * draft, if Tracey hasn't edited that page yet.
+ * Version 12 follows Tracey's feedback of 25 October: medicine sections link to
+ * the NHS pages instead of saying information is being prepared, and the
+ * tender-point diagram is taken out until she supplies her own. It refreshes
+ * every health draft she hasn't edited yet.
  */
-export const DB_VERSION = 11;
+export const DB_VERSION = 12;
 
 const T = "2026-10-20T09:00:00.000Z";
 
@@ -233,6 +237,17 @@ export function migrate(db: Database): boolean {
     const i = page?.sections?.findIndex((s) => s.id === "fibro-diagnosis") ?? -1;
     if (page && fresh && i >= 0) page.sections![i] = structuredClone(fresh);
     db.version = 11;
+    changed = true;
+  }
+
+  if ((db.version ?? 1) < 12) {
+    for (const fresh of HEALTH_DRAFTS) {
+      const page = db.pages.find((p) => p.id === fresh.id && p.updatedBy === DRAFTED_BY);
+      if (!page) continue;
+      page.body = fresh.body;
+      page.sections = structuredClone(fresh.sections);
+    }
+    db.version = 12;
     changed = true;
   }
   return changed;
