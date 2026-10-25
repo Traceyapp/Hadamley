@@ -243,10 +243,8 @@
   html[data-text] .site-bar-actions { order: 2; }
 }
   /* Faint paper tooth across the whole site */
-  body::before {
-    content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 0; opacity: 0.5; mix-blend-mode: multiply;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.45 0 0 0 0 0.4 0 0 0 0 0.3 0 0 0 0.09 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-  }
+  /* No paper-grain overlay: clean white backgrounds (Tracey's brief), and nothing
+     to repaint behind the text while scrolling. */
   body > * { position: relative; z-index: 1; }
 
   h1, h2, h3, .font-display {
@@ -260,9 +258,6 @@
   ::selection { background: var(--accent-soft); color: var(--ink); }
 }
 
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) body::before { mix-blend-mode: screen; opacity: 0.25; }
-}
 
 @layer base {
 /* Keyboard focus: a clear brand ring with a gap, visible on any background
@@ -457,15 +452,8 @@
 @keyframes paper-in { to { fill-opacity: 1; } }
 @keyframes riso-in { to { opacity: 1; translate: 0 0; } }
 
-/* Vignettes sketch themselves as they scroll into view (where supported) */
-@supports (animation-timeline: view()) {
-  .sketch-on-scroll .ln, .sketch-on-scroll .ln-thin {
-    stroke-dasharray: 700; stroke-dashoffset: 700;
-    animation: sketch linear both; animation-timeline: view(); animation-range: entry 10% cover 45%;
-  }
-  .slide-on-scroll { animation: slide-in linear both; animation-timeline: view(); animation-range: entry 0% cover 30%; }
-  @keyframes slide-in { from { opacity: 0; translate: -28px 0; } to { opacity: 1; translate: 0 0; } }
-}
+/* Nothing is tied to the scroll position: text and drawings stay still while
+   people scroll up and down, which avoids any flicker or shake. */
 
 /* Living type: Fraunces softens its letterforms on hover */
 .soft-hover { transition: font-variation-settings 0.5s ease; }

@@ -23,7 +23,7 @@ export function HeaderShell({ children }: { children: React.ReactNode }) {
   return (
     <header
       className={`sticky top-0 z-30 transition-[background-color,box-shadow,border-color] duration-500 ${
-        scrolled ? "border-b-2 border-champagne bg-paper/95 backdrop-blur" : "border-b-2 border-champagne/60 bg-paper"
+        scrolled ? "border-b-2 border-champagne bg-paper" : "border-b-2 border-champagne/60 bg-paper"
       }`}
     >
       {children}
