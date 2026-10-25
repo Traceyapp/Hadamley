@@ -1,7 +1,7 @@
 import { ensureDb } from "@/lib/db";
 import path from "node:path";
 import { readDb } from "@/lib/db";
-import { getFile } from "@/lib/files";
+import { fileLink, getFile } from "@/lib/files";
 import { currentAdmin } from "@/lib/auth";
 
 export const runtime = "nodejs";
@@ -16,6 +16,16 @@ export async function GET(_req: Request, { params }: { params: Promise<{ name: s
   const upload = db.uploads.find((u) => u.storedName === safe);
   if (!resource && !upload) return new Response("Not found", { status: 404 });
   if (resource && resource.status !== "published" && !(await currentAdmin())) return new Response("Not found", { status: 404 });
+
+  // With Supabase, send the browser straight to the file on Supabase's CDN.
+  const published = !resource || resource.status === "published";
+  const link = await fileLink(safe, { downloadAs: resource?.fileName, seconds: resource ? 3600 : 86_400 });
+  if (link) {
+    return new Response(null, {
+      status: 302,
+      headers: { Location: link, "Cache-Control": published ? "public, max-age=300, s-maxage=300" : "private, no-store" },
+    });
+  }
 
   const body = await getFile(safe);
   if (!body) return new Response("Not found", { status: 404 });

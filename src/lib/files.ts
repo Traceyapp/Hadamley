@@ -31,6 +31,20 @@ export async function getFile(name: string): Promise<Buffer | null> {
   return fs.existsSync(p) ? fs.readFileSync(p) : null;
 }
 
+/**
+ * A short-lived private link straight to the file in Supabase storage, so big
+ * files come from Supabase's CDN instead of through the site's own server
+ * (which on Vercel is slow and capped at 4.5 MB). Null with local files.
+ */
+export async function fileLink(name: string, opts: { downloadAs?: string; seconds: number }): Promise<string | null> {
+  if (!useSupabase()) return null;
+  const { data, error } = await supabase()
+    .storage.from(BUCKET)
+    .createSignedUrl(safe(name), opts.seconds, opts.downloadAs ? { download: opts.downloadAs } : undefined);
+  if (error || !data?.signedUrl) return null;
+  return data.signedUrl;
+}
+
 export async function removeFile(name: string): Promise<void> {
   if (useSupabase()) {
     await supabase().storage.from(BUCKET).remove([safe(name)]);
