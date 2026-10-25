@@ -27,7 +27,7 @@ export async function reportOutdated(_prev: FormState, form: FormData): Promise<
   // Pretend success for bots so they don't retry.
   if (looksLikeSpam(form)) return { ok: true, message: "Thank you. We'll check this listing." };
 
-  mutate((db) => {
+  await mutate((db) => {
     db.reports.unshift({ id: uid("rep-"), listingId, message, contact, createdAt: nowIso(), handled: false, handledAt: null });
   });
   return { ok: true, message: "Thank you. We'll check this listing and update it if anything has changed." };
@@ -45,7 +45,7 @@ export async function sendContact(_prev: FormState, form: FormData): Promise<For
     return { ok: false, message: "You've sent several messages recently. Please try again later." };
   }
   if (looksLikeSpam(form)) return { ok: true, message: "Thank you, your message has been sent." };
-  mutate((db) => {
+  await mutate((db) => {
     db.messages.unshift({ id: uid("msg-"), topic, name, email, message, createdAt: nowIso(), handled: false });
   });
   return { ok: true, message: "Thank you, your message has been sent. We aim to reply within five working days." };

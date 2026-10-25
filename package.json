@@ -11,10 +11,12 @@
     "reset-data": "rm -f data/db.json && rm -rf public/uploads/*",
     "test": "vitest run",
     "test:watch": "vitest",
-    "eval:helper": "tsx scripts/eval-helper.ts"
+    "eval:helper": "tsx scripts/eval-helper.ts",
+    "db:push": "tsx --env-file=.env.local scripts/push-to-supabase.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.135.0",
+    "@supabase/supabase-js": "^2.58.0",
     "@tiptap/extension-image": "^3.32.0",
     "@tiptap/extension-link": "^3.32.0",
     "@tiptap/pm": "^3.32.0",

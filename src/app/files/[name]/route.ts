@@ -1,6 +1,6 @@
-import fs from "node:fs";
 import path from "node:path";
-import { readDb, UPLOAD_DIR } from "@/lib/db";
+import { readDb } from "@/lib/db";
+import { getFile } from "@/lib/files";
 import { currentAdmin } from "@/lib/auth";
 
 export const runtime = "nodejs";
@@ -15,11 +15,10 @@ export async function GET(_req: Request, { params }: { params: Promise<{ name: s
   if (!resource && !upload) return new Response("Not found", { status: 404 });
   if (resource && resource.status !== "published" && !(await currentAdmin())) return new Response("Not found", { status: 404 });
 
-  const file = path.join(UPLOAD_DIR, safe);
-  if (!fs.existsSync(file)) return new Response("Not found", { status: 404 });
+  const body = await getFile(safe);
+  if (!body) return new Response("Not found", { status: 404 });
   const meta = resource ?? upload!;
-  const body = fs.readFileSync(file);
-  return new Response(body, {
+  return new Response(new Uint8Array(body), {
     headers: {
       "Content-Type": meta.mime || "application/octet-stream",
       "Content-Length": String(body.length),

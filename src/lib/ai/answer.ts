@@ -86,8 +86,8 @@ function budgetLeft(): boolean {
   return spend.usd < cap;
 }
 
-function recordSpend(inputTokens: number, outputTokens: number) {
-  mutate((db) => {
+async function recordSpend(inputTokens: number, outputTokens: number) {
+  await mutate((db) => {
     const m = currentMonth();
     if (db.settings.aiSpend.month !== m) db.settings.aiSpend = { month: m, usd: 0, requests: 0 };
     db.settings.aiSpend.usd += inputTokens * PRICE_IN + outputTokens * PRICE_OUT;
@@ -122,7 +122,7 @@ async function modelAnswer(hits: SearchHit[], question: string, history: ChatTur
       },
     ],
   });
-  recordSpend(response.usage.input_tokens, response.usage.output_tokens);
+  await recordSpend(response.usage.input_tokens, response.usage.output_tokens);
   if (response.stop_reason === "refusal") return { text: "NOT_FOUND" };
   const text = response.content
     .filter((b): b is Anthropic.Beta.BetaTextBlock => b.type === "text")
@@ -132,10 +132,10 @@ async function modelAnswer(hits: SearchHit[], question: string, history: ChatTur
   return { text };
 }
 
-function logQuestion(q: string, kind: string) {
+async function logQuestion(q: string, kind: string) {
   const db = readDb();
   if (!db.settings.keepAnonymisedQuestions) return;
-  mutate((d) => {
+  await mutate((d) => {
     d.questions.unshift({ q: q.slice(0, 300), at: new Date().toISOString(), kind });
     d.questions = d.questions.slice(0, 500);
   });
@@ -148,11 +148,11 @@ export async function answer(question: string, history: ChatTurn[] = []): Promis
   // 2. Grief and funerals: redirect to The Funeral Companion.
   const guard = checkGuards(question);
   if (guard?.kind === "crisis") {
-    logQuestion(`[${guard.topic} rule]`, "crisis");
+    await logQuestion(`[${guard.topic} rule]`, "crisis");
     return { kind: "crisis", ...EMERGENCY_MESSAGES[guard.topic] };
   }
   if (guard?.kind === "funeral") {
-    logQuestion(question, "funeral");
+    await logQuestion(question, "funeral");
     return {
       kind: "funeral",
       text: "Hadamley does not cover grief, bereavement or funerals. Our sister site, The Funeral Companion, has information and local support for that.",
@@ -171,7 +171,7 @@ export async function answer(question: string, history: ChatTurn[] = []): Promis
     .slice(0, 6);
 
   if (hits.length === 0) {
-    logQuestion(question, "not_found");
+    await logQuestion(question, "not_found");
     return {
       kind: "not_found",
       text: "I can't find that on Hadamley. You can browse Find Support or one of the sections below, or try asking in a different way.",
@@ -190,7 +190,7 @@ export async function answer(question: string, history: ChatTurn[] = []): Promis
       const res = await modelAnswer(hits, question, history);
       if (res) {
         if (res.text === "NOT_FOUND" || res.text.startsWith("NOT_FOUND")) {
-          logQuestion(question, "not_found");
+          await logQuestion(question, "not_found");
           return {
             kind: "not_found",
             text: "I can't find that on Hadamley. These pages might still help:",
@@ -202,12 +202,12 @@ export async function answer(question: string, history: ChatTurn[] = []): Promis
         // Renumber citations to match the sources list we show.
         const order = [...cited].sort((a, b) => a - b);
         const text = res.text.replace(/\[(\d+)\]/g, (_m, n) => `[${order.indexOf(Number(n) - 1) + 1}]`);
-        logQuestion(question, "answer");
+        await logQuestion(question, "answer");
         return { kind: "answer", text, sources: sourcesFrom(used.length ? used : hits.slice(0, 2)), mode: "model" };
       }
     } catch (err) {
       console.error("[ai] model call failed, using extractive fallback", err instanceof Anthropic.APIError ? `${err.status} ${err.message}` : err);
-      logQuestion(question, "answer_fallback");
+      await logQuestion(question, "answer_fallback");
       return {
         kind: "answer",
         text: extractiveAnswer(hits, question),
@@ -218,6 +218,6 @@ export async function answer(question: string, history: ChatTurn[] = []): Promis
     }
   }
 
-  logQuestion(question, "answer");
+  await logQuestion(question, "answer");
   return { kind: "answer", text: extractiveAnswer(hits, question), sources: sourcesFrom(hits.slice(0, 3)), mode: "extract" };
 }

@@ -43,8 +43,8 @@ const base = (): Listing => ({
   updatedAt: "2026-10-19T00:00:00.000Z",
 });
 
-function save(l: Listing) {
-  mutate((db) => {
+async function save(l: Listing) {
+  await mutate((db) => {
     const i = db.listings.findIndex((x) => x.id === l.id);
     if (i >= 0) db.listings[i] = l;
     else db.listings.push(l);
@@ -59,17 +59,17 @@ const helperUrls = async (q: string) => {
 
 describe("Addendum 1 demos", () => {
   it("1. a new listing stays hidden until approved, then appears in the directory and the helper", async () => {
-    save(base());
+    await save(base());
     expect(getApprovedListing("test-hydrotherapy-pool")).toBeUndefined();
     expect(await helperUrls("hydrotherapy for arthritis in Upminster")).not.toContain("/find-support/test-hydrotherapy-pool");
 
-    save({ ...base(), status: "approved" });
+    await save({ ...base(), status: "approved" });
     expect(searchListings({ topic: ["physiotherapy"], area: ["upminster"] }).map((l) => l.id)).toContain("test-hydrotherapy-pool");
     expect(await helperUrls("hydrotherapy for arthritis in Upminster")).toContain("/find-support/test-hydrotherapy-pool");
   });
 
-  it("2. an amended contact detail reaches the site and the helper", () => {
-    save({ ...base(), status: "approved", phone: "01632 960 999" });
+  it("2. an amended contact detail reaches the site and the helper", async () => {
+    await save({ ...base(), status: "approved", phone: "01632 960 999" });
     expect(getApprovedListing("test-hydrotherapy-pool")?.phone).toBe("01632 960 999");
     const chunk = readDb().chunks.find((c) => c.sourceId === "test-hydrotherapy-pool");
     expect(chunk?.text).toContain("01632 960 999");
@@ -77,22 +77,22 @@ describe("Addendum 1 demos", () => {
   });
 
   it("3. moving a listing out of Approved removes it from the site, search and helper", async () => {
-    save({ ...base(), status: "clarification_needed" });
+    await save({ ...base(), status: "clarification_needed" });
     expect(getApprovedListing("test-hydrotherapy-pool")).toBeUndefined();
     expect(searchListings({ q: "hydrotherapy" })).toHaveLength(0);
     expect(readDb().chunks.some((c) => c.sourceId === "test-hydrotherapy-pool")).toBe(false);
     expect(await helperUrls("hydrotherapy for arthritis in Upminster")).not.toContain("/find-support/test-hydrotherapy-pool");
   });
 
-  it("hides unconfirmed contact details from the helper", () => {
-    save({ ...base(), status: "approved", contactConfirmed: false });
+  it("hides unconfirmed contact details from the helper", async () => {
+    await save({ ...base(), status: "approved", contactConfirmed: false });
     const chunk = readDb().chunks.find((c) => c.sourceId === "test-hydrotherapy-pool");
     expect(chunk?.text).not.toContain("01632 960");
   });
 });
 
 describe("page publishing", () => {
-  it("unpublishing a page removes it from the site and the helper, publishing brings it back", () => {
+  it("unpublishing a page removes it from the site and the helper, publishing brings it back", async () => {
     const setStatus = (status: "draft" | "published") =>
       mutate((db) => {
         const p = db.pages.find((x) => x.id === "p-transport")!;
@@ -100,11 +100,11 @@ describe("page publishing", () => {
         reindexRecord(db, "page", p.id);
       });
 
-    setStatus("draft");
+    await setStatus("draft");
     expect(getPublishedPage("mobility-daily-living-transport/transport")).toBeUndefined();
     expect(readDb().chunks.some((c) => c.sourceId === "p-transport")).toBe(false);
 
-    setStatus("published");
+    await setStatus("published");
     expect(getPublishedPage("mobility-daily-living-transport/transport")).toBeDefined();
     expect(readDb().chunks.some((c) => c.sourceId === "p-transport")).toBe(true);
   });

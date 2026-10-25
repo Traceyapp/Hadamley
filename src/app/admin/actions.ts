@@ -1,12 +1,11 @@
 "use server";
 
-import fs from "node:fs";
-import path from "node:path";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { checkCredentials, createSession, destroySession, requireAdmin } from "@/lib/auth";
 import { hashPassword, verifyPassword } from "@/lib/password";
-import { mutate, nowIso, readDb, slugify, uid, UPLOAD_DIR } from "@/lib/db";
+import { mutate, nowIso, readDb, slugify, uid } from "@/lib/db";
+import { putFile, removeFile } from "@/lib/files";
 import { cleanBody } from "@/lib/sanitize";
 import { buildAllChunks, reindexRecord } from "@/lib/ai/chunks";
 import { clientKey, rateLimit } from "@/lib/ratelimit";
@@ -121,7 +120,7 @@ export async function savePage(_prev: ActionState, form: FormData): Promise<Acti
     updatedBy: user.name,
   };
 
-  mutate((d) => {
+  await mutate((d) => {
     const i = d.pages.findIndex((p) => p.id === next.id);
     if (i >= 0) d.pages[i] = next;
     else d.pages.push(next);
@@ -137,7 +136,7 @@ export async function savePage(_prev: ActionState, form: FormData): Promise<Acti
 export async function deletePage(form: FormData) {
   await requireAdmin();
   const id = str(form, "id");
-  mutate((d) => {
+  await mutate((d) => {
     const p = d.pages.find((x) => x.id === id);
     if (!p || p.template === "home" || d.pages.some((c) => c.parentId === id)) return;
     d.pages = d.pages.filter((x) => x.id !== id);
@@ -208,7 +207,7 @@ export async function saveListing(_prev: ActionState, form: FormData): Promise<A
     updatedAt: nowIso(),
   };
 
-  mutate((d) => {
+  await mutate((d) => {
     const i = d.listings.findIndex((l) => l.id === next.id);
     if (i >= 0) d.listings[i] = next;
     else d.listings.push(next);
@@ -230,7 +229,7 @@ export async function saveListing(_prev: ActionState, form: FormData): Promise<A
 export async function deleteListing(form: FormData) {
   await requireAdmin();
   const id = str(form, "id");
-  mutate((d) => {
+  await mutate((d) => {
     d.listings = d.listings.filter((l) => l.id !== id);
     d.chunks = d.chunks.filter((c) => !(c.sourceType === "listing" && c.sourceId === id));
     d.reports = d.reports.filter((r) => r.listingId !== id);
@@ -244,7 +243,7 @@ export async function markChecked(form: FormData) {
   const id = str(form, "id");
   const today = new Date().toISOString().slice(0, 10);
   const review = new Date(Date.now() + 182 * 86_400_000).toISOString().slice(0, 10);
-  mutate((d) => {
+  await mutate((d) => {
     const l = d.listings.find((x) => x.id === id);
     if (!l) return;
     l.dateChecked = today;
@@ -286,11 +285,11 @@ export async function saveResource(_prev: ActionState, form: FormData): Promise<
     const { storedName: fresh, clean } = storeFile(file);
     // Replacing keeps the same stored name, so any link to the file keeps working.
     const storedName = existing?.storedName ?? fresh;
-    fs.writeFileSync(path.join(UPLOAD_DIR, storedName), Buffer.from(await file.arrayBuffer()));
+    await putFile(storedName, Buffer.from(await file.arrayBuffer()), file.type || "application/octet-stream");
     fileMeta = { fileName: clean, storedName, mime: file.type || "application/octet-stream", size: file.size };
   }
   const newId = existing?.id ?? uid("r-");
-  mutate((d) => {
+  await mutate((d) => {
     const next = {
       id: newId,
       title,
@@ -312,11 +311,11 @@ export async function saveResource(_prev: ActionState, form: FormData): Promise<
 export async function deleteResource(form: FormData) {
   await requireAdmin();
   const id = str(form, "id");
-  mutate((d) => {
-    const r = d.resources.find((x) => x.id === id);
-    if (r) fs.rmSync(path.join(UPLOAD_DIR, r.storedName), { force: true });
+  const stored = readDb().resources.find((x) => x.id === id)?.storedName;
+  await mutate((d) => {
     d.resources = d.resources.filter((x) => x.id !== id);
   });
+  if (stored) await removeFile(stored);
   refreshSite();
   redirect("/admin/resources?saved=Download+removed");
 }
@@ -330,8 +329,8 @@ export async function uploadImage(form: FormData): Promise<{ ok: boolean; url?: 
   if (file.size > 4 * 1024 * 1024) return { ok: false, message: "Images must be 4 MB or smaller." };
   if (!/^image\/(png|jpe?g|webp|gif)$/.test(file.type)) return { ok: false, message: "Use a PNG, JPG, WebP or GIF image." };
   const { storedName, clean } = storeFile(file);
-  fs.writeFileSync(path.join(UPLOAD_DIR, storedName), Buffer.from(await file.arrayBuffer()));
-  mutate((d) => {
+  await putFile(storedName, Buffer.from(await file.arrayBuffer()), file.type);
+  await mutate((d) => {
     d.uploads.unshift({ id: uid("u-"), fileName: clean, storedName, mime: file.type, size: file.size, alt, createdAt: nowIso() });
   });
   return { ok: true, url: `/files/${storedName}` };
@@ -347,7 +346,7 @@ export async function saveTaxon(_prev: ActionState, form: FormData): Promise<Act
   const slug = slugify(name);
   const db = readDb();
   if (db.taxa.some((t) => t.slug === slug)) return { ok: false, message: `"${name}" already exists.` };
-  mutate((d) => {
+  await mutate((d) => {
     const order = d.taxa.filter((t) => t.type === type).length;
     d.taxa.push({ id: `${type === "topic" ? "t" : "a"}-${slug}`, name, slug, type, parentId: null, order });
   });
@@ -360,7 +359,7 @@ export async function renameTaxon(form: FormData) {
   const id = str(form, "id");
   const name = str(form, "name", 100);
   if (!name) return;
-  mutate((d) => {
+  await mutate((d) => {
     const t = d.taxa.find((x) => x.id === id);
     if (t) t.name = name;
     d.chunks = buildAllChunks(d);
@@ -371,7 +370,7 @@ export async function renameTaxon(form: FormData) {
 export async function deleteTaxon(form: FormData) {
   await requireAdmin();
   const id = str(form, "id");
-  mutate((d) => {
+  await mutate((d) => {
     d.taxa = d.taxa.filter((t) => t.id !== id);
     for (const l of d.listings) {
       l.topicIds = l.topicIds.filter((x) => x !== id);
@@ -387,7 +386,7 @@ export async function moveTaxon(form: FormData) {
   await requireAdmin();
   const id = str(form, "id");
   const dir = str(form, "dir") === "up" ? -1 : 1;
-  mutate((d) => {
+  await mutate((d) => {
     const t = d.taxa.find((x) => x.id === id);
     if (!t) return;
     const group = d.taxa.filter((x) => x.type === t.type).sort((a, b) => a.order - b.order);
@@ -406,7 +405,7 @@ export async function moveNav(form: FormData) {
   await requireAdmin();
   const id = str(form, "id");
   const dir = str(form, "dir") === "up" ? -1 : 1;
-  mutate((d) => {
+  await mutate((d) => {
     const p = d.pages.find((x) => x.id === id);
     if (!p) return;
     const group = d.pages.filter((x) => x.parentId === p.parentId && x.showInNav && x.template !== "home").sort((a, b) => a.navOrder - b.navOrder);
@@ -422,7 +421,7 @@ export async function moveNav(form: FormData) {
 export async function toggleNav(form: FormData) {
   await requireAdmin();
   const id = str(form, "id");
-  mutate((d) => {
+  await mutate((d) => {
     const p = d.pages.find((x) => x.id === id);
     if (p && p.template !== "home") p.showInNav = !p.showInNav;
   });
@@ -434,7 +433,7 @@ export async function toggleNav(form: FormData) {
 export async function toggleReport(form: FormData) {
   await requireAdmin();
   const id = str(form, "id");
-  mutate((d) => {
+  await mutate((d) => {
     const r = d.reports.find((x) => x.id === id);
     if (r) {
       r.handled = !r.handled;
@@ -447,7 +446,7 @@ export async function toggleReport(form: FormData) {
 export async function toggleMessage(form: FormData) {
   await requireAdmin();
   const id = str(form, "id");
-  mutate((d) => {
+  await mutate((d) => {
     const m = d.messages.find((x) => x.id === id);
     if (m) m.handled = !m.handled;
   });
@@ -457,7 +456,7 @@ export async function toggleMessage(form: FormData) {
 export async function deleteMessage(form: FormData) {
   await requireAdmin();
   const id = str(form, "id");
-  mutate((d) => {
+  await mutate((d) => {
     d.messages = d.messages.filter((m) => m.id !== id);
     d.reports = d.reports.filter((r) => r.id !== id);
   });
@@ -469,7 +468,7 @@ export async function deleteMessage(form: FormData) {
 export async function refreshAiIndex(): Promise<ActionState> {
   await requireAdmin();
   const started = Date.now();
-  const count = mutate((d) => {
+  const count = await mutate((d) => {
     d.chunks = buildAllChunks(d);
     d.settings.aiLastIndexedAt = nowIso();
     d.settings.aiLastIndexMs = Date.now() - started;
@@ -487,7 +486,7 @@ export async function saveSettings(_prev: ActionState, form: FormData): Promise<
   if (!/^https?:\/\/[^\s]+$/.test(url)) return { ok: false, message: "Enter a full web address starting with https://" };
   const contactEmail = str(form, "contactEmail", 200);
   if (contactEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contactEmail)) return { ok: false, message: "Please check the contact email address." };
-  mutate((d) => {
+  await mutate((d) => {
     d.settings.funeralCompanionUrl = url;
     d.settings.keepAnonymisedQuestions = form.get("keepAnonymisedQuestions") === "on";
     d.settings.contactEmail = contactEmail;
@@ -515,7 +514,7 @@ export async function updateAccount(_prev: ActionState, form: FormData): Promise
     if (next.length < 10) return { ok: false, message: "Choose a new password of at least 10 characters." };
     if (next !== confirm) return { ok: false, message: "The new passwords don't match." };
   }
-  mutate((d) => {
+  await mutate((d) => {
     const u = d.admins.find((a) => a.email === me.email);
     if (!u) return;
     u.name = name;
@@ -532,7 +531,7 @@ export async function removeAdmin(form: FormData) {
   const me = await requireAdmin();
   if (me.role !== "owner") return;
   const email = str(form, "email");
-  mutate((d) => {
+  await mutate((d) => {
     d.admins = d.admins.filter((a) => a.email !== email || a.role === "owner");
   });
   revalidatePath("/admin/settings");
@@ -568,7 +567,7 @@ export async function savePost(_prev: ActionState, form: FormData): Promise<Acti
     publishedAt: str(form, "publishedAt") || existing?.publishedAt || new Date().toISOString().slice(0, 10),
     updatedAt: nowIso(),
   };
-  mutate((d) => {
+  await mutate((d) => {
     const i = d.posts.findIndex((p) => p.id === next.id);
     if (i >= 0) d.posts[i] = next;
     else d.posts.unshift(next);
@@ -610,7 +609,7 @@ export async function saveEvent(_prev: ActionState, form: FormData): Promise<Act
     status: status as "draft" | "published",
     updatedAt: nowIso(),
   };
-  mutate((d) => {
+  await mutate((d) => {
     const i = d.events.findIndex((e) => e.id === next.id);
     if (i >= 0) d.events[i] = next;
     else d.events.unshift(next);
@@ -626,7 +625,7 @@ export async function deleteNotice(form: FormData) {
   await requireAdmin();
   const id = str(form, "id");
   const kind = str(form, "kind") === "event" ? "event" : "post";
-  mutate((d) => {
+  await mutate((d) => {
     if (kind === "event") d.events = d.events.filter((e) => e.id !== id);
     else d.posts = d.posts.filter((p) => p.id !== id);
     d.chunks = d.chunks.filter((c) => !(c.sourceType === kind && c.sourceId === id));

@@ -1,7 +1,7 @@
-import fs from "node:fs";
 import path from "node:path";
 import { currentAdmin } from "@/lib/auth";
-import { readDb, UPLOAD_DIR } from "@/lib/db";
+import { readDb } from "@/lib/db";
+import { getFile } from "@/lib/files";
 import { makeZip } from "@/lib/zip";
 
 export const runtime = "nodejs";
@@ -44,8 +44,8 @@ export async function GET(req: Request) {
   ];
   const stored = new Set([...resources.map((r) => r.storedName), ...uploads.map((u) => u.storedName)]);
   for (const name of stored) {
-    const p = path.join(UPLOAD_DIR, path.basename(name));
-    if (fs.existsSync(p)) files.push({ name: `files/${path.basename(name)}`, data: fs.readFileSync(p) });
+    const data = await getFile(name);
+    if (data) files.push({ name: `files/${path.basename(name)}`, data: Buffer.from(data) });
   }
   const zip = makeZip(files);
   return new Response(new Uint8Array(zip), {

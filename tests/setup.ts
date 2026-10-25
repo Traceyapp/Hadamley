@@ -6,3 +6,4 @@ import path from "node:path";
 process.env.HADAMLEY_DATA_DIR = fs.mkdtempSync(path.join(os.tmpdir(), "hadamley-test-"));
 // Never call the real model from tests.
 delete process.env.ANTHROPIC_API_KEY;
+process.env.HADAMLEY_STORE = "file";

@@ -35,8 +35,8 @@ describe("accordion sections", () => {
 });
 
 describe("noticeboard", () => {
-  it("shows published posts newest first and keeps drafts off", () => {
-    mutate((db) => {
+  it("shows published posts newest first and keeps drafts off", async () => {
+    await mutate((db) => {
       db.posts.push({ ...db.posts[0], id: "post-draft", slug: "draft", title: "Secret draft", status: "draft", publishedAt: "2099-01-01" });
     });
     const titles = publishedPosts().map((p) => p.title);
@@ -53,7 +53,7 @@ describe("noticeboard", () => {
   });
 
   it("puts a new published event into the helper", async () => {
-    mutate((db) => {
+    await mutate((db) => {
       db.events.push(event({}));
       reindexRecord(db, "event", "e-test");
     });

@@ -31,9 +31,9 @@ const reply = (text: string, stop_reason = "end_turn") => ({
   usage: { input_tokens: 2000, output_tokens: 200 },
 });
 
-beforeEach(() => {
+beforeEach(async () => {
   create.mockReset();
-  mutate((db) => {
+  await mutate((db) => {
     db.settings.aiSpend = { month: new Date().toISOString().slice(0, 7), usd: 0, requests: 0 };
   });
 });
@@ -88,7 +88,7 @@ describe("Claude answer path", () => {
     expect(readDb().settings.aiSpend.requests).toBe(1);
     expect(readDb().settings.aiSpend.usd).toBeGreaterThan(0);
 
-    mutate((db) => {
+    await mutate((db) => {
       db.settings.aiSpend.usd = 25;
     });
     create.mockClear();
