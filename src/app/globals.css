@@ -285,6 +285,15 @@
   }
 }
 
+/* A navy panel that keeps its night colours in both themes (admin sign-in). */
+.night-scope {
+  --paper: #13254a; --paper-2: #182c55; --surface: #1b3160; --sand: #1d335f; --sand-2: #24406f;
+  --ink: #f6f1e6; --ink-2: #c3c9d8; --line: rgb(255 255 255 / 0.12); --line-strong: #8a7650;
+  --brand: #a9c1ea; --accent: #e3c78f; --champagne: #c9a96e;
+  --art-lake: #2c5862; --art-brick: #7a3f23; --art-meadow: #355a37; --art-navy: #343e78; --art-rose: #6b2f44; --art-sun: #c9a96e;
+  color-scheme: dark;
+}
+
 .skip-link {
   position: absolute; left: 1rem; top: -100px; z-index: 100;
   background: var(--brand); color: var(--paper); padding: 0.75rem 1rem; font-weight: 700; border-radius: 0 0 8px 8px;
