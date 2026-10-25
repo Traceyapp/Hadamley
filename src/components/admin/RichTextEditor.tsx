@@ -4,9 +4,9 @@ import { EditorContent, useEditor, type Editor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Link from "@tiptap/extension-link";
 import Image from "@tiptap/extension-image";
-import { Bold, Heading2, Heading3, ImagePlus, Italic, Link2, List, ListOrdered, Quote, Redo2, Undo2, Unlink } from "lucide-react";
+import { Bold, Heading2, Heading3, ImagePlus, Italic, Link2, List, ListOrdered, Loader2, Quote, Redo2, Sparkles, Undo2, Unlink } from "lucide-react";
 import { useRef, useState } from "react";
-import { uploadImage } from "@/app/admin/actions";
+import { suggestTidyWriting, uploadImage } from "@/app/admin/actions";
 
 function ToolButton({ onClick, active, label, children, disabled }: { onClick: () => void; active?: boolean; label: string; children: React.ReactNode; disabled?: boolean }) {
   return (
@@ -24,7 +24,7 @@ function ToolButton({ onClick, active, label, children, disabled }: { onClick: (
   );
 }
 
-function Toolbar({ editor, onImage }: { editor: Editor; onImage: () => void }) {
+function Toolbar({ editor, onImage, onTidy, tidying }: { editor: Editor; onImage: () => void; onTidy: () => void; tidying: boolean }) {
   const setLink = () => {
     const prev = editor.getAttributes("link").href as string | undefined;
     const url = window.prompt("Link address (for example https://example.org or /find-support)", prev ?? "");
@@ -67,6 +67,16 @@ function Toolbar({ editor, onImage }: { editor: Editor; onImage: () => void }) {
       <ToolButton label="Insert image" onClick={onImage}>
         <ImagePlus className="size-[1.1rem]" aria-hidden />
       </ToolButton>
+      <button
+        type="button"
+        onClick={onTidy}
+        disabled={tidying}
+        title="Suggest a clearer version in Hadamley's house style. Nothing changes until you choose to use it."
+        className="ml-1 inline-flex min-h-9 items-center gap-1.5 rounded-lg px-2.5 text-sm font-bold text-brand hover:bg-sand-2 disabled:opacity-60"
+      >
+        {tidying ? <Loader2 className="size-4 animate-spin" aria-hidden /> : <Sparkles className="size-4" aria-hidden />}
+        {tidying ? "Tidying..." : "Tidy up"}
+      </button>
       <span className="ml-auto flex">
         <ToolButton label="Undo" disabled={!editor.can().undo()} onClick={() => editor.chain().focus().undo().run()}>
           <Undo2 className="size-[1.1rem]" aria-hidden />
@@ -82,6 +92,7 @@ function Toolbar({ editor, onImage }: { editor: Editor; onImage: () => void }) {
 export function RichTextEditor({ name, initial, labelId, onChange, minHeight }: { name?: string; initial: string; labelId: string; onChange?: (html: string) => void; minHeight?: string }) {
   const [html, setHtml] = useState(initial);
   const [imgError, setImgError] = useState<string | null>(null);
+  const [tidy, setTidy] = useState<{ busy: boolean; html?: string; message?: string }>({ busy: false });
   const fileRef = useRef<HTMLInputElement>(null);
   const editor = useEditor({
     immediatelyRender: false,
@@ -116,9 +127,41 @@ export function RichTextEditor({ name, initial, labelId, onChange, minHeight }: 
     editor.chain().focus().setImage({ src: res.url, alt }).run();
   }
 
+  async function onTidy() {
+    if (!editor) return;
+    setTidy({ busy: true });
+    const res = await suggestTidyWriting(editor.getHTML());
+    setTidy(res.ok ? { busy: false, html: res.html } : { busy: false, message: res.message });
+  }
+
+  function applySuggestion() {
+    if (!editor || !tidy.html) return;
+    editor.chain().focus().setContent(tidy.html).run();
+    const next = editor.getHTML();
+    setHtml(next);
+    onChange?.(next);
+    setTidy({ busy: false });
+  }
+
   return (
     <div className="rounded-xl border border-line-strong bg-surface focus-within:border-brand">
-      {editor && <Toolbar editor={editor} onImage={() => fileRef.current?.click()} />}
+      {editor && <Toolbar editor={editor} onImage={() => fileRef.current?.click()} onTidy={onTidy} tidying={tidy.busy} />}
+      {tidy.message && <p className="border-b border-line bg-warn-soft px-5 py-2 text-sm font-bold text-warn" role="status">{tidy.message}</p>}
+      {tidy.html && (
+        <div className="border-b border-line bg-brand-tint px-5 py-4" role="region" aria-label="Suggested tidy-up">
+          <p className="text-sm font-bold text-brand">Suggested version. Read it through: you decide whether to use it.</p>
+          <div className="prose-h mt-3 max-h-80 overflow-auto rounded-lg border border-line bg-surface px-4 py-3" dangerouslySetInnerHTML={{ __html: tidy.html }} />
+          <div className="mt-3 flex flex-wrap gap-2">
+            <button type="button" onClick={applySuggestion} className="inline-flex min-h-10 items-center rounded-full bg-brand px-4 text-sm font-bold text-paper">
+              Use this
+            </button>
+            <button type="button" onClick={() => setTidy({ busy: false })} className="inline-flex min-h-10 items-center rounded-full border border-ink px-4 text-sm font-bold">
+              Keep mine
+            </button>
+          </div>
+          <p className="mt-2 text-xs text-ink-2">After using it, you can still press Undo in the toolbar to go back.</p>
+        </div>
+      )}
       <EditorContent editor={editor} />
       {!editor && <div className="min-h-[320px] px-5 py-4 text-ink-2">Loading editor...</div>}
       {name && <input type="hidden" name={name} value={html} />}

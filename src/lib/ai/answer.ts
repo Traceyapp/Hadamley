@@ -1,5 +1,6 @@
 import OpenAI from "openai";
 import { readDb, mutate } from "../db";
+import { budgetLeft, getClient, MODEL, recordSpend } from "./model";
 import { checkGuards, EMERGENCY_MESSAGES, type CallButton } from "./guard";
 import { search, RELEVANCE_FLOOR, tokenize, type SearchHit } from "./search";
 
@@ -16,12 +17,6 @@ export type HelperReply =
   | { kind: "funeral"; text: string; url: string }
   | { kind: "answer"; text: string; sources: Source[]; mode: "model" | "extract"; notice?: string }
   | { kind: "not_found"; text: string; suggestions: Source[] };
-
-const MODEL = process.env.HADAMLEY_AI_MODEL || "gpt-5.4-mini";
-// gpt-5.4-mini standard prices, USD per million tokens (OpenAI pricing page, October 2026).
-// Update these if HADAMLEY_AI_MODEL is changed, so the monthly cap stays accurate.
-const PRICE_IN = 0.75 / 1_000_000;
-const PRICE_OUT = 4.5 / 1_000_000;
 
 const SYSTEM = `You are the Hadamley helper. Hadamley is an information and signposting website for people living with chronic illness, disability and mental health needs in Havering, Romford, Brentwood and nearby.
 
@@ -75,33 +70,6 @@ function extractiveAnswer(hits: SearchHit[], query: string): string {
     return `**${c.title}** [${i + 1}]: ${excerpt(c.text, query)}`;
   });
   return `Here is what I found on Hadamley:\n\n${parts.join("\n\n")}`;
-}
-
-function currentMonth() {
-  return new Date().toISOString().slice(0, 7);
-}
-
-function budgetLeft(): boolean {
-  const cap = Number(process.env.AI_MONTHLY_BUDGET_USD || 25);
-  const spend = readDb().settings.aiSpend;
-  if (spend.month !== currentMonth()) return true;
-  return spend.usd < cap;
-}
-
-async function recordSpend(inputTokens: number, outputTokens: number) {
-  await mutate((db) => {
-    const m = currentMonth();
-    if (db.settings.aiSpend.month !== m) db.settings.aiSpend = { month: m, usd: 0, requests: 0 };
-    db.settings.aiSpend.usd += inputTokens * PRICE_IN + outputTokens * PRICE_OUT;
-    db.settings.aiSpend.requests += 1;
-  });
-}
-
-let client: OpenAI | null = null;
-function getClient() {
-  if (!process.env.OPENAI_API_KEY) return null;
-  client ??= new OpenAI();
-  return client;
 }
 
 async function modelAnswer(hits: SearchHit[], question: string, history: ChatTurn[]) {

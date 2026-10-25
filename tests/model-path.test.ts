@@ -102,3 +102,35 @@ describe("AI answer path", () => {
     expect(create).not.toHaveBeenCalled();
   });
 });
+
+describe("easy read and the writing helper", () => {
+  it("makes an easy read version once per page version, cleaned of unsafe HTML", async () => {
+    const { easyRead } = await import("@/lib/ai/easy-read");
+    const page = readDb().pages.find((p) => p.id === "p-physio")!;
+    create.mockResolvedValue(reply('<h3>Physiotherapy</h3><p>A physio helps you move.</p><script>alert(1)</script><a href="https://evil.example">x</a>'));
+    const html = await easyRead(page);
+    expect(html).toContain("<h3>Physiotherapy</h3>");
+    expect(html).not.toContain("<script");
+    expect(create.mock.calls[0][0].instructions).toMatch(/Use ONLY the information in the page/);
+    expect(create.mock.calls[0][0].input).toContain(page.title);
+    await easyRead(page);
+    expect(create).toHaveBeenCalledTimes(1); // cached until the page changes
+  });
+
+  it("suggests a tidy-up without changing links and strips code fences", async () => {
+    const { tidyWriting } = await import("@/lib/ai/writing");
+    create.mockResolvedValue(reply('```html\n<p>Call us on <a href="tel:01708000000">01708 000000</a>.</p><iframe src="x"></iframe>\n```'));
+    const out = await tidyWriting("<p>call us on <a href=\"tel:01708000000\">01708 000000</a></p>");
+    expect(out).toBe('<p>Call us on <a href="tel:01708000000">01708 000000</a>.</p>');
+    expect(create.mock.calls[0][0].instructions).toMatch(/Never use em dashes/);
+  });
+
+  it("returns nothing when the monthly budget is used up", async () => {
+    const { tidyWriting } = await import("@/lib/ai/writing");
+    await mutate((db) => {
+      db.settings.aiSpend.usd = 25;
+    });
+    expect(await tidyWriting("<p>Some text to tidy up here.</p>")).toBeNull();
+    expect(create).not.toHaveBeenCalled();
+  });
+});

@@ -9,6 +9,7 @@ import { putFile, removeFile } from "@/lib/files";
 import { cleanBody } from "@/lib/sanitize";
 import { buildAllChunks, reindexRecord } from "@/lib/ai/chunks";
 import { clientKey, rateLimit } from "@/lib/ratelimit";
+import { tidyWriting } from "@/lib/ai/writing";
 import { headers } from "next/headers";
 import type { Delivery, Listing, ListingStatus, Page, PageSection, ProviderType, ResourceKind, Template, TriState } from "@/lib/types";
 
@@ -632,4 +633,23 @@ export async function deleteNotice(form: FormData) {
   });
   refreshSite();
   redirect("/admin/noticeboard?saved=Removed+from+the+noticeboard");
+}
+
+/* --------------------------------------------------------- writing helper */
+
+/** Suggests a tidier version of editor content. Nothing is saved; the editor decides whether to use it. */
+export async function suggestTidyWriting(html: string): Promise<{ ok: boolean; html?: string; message?: string }> {
+  const admin = await requireAdmin();
+  if (!process.env.OPENAI_API_KEY) return { ok: false, message: "The writing helper needs an AI key. Ask your developer to add OPENAI_API_KEY." };
+  if (!rateLimit(`tidy:${admin.email}`, 30, 60 * 60_000)) return { ok: false, message: "That's a lot of suggestions in an hour. Please try again a little later." };
+  const plain = html.replace(/<[^>]*>/g, "").trim();
+  if (plain.length < 20) return { ok: false, message: "Write a little more first, then ask for a tidy-up." };
+  try {
+    const out = await tidyWriting(html);
+    if (!out) return { ok: false, message: "The writing helper couldn't make a suggestion this time. The monthly AI budget may be used up, or please try again." };
+    return { ok: true, html: out };
+  } catch (err) {
+    console.error("[ai] writing helper failed", err);
+    return { ok: false, message: "The writing helper isn't available right now. Please try again later." };
+  }
 }

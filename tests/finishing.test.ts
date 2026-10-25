@@ -15,10 +15,16 @@ describe("site-wide search", () => {
     expect(siteSearch("HCPC").some((r) => r.url === "/physiotherapy#s-physio-private")).toBe(true);
   });
 
-  it("finds downloads, news and upcoming events", () => {
+  it("finds downloads, news and upcoming events", async () => {
+    const { mutate } = await import("@/lib/db");
+    const now = new Date().toISOString();
+    await mutate((db) => {
+      db.posts.push({ id: "post-test", slug: "test-hydrotherapy", title: "New hydrotherapy sessions", summary: "Warm water exercise.", body: "<p>Warm water exercise.</p>", status: "published", publishedAt: now.slice(0, 10), updatedAt: now });
+      db.events.push({ id: "event-test", slug: "test-coffee-morning", title: "Carers coffee morning", summary: "A relaxed coffee morning.", body: "<p>Come along.</p>", startsAt: "2099-01-10T10:00", endsAt: "2099-01-10T12:00", location: "Romford", online: false, cost: "Free", bookingUrl: "", status: "published", updatedAt: now });
+    });
     expect(siteSearch("appointment notes").some((r) => r.kind === "download")).toBe(true);
-    expect(siteSearch("winter").some((r) => r.kind === "news")).toBe(true);
-    expect(siteSearch("drop-in").some((r) => r.kind === "event")).toBe(true);
+    expect(siteSearch("hydrotherapy").some((r) => r.kind === "news")).toBe(true);
+    expect(siteSearch("coffee morning").some((r) => r.kind === "event")).toBe(true);
   });
 
   it("never returns hidden content", () => {
@@ -83,7 +89,7 @@ describe("Tracey's printable library", () => {
       expect(r?.status, e.id).toBe("published");
       expect(fs.existsSync(path.join(UPLOAD_DIR, r!.storedName)), e.id).toBe(true);
     }
-    expect(db.resources.find((r) => r.id === "r-appointment")?.status).toBe("draft");
+    expect(db.resources.find((r) => r.id === "r-appointment")).toBeUndefined();
   });
 });
 
@@ -128,6 +134,16 @@ describe("health content drafts", () => {
     const { HEALTH_DRAFTS } = await import("@/lib/content");
     const ids = new Set(readDb().resources.map((r) => r.id));
     for (const d of HEALTH_DRAFTS) for (const s of d.sections ?? []) for (const r of s.resourceIds) expect(ids.has(r), `${d.id}/${s.id} -> ${r}`).toBe(true);
+  });
+});
+
+describe("sample content removed before launch", () => {
+  it("has no sample report, sample posts or events, or placeholder downloads", () => {
+    const db = readDb();
+    expect(db.reports.some((r) => r.id === "rep-sample")).toBe(false);
+    expect(db.posts.some((p) => ["post-welcome", "post-winter"].includes(p.id))).toBe(false);
+    expect(db.events.some((e) => ["event-dropin", "event-carers"].includes(e.id))).toBe(false);
+    expect(db.resources.some((r) => r.id.startsWith("r-"))).toBe(false);
   });
 });
 

@@ -32,8 +32,11 @@ import { CHRONIC_BODY, CHRONIC_SUMMARY, conditionHeadings } from "./content/chro
  * every health draft she hasn't edited yet.
  * Version 13 follows the Chronic Illness Support brief of 25 October: Tracey's
  * introduction and the 22 condition accordion headings (wording to follow).
+ * Version 14 removes the sample content before launch: the example outdated
+ * report, the example news posts and events (unless Tracey edited them), and
+ * the hidden one-page placeholder downloads and their files.
  */
-export const DB_VERSION = 13;
+export const DB_VERSION = 14;
 
 const T = "2026-10-20T09:00:00.000Z";
 
@@ -266,6 +269,23 @@ export function migrate(db: Database): boolean {
       page.sections = [...(page.sections ?? []), ...conditionHeadings().filter((s) => !have.has(s.id))];
     }
     db.version = 13;
+    changed = true;
+  }
+
+  if ((db.version ?? 1) < 14) {
+    db.reports = db.reports.filter((r) => r.id !== "rep-sample");
+    const samplePosts = new Set(SAMPLE_POSTS.map((p) => p.id));
+    db.posts = db.posts.filter((p) => !(samplePosts.has(p.id) && p.updatedAt === T));
+    const sampleEvents = new Set(SAMPLE_EVENTS.map((e) => e.id));
+    db.events = db.events.filter((e) => !(sampleEvents.has(e.id) && e.updatedAt === T));
+    const placeholders = new Set(["r-appointment", "r-symptoms", "r-home-safety", "r-transport"]);
+    const gone = db.resources.filter((r) => placeholders.has(r.id) && r.status === "draft" && r.size < 5000);
+    for (const r of gone) fs.rmSync(path.join(UPLOAD_DIR, path.basename(r.storedName)), { force: true });
+    const goneIds = new Set(gone.map((r) => r.id));
+    db.resources = db.resources.filter((r) => !goneIds.has(r.id));
+    for (const p of db.pages) for (const s of p.sections ?? []) s.resourceIds = s.resourceIds.filter((id) => !goneIds.has(id));
+    db.chunks = db.chunks.filter((c) => !(c.sourceType === "post" && samplePosts.has(c.sourceId)) && !(c.sourceType === "event" && sampleEvents.has(c.sourceId)));
+    db.version = 14;
     changed = true;
   }
   return changed;

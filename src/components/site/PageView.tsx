@@ -13,6 +13,7 @@ import { ResourceCard } from "./ResourceCard";
 import { AskButton } from "./HelperWidget";
 import { ContactForm } from "./ContactForm";
 import { HealthUrgentBox } from "./HealthUrgentBox";
+import { EasyRead } from "./EasyRead";
 
 const FUNERAL_LINK_SECTIONS = new Set(["chronic-illness-support", "mental-health-support"]);
 
@@ -66,6 +67,7 @@ export function PageView({ page, preview = false }: { page: Page; preview?: bool
         <div className="min-w-0">
           {page.section === "mental-health-support" && <HealthUrgentBox kind="mental" />}
           {page.section === "chronic-illness-support" && <HealthUrgentBox kind="physical" />}
+          {!isLegal && process.env.OPENAI_API_KEY && <EasyRead pageId={page.id} />}
           {html.trim() && <div className="prose-h" dangerouslySetInnerHTML={{ __html: html }} />}
           <Accordions sections={page.sections ?? []} preview={preview} />
           {page.slug === "contact" && (
