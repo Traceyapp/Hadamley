@@ -1,4 +1,4 @@
-import Anthropic from "@anthropic-ai/sdk";
+import OpenAI from "openai";
 import { readDb, mutate } from "../db";
 import { checkGuards, EMERGENCY_MESSAGES, type CallButton } from "./guard";
 import { search, RELEVANCE_FLOOR, tokenize, type SearchHit } from "./search";
@@ -17,16 +17,18 @@ export type HelperReply =
   | { kind: "answer"; text: string; sources: Source[]; mode: "model" | "extract"; notice?: string }
   | { kind: "not_found"; text: string; suggestions: Source[] };
 
-const MODEL = process.env.HADAMLEY_AI_MODEL || "claude-opus-5-5";
-// Claude Opus 5.5 list prices, USD per million tokens.
-const PRICE_IN = 4 / 1_000_000;
-const PRICE_OUT = 20 / 1_000_000;
+const MODEL = process.env.HADAMLEY_AI_MODEL || "gpt-5.4-mini";
+// gpt-5.4-mini standard prices, USD per million tokens (OpenAI pricing page, October 2026).
+// Update these if HADAMLEY_AI_MODEL is changed, so the monthly cap stays accurate.
+const PRICE_IN = 0.75 / 1_000_000;
+const PRICE_OUT = 4.5 / 1_000_000;
 
 const SYSTEM = `You are the Hadamley helper. Hadamley is an information and signposting website for people living with chronic illness, disability and mental health needs in Havering, Romford, Brentwood and nearby.
 
 Rules you must always follow:
 - Answer ONLY from the numbered sources provided in the user's message. Never use outside knowledge, even if you are confident.
 - If the sources do not answer the question, reply with exactly: NOT_FOUND
+- If the question names a specific service or organisation that is not in the sources, reply with exactly: NOT_FOUND. Do not answer about a different service instead.
 - Do not give medical, legal or financial advice. Do not recommend one service over another or make personal recommendations. Describe what the sources say and let the person decide.
 - Quote fees, ages, eligibility and referral routes exactly as written in the source, and mention the "Last checked" date when you give them.
 - Never say a service accepts self-referral unless its source says so.
@@ -95,10 +97,10 @@ async function recordSpend(inputTokens: number, outputTokens: number) {
   });
 }
 
-let client: Anthropic | null = null;
+let client: OpenAI | null = null;
 function getClient() {
-  if (!process.env.ANTHROPIC_API_KEY) return null;
-  client ??= new Anthropic();
+  if (!process.env.OPENAI_API_KEY) return null;
+  client ??= new OpenAI();
   return client;
 }
 
@@ -107,28 +109,19 @@ async function modelAnswer(hits: SearchHit[], question: string, history: ChatTur
   if (!c) return null;
   const sources = hits.map((h, i) => `[${i + 1}] ${h.chunk.title}\nURL: ${h.chunk.url}\n${h.chunk.text}`).join("\n\n---\n\n");
   const recent = history.slice(-4).map((t) => `${t.role === "user" ? "Visitor" : "Helper"}: ${t.content}`).join("\n");
-  const response = await c.beta.messages.create({
+  const response = await c.responses.create({
     model: MODEL,
-    max_tokens: 2000,
-    // Refusal fallbacks: on a safeguard decline the API reroutes server-side.
-    betas: ["server-side-fallback-2026-07-01"],
-    fallbacks: "default",
-    output_config: { effort: "low" },
-    system: SYSTEM,
-    messages: [
-      {
-        role: "user",
-        content: `<sources>\n${sources}\n</sources>\n${recent ? `\n<earlier_conversation>\n${recent}\n</earlier_conversation>\n` : ""}\n<question>${question}</question>`,
-      },
-    ],
+    max_output_tokens: 2000,
+    reasoning: { effort: "low" },
+    store: false,
+    instructions: SYSTEM,
+    input: `<sources>\n${sources}\n</sources>\n${recent ? `\n<earlier_conversation>\n${recent}\n</earlier_conversation>\n` : ""}\n<question>${question}</question>`,
   });
-  await recordSpend(response.usage.input_tokens, response.usage.output_tokens);
-  if (response.stop_reason === "refusal") return { text: "NOT_FOUND" };
-  const text = response.content
-    .filter((b): b is Anthropic.Beta.BetaTextBlock => b.type === "text")
-    .map((b) => b.text)
-    .join("")
-    .trim();
+  if (response.usage) await recordSpend(response.usage.input_tokens, response.usage.output_tokens);
+  // A refusal or a cut-off reply is treated as "not found", so the visitor gets the page links instead.
+  const refused = response.output.some((o) => o.type === "message" && o.content.some((c) => c.type === "refusal"));
+  const text = (response.output_text ?? "").trim();
+  if (refused || response.status === "incomplete" || !text) return { text: "NOT_FOUND" };
   return { text };
 }
 
@@ -206,7 +199,7 @@ export async function answer(question: string, history: ChatTurn[] = []): Promis
         return { kind: "answer", text, sources: sourcesFrom(used.length ? used : hits.slice(0, 2)), mode: "model" };
       }
     } catch (err) {
-      console.error("[ai] model call failed, using extractive fallback", err instanceof Anthropic.APIError ? `${err.status} ${err.message}` : err);
+      console.error("[ai] model call failed, using extractive fallback", err instanceof OpenAI.APIError ? `${err.status} ${err.message}` : err);
       await logQuestion(question, "answer_fallback");
       return {
         kind: "answer",

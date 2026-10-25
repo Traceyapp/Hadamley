@@ -70,7 +70,7 @@ export function TestConsole() {
         <div className="rounded-xl border border-line bg-paper p-4" aria-live="polite">
           <p className={`text-xs font-bold uppercase tracking-[0.1em] ${reply.kind === "crisis" ? "text-urgent" : reply.kind === "answer" ? "text-ok" : "text-ink-2"}`}>
             {KIND_LABEL[reply.kind] ?? reply.kind}
-            {reply.kind === "answer" && ` · ${reply.mode === "model" ? "written by Claude" : "quoting mode"}`}
+            {reply.kind === "answer" && ` · ${reply.mode === "model" ? "written by AI" : "quoting mode"}`}
           </p>
           <div className="mt-2 whitespace-pre-line text-[0.95rem]">
             {reply.kind === "crisis" ? (reply.lines as string[]).join("\n") : String(reply.text ?? "")}

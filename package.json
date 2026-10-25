@@ -11,11 +11,10 @@
     "reset-data": "rm -f data/db.json && rm -rf public/uploads/*",
     "test": "vitest run",
     "test:watch": "vitest",
-    "eval:helper": "tsx scripts/eval-helper.ts",
+    "eval:helper": "tsx --env-file=.env.local scripts/eval-helper.ts",
     "db:push": "tsx --env-file=.env.local scripts/push-to-supabase.ts"
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.135.0",
     "@supabase/supabase-js": "^2.58.0",
     "@tiptap/extension-image": "^3.32.0",
     "@tiptap/extension-link": "^3.32.0",
@@ -25,6 +24,7 @@
     "lucide-react": "^1.59.0",
     "motion": "^12.43.0",
     "next": "^15.5.28",
+    "openai": "^6.7.0",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
     "sanitize-html": "^2.17.5"

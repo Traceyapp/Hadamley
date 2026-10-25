@@ -24,7 +24,7 @@ npm test
 To check answer quality against the real API (about 12 calls, roughly $0.15 to $0.30):
 
 ```bash
-ANTHROPIC_API_KEY=sk-ant-... npm run eval:helper
+OPENAI_API_KEY=sk-... npm run eval:helper
 ```
 
 ## What's here
@@ -50,7 +50,7 @@ ANTHROPIC_API_KEY=sk-ant-... npm run eval:helper
 1. Crisis wording returns the fixed NHS 111 / 999 message. The model is never called.
 2. Grief, bereavement and funeral questions are redirected to The Funeral Companion.
 3. The question is matched against approved, published content using BM25 keyword search with synonyms and a coverage rule, so off-topic questions don't match on a place name alone. Vector search (embeddings) is not built; it would help with unusual phrasings and is the natural next step for the helper.
-4. With `ANTHROPIC_API_KEY` set, Claude (`claude-opus-5-5` at low effort, with server-side refusal fallbacks) writes a short answer using only those chunks and cites them. Without a key, or past the monthly cap in `AI_MONTHLY_BUDGET_USD`, the helper quotes the matching content directly. If nothing relevant is found it says it can't find that on Hadamley.
+4. With `OPENAI_API_KEY` set, OpenAI (`gpt-5.4-mini` at low reasoning effort) writes a short answer using only those chunks and cites them. Without a key, or past the monthly cap in `AI_MONTHLY_BUDGET_USD`, the helper quotes the matching content directly. If nothing relevant is found it says it can't find that on Hadamley.
 
 Rate limit: 20 questions per visitor every 10 minutes, held in memory. That is correct for the single-server hosting above.
 
@@ -71,7 +71,7 @@ Checked locally in the browser and against the API:
 - [x] Works at phone and desktop widths; keyboard focus styles, skip link, labelled forms, text size control
 - [ ] Replace a downloadable file (built, not yet clicked through)
 - [ ] Formal accessibility audit (axe, screen reader pass)
-- [ ] Live check of Claude-written answers (`npm run eval:helper` with a real key)
+- [ ] Live check of AI-written answers (`npm run eval:helper` with a real key)
 - [ ] Hosting with a persistent disk, domain, handover recording and written guide
 
 ## Before launch

@@ -61,7 +61,7 @@ describe("physical emergency rules", () => {
 });
 
 describe("Funeral Companion redirect", () => {
-  it.each(["How do I arrange a funeral?", "I'm grieving my husband", "bereavement counselling near me", "my mum passed away last week", "help with probate"])(
+  it.each(["How do I arrange a funeral?", "I'm grieving my husband", "bereavement counselling near me", "my mum passed away last week", "help with probate", "How do I register a death?", "getting a death certificate"])(
     "redirects %j",
     (q) => {
       expect(checkGuards(q)?.kind).toBe("funeral");

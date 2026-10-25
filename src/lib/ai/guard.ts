@@ -84,6 +84,7 @@ const FUNERAL = [
   /\bcremat/i,
   /\bburial\b/i,
   /\bpassed away\b/i,
+  /\b(register(ing)? a death|death certificate|deaths? in the family)\b/i,
   /\b(died|death of|lost my (mum|dad|mother|father|husband|wife|partner|son|daughter|child|baby|friend))\b/i,
   /\bmourn/i,
   /\bundertaker/i,

@@ -14,7 +14,7 @@ export default function AiAdmin() {
   const hiddenListings = db.listings.filter((l) => l.status !== "approved").length;
   const draftPages = db.pages.filter((p) => p.status === "draft").length;
   const cap = Number(process.env.AI_MONTHLY_BUDGET_USD || 25);
-  const modelOn = Boolean(process.env.ANTHROPIC_API_KEY);
+  const modelOn = Boolean(process.env.OPENAI_API_KEY);
   const month = new Date().toISOString().slice(0, 7);
   const spend = db.settings.aiSpend.month === month ? db.settings.aiSpend : { usd: 0, requests: 0 };
 
@@ -80,11 +80,11 @@ export default function AiAdmin() {
             <p className="text-[0.95rem]">
               {modelOn ? (
                 <>
-                  <strong className="text-ok">Claude is writing answers</strong> from the retrieved content, with sources.
+                  <strong className="text-ok">The AI model is writing answers</strong> from the retrieved content, with sources.
                 </>
               ) : (
                 <>
-                  <strong>Quoting mode.</strong> No AI key is set, so the helper shows the closest matching content directly. Add <code className="rounded bg-sand px-1">ANTHROPIC_API_KEY</code> to switch on written answers.
+                  <strong>Quoting mode.</strong> No AI key is set, so the helper shows the closest matching content directly. Add <code className="rounded bg-sand px-1">OPENAI_API_KEY</code> to switch on written answers.
                 </>
               )}
             </p>

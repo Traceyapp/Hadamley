@@ -1,18 +1,18 @@
 /**
- * Live check of the AI helper against the real Claude API.
+ * Live check of the AI helper against the real OpenAI API.
  *
- *   ANTHROPIC_API_KEY=sk-... npm run eval:helper
+ *   npm run eval:helper   (reads OPENAI_API_KEY from .env.local)
  *
  * Runs a set of realistic questions against a throwaway copy of the seed
  * data, prints each answer with its sources, and the total cost. About
- * 12 calls; expect roughly $0.15 to $0.30 on Claude Opus 5.5.
+ * 12 calls; expect a few US cents on gpt-5.4-mini.
  */
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 
-if (!process.env.ANTHROPIC_API_KEY) {
-  console.error("Set ANTHROPIC_API_KEY to run the live helper check.");
+if (!process.env.OPENAI_API_KEY) {
+  console.error("Set OPENAI_API_KEY to run the live helper check.");
   process.exit(1);
 }
 process.env.HADAMLEY_DATA_DIR = fs.mkdtempSync(path.join(os.tmpdir(), "hadamley-eval-"));
