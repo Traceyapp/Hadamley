@@ -11,7 +11,7 @@ import { ConfirmButton, SubmitButton } from "@/components/admin/client";
 export const metadata = { title: "Inbox" };
 
 export default async function InboxPage({ searchParams }: { searchParams: Promise<{ show?: string; topic?: string }> }) {
-  await ensureDb();
+  await ensureDb({ fresh: true });
   const { show, topic } = await searchParams;
   const showHandled = show === "all";
   const db = readDb();

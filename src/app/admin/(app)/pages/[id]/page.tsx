@@ -11,7 +11,7 @@ import { PageForm } from "../PageForm";
 export const metadata = { title: "Edit page" };
 
 export default async function EditPage({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ saved?: string }> }) {
-  await ensureDb();
+  await ensureDb({ fresh: true });
   const { id } = await params;
   const { saved } = await searchParams;
   const db = readDb();

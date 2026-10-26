@@ -12,7 +12,7 @@ export const metadata = { title: "Preview" };
 
 /** Draft preview: visible to signed-in admins only. Lives outside the admin shell so it looks exactly like the site. */
 export default async function PreviewPage({ params }: { params: Promise<{ id: string }> }) {
-  await ensureDb();
+  await ensureDb({ fresh: true });
   await requireAdmin();
   const { id } = await params;
   const page = getPageAnyStatus(id);

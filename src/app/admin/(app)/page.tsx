@@ -20,7 +20,7 @@ const WORKFLOW: { status: ListingStatus; bar: string }[] = [
 ];
 
 export default async function Dashboard() {
-  await ensureDb();
+  await ensureDb({ fresh: true });
   const user = await requireAdmin();
   const db = readDb();
   const byStatus = (s: ListingStatus) => db.listings.filter((l) => l.status === s).length;

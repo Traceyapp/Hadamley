@@ -12,7 +12,7 @@ import { ResourceForm } from "./ResourceForm";
 export const metadata = { title: "Downloads" };
 
 export default async function ResourcesAdmin({ searchParams }: { searchParams: Promise<{ saved?: string }> }) {
-  await ensureDb();
+  await ensureDb({ fresh: true });
   const { saved } = await searchParams;
   const db = readDb();
   const t = topics();

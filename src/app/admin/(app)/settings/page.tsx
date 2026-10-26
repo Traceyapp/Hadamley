@@ -12,7 +12,7 @@ import { AccountForm } from "./AccountForm";
 export const metadata = { title: "Settings" };
 
 export default async function SettingsPage() {
-  await ensureDb();
+  await ensureDb({ fresh: true });
   const me = await requireAdmin();
   const db = readDb();
   return (

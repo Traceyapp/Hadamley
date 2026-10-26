@@ -55,7 +55,7 @@ function TaxonList({ items, usage }: { items: Taxon[]; usage: (id: string) => nu
 }
 
 export default async function TaxonomyAdmin() {
-  await ensureDb();
+  await ensureDb({ fresh: true });
   const db = readDb();
   const topics = db.taxa.filter((t) => t.type === "topic").sort((a, b) => a.order - b.order);
   const areas = db.taxa.filter((t) => t.type === "area").sort((a, b) => a.order - b.order);

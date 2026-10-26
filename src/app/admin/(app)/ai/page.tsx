@@ -9,7 +9,7 @@ import { TestConsole } from "./TestConsole";
 export const metadata = { title: "Ask Hadamley" };
 
 export default async function AiAdmin() {
-  await ensureDb();
+  await ensureDb({ fresh: true });
   const db = readDb();
   const pages = new Set(db.chunks.filter((c) => c.sourceType === "page").map((c) => c.sourceId)).size;
   const listings = db.chunks.filter((c) => c.sourceType === "listing").length;

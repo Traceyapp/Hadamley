@@ -7,7 +7,7 @@ import { PageForm } from "../PageForm";
 export const metadata = { title: "New page" };
 
 export default async function NewPage() {
-  await ensureDb();
+  await ensureDb({ fresh: true });
   const parents = readDb()
     .pages.filter((p) => p.template === "section")
     .map((p) => ({ id: p.id, title: p.title }));

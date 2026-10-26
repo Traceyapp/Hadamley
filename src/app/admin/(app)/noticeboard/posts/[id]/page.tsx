@@ -10,7 +10,7 @@ import { PostForm } from "../../NoticeForms";
 export const metadata = { title: "Post" };
 
 export default async function EditPost({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ saved?: string }> }) {
-  await ensureDb();
+  await ensureDb({ fresh: true });
   const { id } = await params;
   const { saved } = await searchParams;
   const item = id === "new" ? undefined : readDb().posts.find((x) => x.id === id);

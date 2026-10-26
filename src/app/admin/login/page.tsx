@@ -18,7 +18,7 @@ const MANAGE = [
 ];
 
 export default async function LoginPage() {
-  await ensureDb();
+  await ensureDb({ fresh: true });
   if (await currentAdmin()) redirect("/admin");
   return (
     <div className="grid min-h-dvh bg-paper lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)]">

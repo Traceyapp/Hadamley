@@ -9,7 +9,7 @@ export const runtime = "nodejs";
 
 /** Content export. ?format=zip adds every uploaded file. Never includes password hashes or the AI index. */
 export async function GET(req: Request) {
-  await ensureDb();
+  await ensureDb({ fresh: true });
   if (!(await currentAdmin())) return new Response("Not found", { status: 404 });
   const { pages, listings, taxa, resources, reports, messages, posts, events, uploads, settings, admins } = readDb();
   const day = new Date().toISOString().slice(0, 10);

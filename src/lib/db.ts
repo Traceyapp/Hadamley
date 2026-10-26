@@ -37,23 +37,34 @@ export function readDb(): Database {
 }
 
 /** Loads (or reloads) the data from Supabase. With the local file, just reads it. */
+/** Every load and save is numbered, so an older load can never replace newer data. */
+let seq = 0;
+let applied = 0;
+function apply(db: Database, n: number) {
+  if (n < applied) return;
+  applied = n;
+  g.__hadamleyDb = { db, mtime: 0, loadedAt: Date.now() };
+}
+
+async function loadFresh(): Promise<Database> {
+  const n = ++seq;
+  const loaded = await withRetry(loadFromSupabase);
+  if (!loaded) throw new Error("The Supabase database is empty. Copy the content across with: npm run db:push");
+  const before = structuredClone(loaded);
+  if (migrate(loaded)) {
+    loaded.chunks = buildAllChunks(loaded);
+    await saveToSupabase(before, loaded);
+  }
+  apply(loaded, n);
+  return loaded;
+}
+
+/** Loads (or reloads) the data from Supabase, sharing one load between callers. With the local file, just reads it. */
 export async function loadDb(): Promise<Database> {
   if (!useSupabase()) return readFileDb();
-  g.__hadamleyLoading ??= (async () => {
-    try {
-      const loaded = await withRetry(loadFromSupabase);
-      if (!loaded) throw new Error("The Supabase database is empty. Copy the content across with: npm run db:push");
-      const before = structuredClone(loaded);
-      if (migrate(loaded)) {
-        loaded.chunks = buildAllChunks(loaded);
-        await saveToSupabase(before, loaded);
-      }
-      g.__hadamleyDb = { db: loaded, mtime: 0, loadedAt: Date.now() };
-      return loaded;
-    } finally {
-      g.__hadamleyLoading = undefined;
-    }
-  })();
+  g.__hadamleyLoading ??= loadFresh().finally(() => {
+    g.__hadamleyLoading = undefined;
+  });
   return g.__hadamleyLoading;
 }
 
@@ -77,9 +88,12 @@ async function withRetry<T>(fn: () => Promise<T>, attempts = 3): Promise<T> {
   throw last;
 }
 
-export async function ensureDb(): Promise<void> {
-  if (!useSupabase() || g.__hadamleyDb) return;
-  await loadDb();
+export async function ensureDb(opts: { fresh?: boolean } = {}): Promise<void> {
+  if (!useSupabase()) return;
+  // Admin screens ask for fresh data: on Vercel the save may have happened on
+  // another server copy whose changes this one has not picked up yet.
+  if (opts.fresh) await loadFresh(); // its own load, never one that started before the save
+  else if (!g.__hadamleyDb) await loadDb();
 }
 
 /** Read, change and save in one step. Returns whatever the callback returns. Changes run one at a time. */
@@ -91,11 +105,11 @@ export function mutate<T>(fn: (db: Database) => T): Promise<T> {
       writeFileDb(db);
       return out;
     }
-    const prev = await loadDb();
+    const prev = await loadFresh();
     const next = structuredClone(prev);
     const out = fn(next);
     await saveToSupabase(prev, next);
-    g.__hadamleyDb = { db: next, mtime: 0, loadedAt: Date.now() };
+    apply(next, ++seq);
     return out;
   };
   const result = (g.__hadamleyQueue ?? Promise.resolve()).then(run, run);

@@ -6,7 +6,7 @@ import { ListingForm } from "../ListingForm";
 export const metadata = { title: "Add listing" };
 
 export default async function NewListing() {
-  await ensureDb();
+  await ensureDb({ fresh: true });
   return (
     <>
       <AdminHeader title="Add a listing" back={{ href: "/admin/listings", label: "All listings" }} description="New listings stay hidden until you mark them Approved for publication." />

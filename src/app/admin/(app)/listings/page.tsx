@@ -9,7 +9,7 @@ import { AdminHeader, btn, Empty, Flash, input, ListingStatusBadge } from "@/com
 export const metadata = { title: "Directory listings" };
 
 export default async function ListingsAdmin({ searchParams }: { searchParams: Promise<{ status?: string; q?: string; saved?: string; due?: string }> }) {
-  await ensureDb();
+  await ensureDb({ fresh: true });
   const { status, q = "", saved, due } = await searchParams;
   const db = readDb();
   const all = db.listings;

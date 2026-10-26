@@ -9,7 +9,7 @@ import { AdminHeader, btn, Card, Empty, Flash, PageStatusBadge } from "@/compone
 export const metadata = { title: "Noticeboard" };
 
 export default async function NoticeboardAdmin({ searchParams }: { searchParams: Promise<{ saved?: string }> }) {
-  await ensureDb();
+  await ensureDb({ fresh: true });
   const { saved } = await searchParams;
   const db = readDb();
   const now = londonNow();

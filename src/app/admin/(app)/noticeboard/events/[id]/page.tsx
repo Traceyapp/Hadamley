@@ -10,7 +10,7 @@ import { EventForm } from "../../NoticeForms";
 export const metadata = { title: "Event" };
 
 export default async function EditEvent({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ saved?: string }> }) {
-  await ensureDb();
+  await ensureDb({ fresh: true });
   const { id } = await params;
   const { saved } = await searchParams;
   const item = id === "new" ? undefined : readDb().events.find((x) => x.id === id);
