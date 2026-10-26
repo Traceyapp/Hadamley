@@ -177,6 +177,11 @@ export function ListingForm({ listing, topics, areas, flash }: { listing?: Listi
               ))}
             </div>
           </fieldset>
+          {l && status !== l.status && (
+            <p role="status" className="mt-4 rounded-lg border border-warn/30 bg-warn-soft px-3 py-2 text-[0.86rem] font-bold text-warn">
+              Not saved yet. This listing stays &ldquo;{STATUS_LABEL[l.status]}&rdquo;{l.status === "approved" ? " and live" : " and hidden"} until you save.
+            </p>
+          )}
           <SubmitButton className={`${btn.primary} mt-4 w-full`} pendingText="Saving...">
             {status === "approved" ? (l?.status === "approved" ? "Save live listing" : "Save and approve") : "Save listing"}
           </SubmitButton>
