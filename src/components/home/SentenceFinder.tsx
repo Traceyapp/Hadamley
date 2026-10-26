@@ -30,7 +30,7 @@ const NEEDS: Record<string, string> = {
   transport: "accessible transport",
   "assessments-costs": "help with costs",
   "hospitals-clinics": "a specialist clinic",
-  "long-term-conditions": "long term condition support",
+  "long-term-conditions": "chronic illness support",
   "disability-rehab": "rehabilitation",
 };
 
@@ -65,7 +65,7 @@ function Blank({ id, label, value, options, onChange }: { id: string; label: str
         name={id}
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="peer absolute inset-0 size-full cursor-pointer appearance-none opacity-0 focus-visible:shadow-none focus-visible:outline-none"
+        className="peer absolute inset-0 size-full cursor-pointer appearance-none font-sans text-base not-italic font-normal tracking-normal opacity-0 focus-visible:shadow-none focus-visible:outline-none"
       >
         {options.map((o) => (
           <option key={o.value} value={o.value}>
