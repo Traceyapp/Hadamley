@@ -49,7 +49,7 @@ export function PageView({ page, preview = false }: { page: Page; preview?: bool
             {kids.map((k, i) => (
               <div key={k.id} className="h-full">
                 <Link href={preview ? `/admin/pages/${k.id}/preview` : `/${k.slug}`} className="card-print card-print-hover group relative z-10 flex h-full flex-col p-6">
-                  <span className="font-display text-[1.6rem] font-semibold leading-none text-sec">{String.fromCharCode(97 + i)}.</span>
+                  <span className="font-display text-[1.6rem] font-semibold leading-none text-sec">{String.fromCharCode(65 + i)}.</span>
                   <span className="mt-3 font-display text-[1.35rem] font-semibold leading-snug group-hover:underline">{k.title}</span>
                   <span className="mt-2 text-[0.95rem] text-ink-2">{k.summary}</span>
                   <span className="mt-auto inline-flex items-center gap-2 pt-5 font-bold text-sec">
