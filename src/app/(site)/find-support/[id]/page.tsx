@@ -10,13 +10,22 @@ import { PageHero } from "@/components/site/PageHero";
 import { Stagger } from "@/components/fx/motion";
 import { ReportForm } from "@/components/site/ReportForm";
 import { ListingCard } from "@/components/site/ListingCard";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { absoluteUrl, breadcrumbSchema } from "@/lib/seo";
 
 type Props = { params: Promise<{ id: string }> };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   await ensureDb();
   const l = getApprovedListing((await params).id);
-  return l ? { title: l.name, description: l.summary } : {};
+  return l
+    ? {
+        title: l.name,
+        description: l.summary,
+        alternates: { canonical: `/find-support/${l.id}` },
+        openGraph: { type: "website", url: `/find-support/${l.id}`, title: l.name, description: l.summary },
+      }
+    : {};
 }
 
 function Row({ label, children }: { label: string; children: React.ReactNode }) {
@@ -41,9 +50,22 @@ export default async function ListingPage({ params }: Props) {
     .filter((x) => x.id !== l.id)
     .slice(0, 2);
   const hasContact = l.contactConfirmed && (l.phone || l.email || l.website || l.contactUrl);
+  const listingUrl = `/find-support/${l.id}`;
+  const serviceSchema = {
+    "@context": "https://schema.org",
+    "@type": "Service",
+    name: l.name,
+    description: l.summary,
+    url: absoluteUrl(listingUrl),
+    provider: { "@type": "Organization", name: l.name },
+    areaServed: areas.map((area) => area!.name),
+    ...(l.contactConfirmed && l.website ? { sameAs: l.website } : {}),
+  };
 
   return (
     <>
+      <JsonLd data={serviceSchema} />
+      <JsonLd data={breadcrumbSchema([{ name: "Home", path: "/" }, { name: "Find Support", path: "/find-support" }, { name: l.name, path: listingUrl }])} />
       <PageHero
         crumbs={[{ label: "Find Support", href: "/find-support" }, { label: l.name }]}
         section="find-support"

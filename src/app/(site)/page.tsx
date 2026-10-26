@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { ensureDb } from "@/lib/db";
 import Link from "next/link";
 import { ArrowRight, ExternalLink } from "lucide-react";
@@ -26,6 +27,8 @@ const CHAPTERS = [
 ];
 
 const QUESTIONS = ["Can I refer myself for physiotherapy?", "Where can I hire a wheelchair for a week?", "Who can help with anxiety?", "Is there help paying for a stairlift?"];
+
+export const metadata: Metadata = { alternates: { canonical: "/" } };
 
 export default async function HomePage() {
   await ensureDb();

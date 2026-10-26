@@ -1,5 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Atkinson_Hyperlegible, Caveat, Fraunces } from "next/font/google";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { absoluteUrl, SHARE_IMAGE } from "@/lib/seo";
 import "./globals.css";
 
 // Atkinson Hyperlegible was designed for readers with low vision.
@@ -9,9 +11,20 @@ const display = Fraunces({ subsets: ["latin"], axes: ["SOFT", "opsz"], variable:
 const hand = Caveat({ subsets: ["latin"], weight: ["500", "700"], variable: "--font-hand", display: "swap" });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(absoluteUrl()),
   title: { default: "Hadamley Information Services | Free Independent Resources", template: "%s | Hadamley" },
   description:
     "Free, independent information and printable resources for mental health, chronic illness and everyday wellbeing, with local support in Havering, Romford, Brentwood and nearby.",
+  openGraph: {
+    type: "website",
+    locale: "en_GB",
+    siteName: "Hadamley",
+    title: "Hadamley | Local support and independent information",
+    description: "Free, independent information and printable resources, with local support in Havering, Romford, Brentwood and nearby.",
+    url: "/",
+    images: [{ url: SHARE_IMAGE, width: 1254, height: 1254, alt: "Hadamley" }],
+  },
+  twitter: { card: "summary", title: "Hadamley | Local support and independent information" },
 };
 
 export const viewport: Viewport = {
@@ -31,7 +44,35 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         <script dangerouslySetInnerHTML={{ __html: prefsScript }} />
       </head>
-      <body className="min-h-dvh">{children}</body>
+      <body className="min-h-dvh">
+        <JsonLd
+          data={{
+            "@context": "https://schema.org",
+            "@graph": [
+              {
+                "@type": "Organization",
+                "@id": absoluteUrl("/#organization"),
+                name: "Hadamley Information Services",
+                alternateName: "Hadamley",
+                slogan: "Free Independent Resources",
+                url: absoluteUrl(),
+                logo: SHARE_IMAGE,
+                email: "support@hadamley.com",
+                areaServed: ["Havering", "Romford", "Brentwood"],
+              },
+              {
+                "@type": "WebSite",
+                "@id": absoluteUrl("/#website"),
+                name: "Hadamley Information Services",
+                url: absoluteUrl(),
+                inLanguage: "en-GB",
+                publisher: { "@id": absoluteUrl("/#organization") },
+              },
+            ],
+          }}
+        />
+        {children}
+      </body>
     </html>
   );
 }

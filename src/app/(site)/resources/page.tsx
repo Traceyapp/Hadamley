@@ -8,9 +8,18 @@ import { PageHero } from "@/components/site/PageHero";
 import { Stagger } from "@/components/fx/motion";
 import { ResourceCard } from "@/components/site/ResourceCard";
 
-export const metadata: Metadata = { title: "Free printable library", description: "Journals, trackers, colouring, puzzles, guides and checklists to download and print, free." };
-
 type SP = Promise<{ kind?: string; topic?: string }>;
+
+export async function generateMetadata({ searchParams }: { searchParams: SP }): Promise<Metadata> {
+  const { kind, topic } = await searchParams;
+  return {
+    title: "Free printable library",
+    description: "Journals, trackers, colouring, puzzles, guides and checklists to download and print, free.",
+    alternates: { canonical: "/resources" },
+    robots: kind || topic ? { index: false, follow: true } : undefined,
+    openGraph: { type: "website", url: "/resources", title: "Free printable library", description: "Free guides, checklists, trackers and activities to download and print." },
+  };
+}
 
 export default async function ResourcesPage({ searchParams }: { searchParams: SP }) {
   await ensureDb();

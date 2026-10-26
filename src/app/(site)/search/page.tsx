@@ -6,7 +6,7 @@ import { siteSearch, type SearchKind } from "@/lib/site-search";
 import { Container } from "@/components/site/bits";
 import { PageHero } from "@/components/site/PageHero";
 
-export const metadata: Metadata = { title: "Search" };
+export const metadata: Metadata = { title: "Search", robots: { index: false, follow: true } };
 
 const LABEL: Record<SearchKind, string> = { service: "Services", page: "Guide pages", event: "Events", news: "News", download: "Downloads" };
 const ORDER: SearchKind[] = ["service", "page", "event", "news", "download"];

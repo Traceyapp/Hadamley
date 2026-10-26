@@ -12,11 +12,6 @@ import { ListingCard } from "@/components/site/ListingCard";
 import { AutoSubmitForm } from "@/components/site/AutoSubmit";
 import { FiltersPanel } from "@/components/site/FiltersPanel";
 
-export const metadata: Metadata = {
-  title: "Find Support",
-  description: "Search local services in Havering, Romford, Brentwood and nearby by need, area and how you want to be seen.",
-};
-
 type SP = Promise<Record<string, string | string[] | undefined>>;
 const arr = (v: string | string[] | undefined) => (v === undefined ? [] : Array.isArray(v) ? v : [v]);
 
@@ -182,4 +177,16 @@ export default async function FindSupportPage({ searchParams }: { searchParams: 
       </AutoSubmitForm>
     </>
   );
+}
+
+export async function generateMetadata({ searchParams }: { searchParams: SP }): Promise<Metadata> {
+  const params = await searchParams;
+  const filtered = Object.values(params).some((value) => Array.isArray(value) ? value.length > 0 : Boolean(value));
+  return {
+    title: "Find Support",
+    description: "Search local services in Havering, Romford, Brentwood and nearby by need, area and how you want to be seen.",
+    alternates: { canonical: "/find-support" },
+    robots: filtered ? { index: false, follow: true } : undefined,
+    openGraph: { type: "website", url: "/find-support", title: "Find local support", description: "Search checked local services in Havering, Romford, Brentwood and nearby." },
+  };
 }

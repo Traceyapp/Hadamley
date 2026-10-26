@@ -8,7 +8,12 @@ import { EventTicket, PostNote } from "@/components/notice/Cards";
 import { eventParts } from "@/lib/notice";
 import Link from "next/link";
 
-export const metadata: Metadata = { title: "Noticeboard", description: "Local events and news from Hadamley." };
+export const metadata: Metadata = {
+  title: "Noticeboard",
+  description: "Local events and news from Hadamley.",
+  alternates: { canonical: "/noticeboard" },
+  openGraph: { type: "website", url: "/noticeboard", title: "Hadamley noticeboard", description: "Local events and news from Hadamley." },
+};
 
 export default async function NoticeboardPage() {
   await ensureDb();

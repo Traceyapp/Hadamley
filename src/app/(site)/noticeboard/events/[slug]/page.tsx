@@ -6,13 +6,22 @@ import { ArrowLeft, CalendarPlus, Clock, ExternalLink, MapPin, Monitor, PoundSte
 import { eventParts, getEvent, londonNow } from "@/lib/notice";
 import { Container, Disclaimer } from "@/components/site/bits";
 import { PageHero } from "@/components/site/PageHero";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { absoluteUrl, breadcrumbSchema } from "@/lib/seo";
 
 type Props = { params: Promise<{ slug: string }> };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   await ensureDb();
   const e = getEvent((await params).slug);
-  return e ? { title: e.title, description: e.summary } : {};
+  return e
+    ? {
+        title: e.title,
+        description: e.summary,
+        alternates: { canonical: `/noticeboard/events/${e.slug}` },
+        openGraph: { type: "website", url: `/noticeboard/events/${e.slug}`, title: e.title, description: e.summary },
+      }
+    : {};
 }
 
 export default async function EventPage({ params }: Props) {
@@ -23,9 +32,25 @@ export default async function EventPage({ params }: Props) {
   const end = e.endsAt ? eventParts(e.endsAt) : null;
   const past = (e.endsAt || e.startsAt) < londonNow();
   const mapHref = !e.online && e.location ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(e.location)}` : null;
+  const path = `/noticeboard/events/${e.slug}`;
+  const eventSchema = {
+    "@context": "https://schema.org",
+    "@type": "Event",
+    name: e.title,
+    description: e.summary,
+    startDate: e.startsAt,
+    ...(e.endsAt ? { endDate: e.endsAt } : {}),
+    eventStatus: "https://schema.org/EventScheduled",
+    eventAttendanceMode: e.online ? "https://schema.org/OnlineEventAttendanceMode" : "https://schema.org/OfflineEventAttendanceMode",
+    location: e.online ? { "@type": "VirtualLocation", url: e.bookingUrl || absoluteUrl(path) } : { "@type": "Place", name: e.location },
+    url: absoluteUrl(path),
+    ...(e.cost ? { offers: { "@type": "Offer", price: e.cost.replace(/[^0-9.]/g, "") || "0", priceCurrency: "GBP", url: e.bookingUrl || absoluteUrl(path), availability: past ? "https://schema.org/SoldOut" : "https://schema.org/InStock" } } : {}),
+  };
 
   return (
     <>
+      <JsonLd data={eventSchema} />
+      <JsonLd data={breadcrumbSchema([{ name: "Home", path: "/" }, { name: "Noticeboard", path: "/noticeboard" }, { name: e.title, path }])} />
       <PageHero crumbs={[{ label: "Noticeboard", href: "/noticeboard" }, { label: e.title }]} eyebrow={<span className="kicker text-accent">{past ? "This event has finished" : "Event"}</span>} title={e.title} summary={e.summary} />
       <Container className="grid gap-10 pt-12 lg:grid-cols-[minmax(0,1fr)_22rem]">
         <article className="prose-h" dangerouslySetInnerHTML={{ __html: e.body }} />
