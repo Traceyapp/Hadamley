@@ -38,7 +38,7 @@ const NEEDS: Record<string, string> = {
 const HAVERING_TOWNS = new Set(["romford", "hornchurch", "upminster", "rainham"]);
 
 const WAYS: Opt[] = [
-  { value: "", label: "suits me" },
+  { value: "", label: "works for me" },
   { value: "self", label: "I can refer myself to" },
   { value: "home", label: "can visit me at home" },
   { value: "remote", label: "I can use by phone or online" },
@@ -98,8 +98,8 @@ export function SentenceFinder({
   const [way, setWay] = useState("");
   useEffect(() => onFocusChange?.({ need, place }), [need, place, onFocusChange]);
 
-  const needOpts: Opt[] = [{ value: "", label: "any kind of support" }, ...topics.map((t) => ({ value: t.value, label: NEEDS[t.value] ?? t.label.toLowerCase() }))];
-  const placeOpts: Opt[] = [{ value: "", label: "anywhere nearby" }, ...areas];
+  const needOpts: Opt[] = [{ value: "", label: "anything" }, ...topics.map((t) => ({ value: t.value, label: NEEDS[t.value] ?? t.label.toLowerCase() }))];
+  const placeOpts: Opt[] = [{ value: "", label: "any area" }, ...areas];
 
   const matches = useMemo(
     () =>
@@ -133,8 +133,8 @@ export function SentenceFinder({
     <form action="/find-support" className="sec-find">
       <p className="mb-3 text-sm text-ink-2">Choose what you need, where, and what works for you.</p>
       <p className="max-w-5xl font-display text-[1.55rem] font-medium leading-[1.4] tracking-[-0.02em] text-ink sm:text-[2.6rem] lg:text-[3.1rem]">
-        I&apos;m looking for <Blank id="topic" label="What kind of support" value={need} options={needOpts} onChange={setNeed} />
-        {" near "}
+        I&apos;d like help with <Blank id="topic" label="What kind of support" value={need} options={needOpts} onChange={setNeed} />
+        {" in "}
         <Blank id="area" label="Where" value={place} options={placeOpts} onChange={setPlace} />
         {" that "}
         <Blank id="way" label="What matters to you" value={way} options={WAYS} onChange={setWay} />
@@ -202,7 +202,7 @@ export function SentenceFinder({
           <li className="rounded-[var(--radius-card)] border-[1.5px] border-dashed border-line-strong p-6 md:col-span-3">
             <p className="font-display text-xl font-semibold">Nothing matches all three yet.</p>
             <p className="mt-1 text-ink-2">
-              Try <button type="button" className="link font-bold" onClick={() => setPlace("")}>anywhere nearby</button> or{" "}
+              Try <button type="button" className="link font-bold" onClick={() => setPlace("")}>any area</button> or{" "}
               <button type="button" className="link font-bold" onClick={() => setWay("")}>any way</button>, or ask the Hadamley helper in your own words.
             </p>
           </li>
