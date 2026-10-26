@@ -42,9 +42,9 @@ export default async function PagesList({ searchParams }: { searchParams: Promis
         }
       />
       <Flash message={saved} />
-      <div className="overflow-hidden rounded-2xl border border-line bg-surface shadow-soft">
+      <div className="admin-card overflow-hidden">
         <table className="w-full text-left text-[0.95rem]">
-          <thead className="border-b border-line bg-sand text-[0.8rem] uppercase tracking-[0.08em] text-ink-2">
+          <thead className="admin-thead">
             <tr>
               <th scope="col" className="px-5 py-3 font-bold">
                 Page

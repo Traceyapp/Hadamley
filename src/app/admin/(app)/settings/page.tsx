@@ -18,7 +18,7 @@ export default async function SettingsPage() {
   return (
     <>
       <AdminHeader title="Settings" />
-      <div className="grid gap-6 lg:grid-cols-2">
+      <div className="grid grid-cols-[minmax(0,1fr)] gap-6 xl:grid-cols-2">
         <div className="space-y-6">
         <Card title="Your account" description="Change your name, login email or password.">
           <AccountForm name={me.name} email={me.email} />

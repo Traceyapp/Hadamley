@@ -35,7 +35,7 @@ export function ListingForm({ listing, topics, areas, flash }: { listing?: Listi
   const l = listing;
 
   return (
-    <form action={action} className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_20rem]">
+    <form action={action} className="grid grid-cols-[minmax(0,1fr)] gap-6 xl:grid-cols-[minmax(0,1fr)_20rem]">
       <input type="hidden" name="id" value={l?.id ?? ""} />
       <div className="min-w-0 space-y-6">
 
@@ -158,7 +158,7 @@ export function ListingForm({ listing, topics, areas, flash }: { listing?: Listi
         </Card>
       </div>
 
-      <div className="space-y-6 lg:sticky lg:top-6 lg:self-start">
+      <div className="space-y-6 xl:sticky xl:top-6 xl:self-start">
         <Card title="Status">
           <fieldset>
             <legend className="sr-only">Listing status</legend>
@@ -166,7 +166,7 @@ export function ListingForm({ listing, topics, areas, flash }: { listing?: Listi
               {(Object.keys(STATUS_LABEL) as ListingStatus[]).map((s) => (
                 <label
                   key={s}
-                  className={`flex cursor-pointer items-start gap-2.5 rounded-xl border p-3 ${status === s ? (s === "approved" ? "border-ok bg-ok-soft" : "border-brand bg-brand-tint") : "border-line hover:bg-sand"}`}
+                  className={`flex cursor-pointer items-start gap-2.5 rounded-xl border p-3 ${status === s ? (s === "approved" ? "border-ok bg-ok-soft" : "border-brand bg-brand-tint") : "border-line hover:bg-paper-2"}`}
                 >
                   <input type="radio" name="status" value={s} checked={status === s} onChange={() => setStatus(s)} className="mt-1 accent-[var(--brand)]" />
                   <span>

@@ -68,9 +68,9 @@ export default async function ListingsAdmin({ searchParams }: { searchParams: Pr
       </div>
 
       {rows.length ? (
-        <div className="overflow-x-auto rounded-2xl border border-line bg-surface shadow-soft">
+        <div className="overflow-x-auto admin-card">
           <table className="w-full min-w-[44rem] text-left text-[0.95rem]">
-            <thead className="border-b border-line bg-sand text-[0.8rem] uppercase tracking-[0.08em] text-ink-2">
+            <thead className="admin-thead">
               <tr>
                 <th scope="col" className="px-5 py-3 font-bold">
                   Service

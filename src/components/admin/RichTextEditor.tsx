@@ -17,7 +17,7 @@ function ToolButton({ onClick, active, label, children, disabled }: { onClick: (
       title={label}
       aria-pressed={active}
       disabled={disabled}
-      className={`grid size-9 place-items-center rounded-lg ${active ? "bg-brand text-paper" : "text-ink hover:bg-sand-2"} disabled:opacity-40`}
+      className={`grid size-9 place-items-center rounded-lg ${active ? "bg-brand text-paper" : "text-ink hover:bg-line"} disabled:opacity-40`}
     >
       {children}
     </button>
@@ -33,7 +33,7 @@ function Toolbar({ editor, onImage, onTidy, tidying }: { editor: Editor; onImage
     else editor.chain().focus().extendMarkRange("link").setLink({ href: url }).run();
   };
   return (
-    <div className="sticky top-0 z-10 flex flex-wrap items-center gap-0.5 rounded-t-xl border-b border-line bg-sand px-2 py-1.5" role="toolbar" aria-label="Formatting">
+    <div className="sticky top-0 z-10 flex flex-wrap items-center gap-0.5 rounded-t-xl border-b border-line bg-paper-2 px-2 py-1.5" role="toolbar" aria-label="Formatting">
       <ToolButton label="Heading" active={editor.isActive("heading", { level: 2 })} onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}>
         <Heading2 className="size-[1.15rem]" aria-hidden />
       </ToolButton>
@@ -72,7 +72,7 @@ function Toolbar({ editor, onImage, onTidy, tidying }: { editor: Editor; onImage
         onClick={onTidy}
         disabled={tidying}
         title="Suggest a clearer version in Hadamley's house style. Nothing changes until you choose to use it."
-        className="ml-1 inline-flex min-h-9 items-center gap-1.5 rounded-lg px-2.5 text-sm font-bold text-brand hover:bg-sand-2 disabled:opacity-60"
+        className="ml-1 inline-flex min-h-9 items-center gap-1.5 rounded-lg px-2.5 text-sm font-bold text-brand hover:bg-line disabled:opacity-60"
       >
         {tidying ? <Loader2 className="size-4 animate-spin" aria-hidden /> : <Sparkles className="size-4" aria-hidden />}
         {tidying ? "Tidying..." : "Tidy up"}

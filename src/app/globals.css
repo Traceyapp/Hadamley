@@ -74,6 +74,7 @@
 
   --shadow: 0 1px 0 rgb(20 42 82 / 0.04), 0 2px 8px -2px rgb(20 42 82 / 0.08);
   --shadow-lg: 0 1px 0 rgb(20 42 82 / 0.05), 0 18px 40px -18px rgb(20 42 82 / 0.28);
+  --admin-shadow: 0 1px 2px rgb(20 42 82 / 0.05), 0 6px 18px -10px rgb(20 42 82 / 0.16);
   --shadow-glow: var(--shadow-lg);
   --print: 4px 4px 0 0 var(--ink);
   color-scheme: light;
@@ -126,6 +127,7 @@
     --glow-4: #5a2c3c;
     --shadow: 0 1px 0 rgb(0 0 0 / 0.3), 0 2px 8px -2px rgb(0 0 0 / 0.5);
     --shadow-lg: 0 1px 0 rgb(0 0 0 / 0.3), 0 18px 40px -18px rgb(0 0 0 / 0.7);
+    --admin-shadow: 0 1px 2px rgb(0 0 0 / 0.35), 0 6px 18px -10px rgb(0 0 0 / 0.6);
     --print: 4px 4px 0 0 #000;
     color-scheme: dark;
   }
@@ -177,6 +179,7 @@
   --glow-4: #5a2c3c;
   --shadow: 0 1px 0 rgb(0 0 0 / 0.3), 0 2px 8px -2px rgb(0 0 0 / 0.5);
   --shadow-lg: 0 1px 0 rgb(0 0 0 / 0.3), 0 18px 40px -18px rgb(0 0 0 / 0.7);
+    --admin-shadow: 0 1px 2px rgb(0 0 0 / 0.35), 0 6px 18px -10px rgb(0 0 0 / 0.6);
   --print: 4px 4px 0 0 #000;
   color-scheme: dark;
 }
@@ -292,6 +295,17 @@
   --brand: #a9c1ea; --accent: #e3c78f; --champagne: #c9a96e;
   --art-lake: #2c5862; --art-brick: #7a3f23; --art-meadow: #355a37; --art-navy: #343e78; --art-rose: #6b2f44; --art-sun: #c9a96e;
   color-scheme: dark;
+}
+
+/* Admin area: a calm app look (white cards, fine borders, soft shadows). */
+@layer components {
+  .admin-card { border: 1px solid var(--line); background: var(--surface); border-radius: 1rem; box-shadow: var(--admin-shadow); }
+  .admin-card-hover { transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease; }
+  .admin-card-hover:hover { transform: translateY(-2px); border-color: var(--line-strong); }
+  .admin-thead { background: var(--paper-2); color: var(--ink-2); font-size: 0.74rem; letter-spacing: 0.09em; text-transform: uppercase; border-bottom: 1px solid var(--line); }
+  .admin-row:hover { background: var(--brand-tint); }
+  .no-scrollbar { scrollbar-width: none; }
+  .no-scrollbar::-webkit-scrollbar { display: none; }
 }
 
 .skip-link {

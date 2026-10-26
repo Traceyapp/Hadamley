@@ -42,7 +42,7 @@ function PublishCard({ status, state, viewHref }: { status?: "draft" | "publishe
 export function PostForm({ post, flash }: { post?: Post; flash?: string }) {
   const [state, action] = useActionState<ActionState, FormData>(savePost, flash ? { ok: true, message: flash } : null);
   return (
-    <form action={action} className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_19rem]">
+    <form action={action} className="grid grid-cols-[minmax(0,1fr)] gap-6 xl:grid-cols-[minmax(0,1fr)_19rem]">
       <input type="hidden" name="id" value={post?.id ?? ""} />
       <input type="hidden" name="intent" defaultValue="save" />
       <div className="min-w-0 space-y-6">
@@ -63,7 +63,7 @@ export function PostForm({ post, flash }: { post?: Post; flash?: string }) {
           <RichTextEditor name="body" initial={post?.body ?? ""} labelId="post-body" />
         </div>
       </div>
-      <div className="space-y-6 lg:sticky lg:top-6 lg:self-start">
+      <div className="space-y-6 xl:sticky xl:top-6 xl:self-start">
         <PublishCard status={post?.status} state={state} viewHref={post ? `/noticeboard/news/${post.slug}` : undefined} />
         <Card title="Date">
           <Field label="Publish date" htmlFor="publishedAt" hint="Posts are ordered newest first.">
@@ -79,7 +79,7 @@ export function EventForm({ event, flash }: { event?: NoticeEvent; flash?: strin
   const [state, action] = useActionState<ActionState, FormData>(saveEvent, flash ? { ok: true, message: flash } : null);
   const e = event;
   return (
-    <form action={action} className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_19rem]">
+    <form action={action} className="grid grid-cols-[minmax(0,1fr)] gap-6 xl:grid-cols-[minmax(0,1fr)_19rem]">
       <input type="hidden" name="id" value={e?.id ?? ""} />
       <input type="hidden" name="intent" defaultValue="save" />
       <div className="min-w-0 space-y-6">
@@ -123,7 +123,7 @@ export function EventForm({ event, flash }: { event?: NoticeEvent; flash?: strin
           <RichTextEditor name="body" initial={e?.body ?? ""} labelId="event-body" />
         </div>
       </div>
-      <div className="space-y-6 lg:sticky lg:top-6 lg:self-start">
+      <div className="space-y-6 xl:sticky xl:top-6 xl:self-start">
         <PublishCard status={e?.status} state={state} viewHref={e ? `/noticeboard/events/${e.slug}` : undefined} />
         <p className="px-1 text-[0.85rem] text-ink-2">Past events drop off the board and out of the AI helper automatically.</p>
       </div>

@@ -38,7 +38,7 @@ export default async function InboxPage({ searchParams }: { searchParams: Promis
               {reports.map((r) => {
                 const l = db.listings.find((x) => x.id === r.listingId);
                 return (
-                  <li key={r.id} className={`rounded-xl border p-4 ${r.handled ? "border-line bg-sand opacity-75" : "border-line-strong bg-surface"}`}>
+                  <li key={r.id} className={`rounded-xl border p-4 ${r.handled ? "border-line bg-paper-2 opacity-75" : "border-line-strong bg-surface"}`}>
                     <div className="flex flex-wrap items-start justify-between gap-2">
                       {l ? (
                         <Link href={`/admin/listings/${l.id}`} className="font-bold hover:text-brand">
@@ -89,7 +89,7 @@ export default async function InboxPage({ searchParams }: { searchParams: Promis
           ) : (
             <ul className="space-y-3">
               {messages.map((m) => (
-                <li key={m.id} className={`rounded-xl border p-4 ${m.handled ? "border-line bg-sand opacity-75" : "border-line-strong bg-surface"}`}>
+                <li key={m.id} className={`rounded-xl border p-4 ${m.handled ? "border-line bg-paper-2 opacity-75" : "border-line-strong bg-surface"}`}>
                   <div className="flex flex-wrap items-start justify-between gap-2">
                     <span className="font-bold">
                       {m.name || "No name given"}

@@ -49,7 +49,7 @@ export function SectionsEditor({ initial, resources }: { initial: PageSection[];
             <li key={s.id} className="rounded-xl border border-line-strong bg-surface">
               <div className="flex items-center gap-2 p-2 pl-4">
                 <span className="font-display font-semibold text-brand">{String(i + 1).padStart(2, "0")}</span>
-                <button type="button" onClick={() => setOpen(isOpen ? null : s.id)} className="flex min-h-10 flex-1 items-center gap-2 text-left font-bold" aria-expanded={isOpen}>
+                <button type="button" onClick={() => setOpen(isOpen ? null : s.id)} className="flex min-h-10 min-w-0 flex-1 items-center gap-2 text-left font-bold" aria-expanded={isOpen}>
                   <span className="flex-1 truncate">{s.heading || "Untitled section"}</span>
                   <ChevronDown className={`size-4 transition-transform ${isOpen ? "rotate-180" : ""}`} aria-hidden />
                 </button>
@@ -130,7 +130,7 @@ export function SectionsEditor({ initial, resources }: { initial: PageSection[];
                       <legend className="mb-1.5 text-[0.95rem] font-bold">Downloads in this section</legend>
                       <div className="grid gap-1 sm:grid-cols-2">
                         {resources.map((r) => (
-                          <label key={r.id} className="flex min-h-10 items-center gap-2.5 rounded-lg px-2 hover:bg-sand">
+                          <label key={r.id} className="flex min-h-10 items-center gap-2.5 rounded-lg px-2 hover:bg-paper-2">
                             <input
                               type="checkbox"
                               checked={s.resourceIds.includes(r.id)}

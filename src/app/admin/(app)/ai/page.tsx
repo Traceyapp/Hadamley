@@ -6,7 +6,7 @@ import { AdminHeader, Card } from "@/components/admin/ui";
 import { RefreshAiButton } from "./RefreshAiButton";
 import { TestConsole } from "./TestConsole";
 
-export const metadata = { title: "AI helper" };
+export const metadata = { title: "Ask Hadamley" };
 
 export default async function AiAdmin() {
   await ensureDb();
@@ -22,8 +22,8 @@ export default async function AiAdmin() {
 
   return (
     <>
-      <AdminHeader title="AI helper" description="The helper answers only from published pages and approved listings. Changes are picked up as soon as you save." />
-      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_22rem]">
+      <AdminHeader title="Ask Hadamley" description="The AI helper on the website answers only from published pages and approved listings. Changes are picked up as soon as you save." />
+      <div className="grid grid-cols-[minmax(0,1fr)] gap-6 xl:grid-cols-[minmax(0,1fr)_22rem]">
         <div className="space-y-6">
           <Card title="Try a question" description="Test the helper exactly as a visitor would see it.">
             <TestConsole />
@@ -86,7 +86,7 @@ export default async function AiAdmin() {
                 </>
               ) : (
                 <>
-                  <strong>Quoting mode.</strong> No AI key is set, so the helper shows the closest matching content directly. Add <code className="rounded bg-sand px-1">OPENAI_API_KEY</code> to switch on written answers.
+                  <strong>Quoting mode.</strong> No AI key is set, so the helper shows the closest matching content directly. Add <code className="rounded bg-paper-2 px-1">OPENAI_API_KEY</code> to switch on written answers.
                 </>
               )}
             </p>
@@ -98,7 +98,7 @@ export default async function AiAdmin() {
                     ${spend.usd.toFixed(2)} of ${cap}
                   </span>
                 </div>
-                <div className="mt-1.5 h-2 overflow-hidden rounded-full bg-sand-2" role="progressbar" aria-valuenow={Math.round((spend.usd / cap) * 100)} aria-valuemin={0} aria-valuemax={100} aria-label="Monthly AI spend">
+                <div className="mt-1.5 h-2 overflow-hidden rounded-full bg-paper-2" role="progressbar" aria-valuenow={Math.round((spend.usd / cap) * 100)} aria-valuemin={0} aria-valuemax={100} aria-label="Monthly AI spend">
                   <div className="h-full rounded-full bg-brand" style={{ width: `${Math.min(100, (spend.usd / cap) * 100)}%` }} />
                 </div>
                 <p className="mt-1.5 text-xs text-ink-2">{spend.requests} answers written. At the cap, the helper switches to quoting mode until next month.</p>

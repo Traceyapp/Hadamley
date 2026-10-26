@@ -21,11 +21,11 @@ export default async function ResourcesAdmin({ searchParams }: { searchParams: P
     <>
       <AdminHeader title="Downloads" description="Files for the Resources library and section pages. Replacing a file keeps every link working." />
       <Flash message={saved} />
-      <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_24rem]">
+      <div className="grid grid-cols-[minmax(0,1fr)] gap-6 xl:grid-cols-[minmax(0,1fr)_24rem]">
         <div className="space-y-4">
           {db.resources.length === 0 && <Empty>No downloads yet.</Empty>}
           {db.resources.map((r) => (
-            <details key={r.id} className="group rounded-2xl border border-line bg-surface shadow-soft">
+            <details key={r.id} className="group admin-card">
               <summary className="flex cursor-pointer list-none flex-wrap items-center gap-4 p-5">
                 <span className="grid size-11 place-items-center rounded-xl bg-brand-soft text-brand">
                   <FileText className="size-5" aria-hidden />

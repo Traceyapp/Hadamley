@@ -21,7 +21,7 @@ export function PageForm({ page, parents, topics, resources = [], flash }: { pag
   const isSpecial = page && ["home", "directory", "resources"].includes(page.template);
 
   return (
-    <form action={action} className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_20rem]">
+    <form action={action} className="grid grid-cols-[minmax(0,1fr)] gap-6 xl:grid-cols-[minmax(0,1fr)_20rem]">
       <input type="hidden" name="id" value={page?.id ?? ""} />
       <input type="hidden" name="intent" defaultValue="save" />
       <div className="min-w-0 space-y-6">
@@ -58,7 +58,7 @@ export function PageForm({ page, parents, topics, resources = [], flash }: { pag
         {isSpecial && page?.listingTopics.map((t) => <input key={t} type="hidden" name="listingTopics" value={t} />)}
       </div>
 
-      <div className="space-y-6 lg:sticky lg:top-6 lg:self-start">
+      <div className="space-y-6 xl:sticky xl:top-6 xl:self-start">
         <Card title="Publish" aside={page && <PageStatusBadge status={page.status} />}>
           <div className="grid gap-2">
             <SubmitButton intent="publish" className={btn.primary} pendingText="Publishing...">

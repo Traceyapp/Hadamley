@@ -9,7 +9,7 @@ import type { Taxon } from "@/lib/types";
 
 export const metadata = { title: "Topics, areas and menu" };
 
-const iconBtn = "grid size-9 place-items-center rounded-lg text-ink-2 hover:bg-sand hover:text-ink disabled:opacity-30";
+const iconBtn = "grid size-9 place-items-center rounded-lg text-ink-2 hover:bg-paper-2 hover:text-ink disabled:opacity-30";
 
 function TaxonList({ items, usage }: { items: Taxon[]; usage: (id: string) => number }) {
   return (
@@ -101,7 +101,7 @@ export default async function TaxonomyAdmin() {
                     )}
                     <form action={toggleNav}>
                       <input type="hidden" name="id" value={p.id} />
-                      <button className="inline-flex min-h-9 items-center gap-1.5 rounded-lg px-2.5 text-sm font-bold text-ink-2 hover:bg-sand hover:text-ink">
+                      <button className="inline-flex min-h-9 items-center gap-1.5 rounded-lg px-2.5 text-sm font-bold text-ink-2 hover:bg-paper-2 hover:text-ink">
                         {p.showInNav ? <Eye className="size-4" aria-hidden /> : <EyeOff className="size-4" aria-hidden />}
                         {p.showInNav ? "In menu" : "Hidden"}
                       </button>
@@ -134,7 +134,7 @@ export default async function TaxonomyAdmin() {
                             )}
                             <form action={toggleNav}>
                               <input type="hidden" name="id" value={k.id} />
-                              <button className="inline-flex min-h-9 items-center gap-1.5 rounded-lg px-2.5 text-sm font-bold text-ink-2 hover:bg-sand hover:text-ink">
+                              <button className="inline-flex min-h-9 items-center gap-1.5 rounded-lg px-2.5 text-sm font-bold text-ink-2 hover:bg-paper-2 hover:text-ink">
                                 {k.showInNav ? <Eye className="size-4" aria-hidden /> : <EyeOff className="size-4" aria-hidden />}
                                 {k.showInNav ? "In menu" : "Hidden"}
                               </button>
