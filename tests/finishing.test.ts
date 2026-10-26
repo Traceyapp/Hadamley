@@ -102,11 +102,11 @@ describe("health content drafts", () => {
       const p = db.pages.find((x) => x.id === d.id);
       expect(p?.status, d.id).toBe("draft");
       expect(p!.sections!.length, d.id).toBeGreaterThan(0);
-      for (const s of p!.sections!) expect(s.reviewedAt, `${d.id}/${s.id}`).toBe("2026-10-24");
+      for (const s of p!.sections!) expect(["2026-10-24", "2026-10-25"], `${d.id}/${s.id}`).toContain(s.reviewedAt);
     }
     const az = db.pages.find((p) => p.id === "p-conditions")!.sections!.map((s) => s.heading);
     expect(az).toEqual([...az].sort((a, b) => a.localeCompare(b)));
-    expect(db.pages.find((p) => p.id === "p-fibro")!.sections!.every((s) => s.health)).toBe(true);
+    expect(db.pages.find((p) => p.id === "p-fibro")!.sections!.filter((s) => s.id !== "fibro-support").every((s) => s.health)).toBe(true);
   });
 
   it("keeps drafts out of the AI helper and site search", async () => {
@@ -158,5 +158,30 @@ describe("Chronic Illness Support page (brief of 25 October)", () => {
     expect(p.sections!.map((s) => s.heading)).toEqual(CONDITION_TITLES.map(([, h]) => h));
     expect(p.sections!.every((s) => s.health)).toBe(true);
     expect(CONDITION_TITLES).toHaveLength(22);
+  });
+});
+
+describe("Tracey's condition wording (25 October)", () => {
+  it("fills 17 condition accordions and leaves the 5 without wording empty and hidden", () => {
+    const p = readDb().pages.find((x) => x.id === "p-ltc")!;
+    const filled = p.sections!.filter((s) => s.body.replace(/<[^>]*>/g, "").trim());
+    expect(filled).toHaveLength(17);
+    const empty = p.sections!.filter((s) => !s.body.trim()).map((s) => s.id);
+    expect(empty).toEqual(["cond-osteoarthritis", "cond-psoriatic-arthritis", "cond-reactive-arthritis", "cond-rheumatoid-arthritis", "cond-ulcerative-colitis"]);
+    for (const s of filled) {
+      expect(s.health, s.id).toBe(true);
+      expect(s.reviewedAt, s.id).toBe("2026-10-25");
+      expect(s.body, s.id).not.toMatch(/Ronald|Medical information disclaimer|For general information only/);
+    }
+    expect(filled.filter((s) => s.urgent).length).toBeGreaterThanOrEqual(16);
+  });
+
+  it("puts the full fibromyalgia wording into the draft page, still unpublished", () => {
+    const p = readDb().pages.find((x) => x.id === "p-fibro")!;
+    expect(p.status).toBe("draft");
+    expect(p.sections!.map((s) => s.heading).slice(0, 3)).toEqual(["What is fibromyalgia?", "The history of fibromyalgia", "What might cause fibromyalgia?"]);
+    expect(p.sections!).toHaveLength(11);
+    expect(p.body).toMatch(/Do not assume every new symptom is fibromyalgia/);
+    expect(JSON.stringify(p)).not.toMatch(/Ronald|\[\d+\]/);
   });
 });

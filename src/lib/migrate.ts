@@ -6,6 +6,7 @@ import { importLibrary } from "./library";
 import { HEALTH_DRAFTS } from "./content";
 import { DRAFTED_BY } from "./content/helpers";
 import { CHRONIC_BODY, CHRONIC_SUMMARY, conditionHeadings } from "./content/chronic-illness";
+import { applyTraceyOct25 } from "./content/tracey-oct25";
 
 /**
  * Brings older data files up to date. Version 2 adds accordion sections,
@@ -35,8 +36,10 @@ import { CHRONIC_BODY, CHRONIC_SUMMARY, conditionHeadings } from "./content/chro
  * Version 14 removes the sample content before launch: the example outdated
  * report, the example news posts and events (unless Tracey edited them), and
  * the hidden one-page placeholder downloads and their files.
+ * Version 15 adds Tracey's wording of 25 October: 17 condition accordions (A to M)
+ * and the full Understanding fibromyalgia page (still a draft for her to publish).
  */
-export const DB_VERSION = 14;
+export const DB_VERSION = 15;
 
 const T = "2026-10-20T09:00:00.000Z";
 
@@ -286,6 +289,12 @@ export function migrate(db: Database): boolean {
     for (const p of db.pages) for (const s of p.sections ?? []) s.resourceIds = s.resourceIds.filter((id) => !goneIds.has(id));
     db.chunks = db.chunks.filter((c) => !(c.sourceType === "post" && samplePosts.has(c.sourceId)) && !(c.sourceType === "event" && sampleEvents.has(c.sourceId)));
     db.version = 14;
+    changed = true;
+  }
+
+  if ((db.version ?? 1) < 15) {
+    applyTraceyOct25(db.pages, DRAFTED_BY);
+    db.version = 15;
     changed = true;
   }
   return changed;
