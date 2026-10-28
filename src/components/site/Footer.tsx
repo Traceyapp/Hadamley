@@ -10,7 +10,7 @@ export function Footer() {
   return (
     <footer className="mt-28">
       <div className="overflow-hidden">
-        <Skyline animate={false} className="block h-auto w-full min-w-[720px] translate-y-[2px]" />
+        <Skyline className="block h-auto w-full min-w-[720px] translate-y-[2px]" />
       </div>
       <div className="border-t-4 border-champagne bg-paper-2">
         <div className="mx-auto max-w-7xl px-4 pb-10 pt-14 sm:px-6">
