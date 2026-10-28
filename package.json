@@ -25,6 +25,7 @@
     "motion": "^12.43.0",
     "next": "^15.5.28",
     "openai": "^6.7.0",
+    "pdfjs-dist": "^4.10.38",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
     "sanitize-html": "^2.17.5"

@@ -1,6 +1,7 @@
 "use client";
 
-import { useActionState, useRef } from "react";
+import { useActionState, useEffect, useRef, useState } from "react";
+import { pdfThumb } from "@/components/admin/pdfThumb";
 import { saveResource, type ActionState } from "../../actions";
 import type { Resource, Taxon } from "@/lib/types";
 import { KIND_LABEL } from "@/lib/types";
@@ -9,9 +10,27 @@ import { btn, CheckGroup, Field, input } from "@/components/admin/ui";
 
 export function ResourceForm({ resource, topics }: { resource?: Resource; topics: Taxon[] }) {
   const ref = useRef<HTMLFormElement>(null);
+  // First-page preview of a chosen PDF, made in the browser and sent with the form.
+  const [thumb, setThumb] = useState<{ blob: Blob; url: string } | null>(null);
+  const [making, setMaking] = useState(false);
+  useEffect(() => () => { if (thumb) URL.revokeObjectURL(thumb.url); }, [thumb]);
+
+  const onFile = async (file?: File) => {
+    setThumb(null);
+    if (!file || !/\.pdf$/i.test(file.name)) return;
+    setMaking(true);
+    const blob = await pdfThumb(file);
+    setMaking(false);
+    if (blob) setThumb({ blob, url: URL.createObjectURL(blob) });
+  };
+
   const [state, action] = useActionState<ActionState, FormData>(async (prev, fd) => {
+    if (thumb) fd.set("thumb", thumb.blob, "thumb.jpg");
     const res = await saveResource(prev, fd);
-    if (res?.ok && !resource) ref.current?.reset();
+    if (res?.ok && !resource) {
+      ref.current?.reset();
+      setThumb(null);
+    }
     return res;
   }, null);
   const r = resource;
@@ -48,8 +67,17 @@ export function ResourceForm({ resource, topics }: { resource?: Resource; topics
           type="file"
           required={!r}
           accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.rtf,.odt,.png,.jpg,.jpeg,.webp,.gif,.svg"
+          onChange={(e) => onFile(e.currentTarget.files?.[0])}
           className="block w-full text-[0.95rem] file:mr-3 file:min-h-10 file:rounded-lg file:border-0 file:bg-brand-soft file:px-4 file:font-bold file:text-brand-strong"
         />
+        {making && <p className="mt-2 text-sm text-ink-2">Making a preview of the first page…</p>}
+        {thumb && (
+          <figure className="mt-3 flex items-center gap-3 text-sm text-ink-2">
+            {/* eslint-disable-next-line @next/next/no-img-element -- local preview of the chosen file */}
+            <img src={thumb.url} alt="" className="h-24 w-auto rounded-sm bg-white ring-1 ring-line" />
+            <figcaption>This preview will show on the download&apos;s card.</figcaption>
+          </figure>
+        )}
       </Field>
       <CheckGroup legend="Topics" name="topicIds" options={topics.map((t) => ({ value: t.id, label: t.name }))} selected={r?.topicIds ?? []} />
       <label className="flex items-center gap-2.5 font-bold">

@@ -1,6 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import type { Database, Resource, ResourceKind } from "./types";
+import LIBRARY_THUMBS from "./library-thumbs.json";
 
 /**
  * Tracey's printable library (24 October 2026 collection). The PDFs live in
@@ -72,4 +73,15 @@ export function importLibrary(db: Database, uploadDir: string): boolean {
     changed = true;
   }
   return changed;
+}
+
+/**
+ * The bundled first-page preview for a library file (public/thumbs/<id>.jpg),
+ * only while the download is still the original file (same stored name and
+ * size): a replacement gets its own preview from the admin instead.
+ */
+export function libraryThumb(r: Resource): string | undefined {
+  const size = (LIBRARY_THUMBS as Record<string, number>)[r.id];
+  const e = LIBRARY.find((x) => x.id === r.id);
+  return size === r.size && e && r.storedName === `${e.id}-${e.file}` ? `/thumbs/${e.id}.jpg` : undefined;
 }

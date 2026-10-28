@@ -6,6 +6,7 @@ import { checkCredentials, createSession, destroySession, requireAdmin } from "@
 import { hashPassword, verifyPassword } from "@/lib/password";
 import { mutate, nowIso, readDb, slugify, uid } from "@/lib/db";
 import { putFile, removeFile } from "@/lib/files";
+import { thumbName } from "@/lib/repo";
 import { cleanBody } from "@/lib/sanitize";
 import { buildAllChunks, reindexRecord } from "@/lib/ai/chunks";
 import { clientKey, rateLimit } from "@/lib/ratelimit";
@@ -258,6 +259,7 @@ export async function markChecked(form: FormData) {
 /* ------------------------------------------------------------- resources */
 
 const MAX_FILE = 10 * 1024 * 1024;
+const MAX_THUMB = 1024 * 1024;
 const ALLOWED = /\.(pdf|docx?|xlsx?|pptx?|txt|rtf|odt|png|jpe?g|webp|gif|svg)$/i;
 
 function storeFile(file: File) {
@@ -290,7 +292,19 @@ export async function saveResource(_prev: ActionState, form: FormData): Promise<
     fileMeta = { fileName: clean, storedName, mime: file.type || "application/octet-stream", size: file.size };
   }
   const newId = existing?.id ?? uid("r-");
+
+  // A new file brings a new first-page preview (made in the browser), or none: never the old one.
+  const thumb = form.get("thumb");
+  const thumbFile = fileMeta ? thumbName(fileMeta.storedName) : "";
+  const hasThumb = hasFile && thumb instanceof File && thumb.size > 0 && thumb.size <= MAX_THUMB && thumb.type === "image/jpeg";
+  if (hasThumb) await putFile(thumbFile, Buffer.from(await thumb.arrayBuffer()), "image/jpeg");
+  else if (hasFile && readDb().uploads.some((u) => u.storedName === thumbFile)) await removeFile(thumbFile);
+
   await mutate((d) => {
+    if (hasFile) {
+      d.uploads = d.uploads.filter((u) => u.storedName !== thumbFile);
+      if (hasThumb) d.uploads.unshift({ id: `u-thumb-${newId}`, fileName: "preview.jpg", storedName: thumbFile, mime: "image/jpeg", size: (thumb as File).size, alt: `First page of ${title}`, createdAt: nowIso() });
+    }
     const next = {
       id: newId,
       title,
@@ -313,10 +327,12 @@ export async function deleteResource(form: FormData) {
   await requireAdmin();
   const id = str(form, "id");
   const stored = readDb().resources.find((x) => x.id === id)?.storedName;
+  const thumb = stored ? thumbName(stored) : "";
   await mutate((d) => {
     d.resources = d.resources.filter((x) => x.id !== id);
+    d.uploads = d.uploads.filter((u) => u.storedName !== thumb);
   });
-  if (stored) await removeFile(stored);
+  if (stored) await Promise.all([removeFile(stored), removeFile(thumb)]);
   refreshSite();
   redirect("/admin/resources?saved=Download+removed");
 }

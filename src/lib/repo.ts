@@ -1,4 +1,5 @@
 import { readDb } from "./db";
+import { libraryThumb } from "./library";
 import type { Delivery, Listing, Page, ProviderType, Resource, Taxon } from "./types";
 
 /* Public read queries. Only published pages and approved listings leave here. */
@@ -123,4 +124,21 @@ export function publishedResources(topicIds?: string[]): Resource[] {
 export function topicIdsForSlugs(slugs: string[]) {
   const db = readDb();
   return slugs.map((s) => db.taxa.find((t) => t.slug === s)?.id).filter(Boolean) as string[];
+}
+
+/** Stored name of the first-page preview the admin makes for an uploaded download. */
+export const thumbName = (storedName: string) => `thumb-${storedName.replace(/\.[^.]+$/, "")}.jpg`;
+
+/**
+ * The picture shown on a download's card: the preview made when it was
+ * uploaded, the bundled preview of an original library file, or the image
+ * itself. Undefined means the card falls back to the document icon.
+ */
+export function resourceThumb(r: Resource): string | undefined {
+  const name = thumbName(r.storedName);
+  // Previews are cached for a year, so the address changes whenever the file is replaced.
+  const made = readDb().uploads.find((u) => u.storedName === name);
+  if (made) return `/files/${name}?v=${Date.parse(made.createdAt) || 0}`;
+  if (/^image\/(png|jpe?g|webp|gif)$/.test(r.mime)) return `/files/${r.storedName}`;
+  return libraryThumb(r);
 }
