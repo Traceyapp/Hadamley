@@ -33,6 +33,7 @@ export default async function HomePage() {
   return (
     <div className="relative isolate pb-8">
       <CornerLeaves />
+      <CornerLeaves bottom />
       <Container className="max-w-4xl pt-12 text-center sm:pt-16">
         <h1 className="text-[2.6rem] font-semibold leading-[1.05] sm:text-[3.6rem]">Welcome to Hadamley</h1>
         <p className="mx-auto mt-5 max-w-2xl text-[1.15rem] leading-relaxed text-ink-2 sm:text-[1.25rem]">{WELCOME}</p>

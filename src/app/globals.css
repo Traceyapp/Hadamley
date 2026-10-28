@@ -58,8 +58,10 @@
   --art-lake: #a7d2db;
   --art-brick: #f3b38f;
   --art-meadow: #b4d6a9;
-  --leaf: #6f8a74;
-  --leaf-2: #9fb4a1;
+  --leaf-deep: #2f4b52;
+  --leaf: #7f9c93;
+  --leaf-2: #b9c8ad;
+  --stem: #e0a160;
   --pastel-sage: #e8f0e8;
   --pastel-rose: #fbe8e8;
   --pastel-cream: #fbf1e1;
@@ -124,8 +126,10 @@
     --art-lake: #2c5862;
     --art-brick: #7a3f23;
     --art-meadow: #355a37;
-    --leaf: #7f9a86;
-    --leaf-2: #a9bba9;
+    --leaf-deep: #5f7f7c;
+    --leaf: #8eaa9f;
+    --leaf-2: #b7c8ab;
+    --stem: #c9a96e;
     --pastel-sage: #26332b;
     --pastel-rose: #3a2a2e;
     --pastel-cream: #352f23;
@@ -182,8 +186,10 @@
   --art-lake: #2c5862;
   --art-brick: #7a3f23;
   --art-meadow: #355a37;
-  --leaf: #7f9a86;
-  --leaf-2: #a9bba9;
+  --leaf-deep: #5f7f7c;
+  --leaf: #8eaa9f;
+  --leaf-2: #b7c8ab;
+  --stem: #c9a96e;
   --pastel-sage: #26332b;
   --pastel-rose: #3a2a2e;
   --pastel-cream: #352f23;

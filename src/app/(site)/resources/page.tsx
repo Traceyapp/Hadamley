@@ -8,7 +8,6 @@ import { Container, Disclaimer } from "@/components/site/bits";
 import { PageHero } from "@/components/site/PageHero";
 import { Stagger } from "@/components/fx/motion";
 import { ResourceCard } from "@/components/site/ResourceCard";
-import { CornerLeaves } from "@/components/art/Leaves";
 import { AnimationSlot } from "@/components/site/AnimationSlot";
 
 /** The three categories agreed on 27 October. Every download kind belongs to one. */
@@ -90,7 +89,6 @@ export default async function ResourcesPage({ searchParams }: { searchParams: SP
 
   return (
     <div className="relative isolate">
-      <CornerLeaves />
       <PageHero crumbs={[{ label: "Guides & Resources" }]} title="Guides & Resources" summary="Browse free downloads to read, colour and enjoy." />
       <Container className="max-w-4xl pt-10">
         <h2 className="sr-only">Categories</h2>

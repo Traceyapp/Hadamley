@@ -2,6 +2,7 @@ import { Reveal } from "@/components/fx/motion";
 import { SectionArt, sectionClass } from "@/components/art/Landmarks";
 import { Breadcrumbs, Container } from "./bits";
 import { Morph } from "@/components/fx/Morph";
+import { CornerLeaves } from "@/components/art/Leaves";
 
 const CHAPTER: Record<string, { n: string; name: string }> = {
   "chronic-illness-support": { n: "01", name: "Living with chronic illness" },
@@ -37,7 +38,8 @@ export function PageHero({
 }) {
   const chapter = section ? CHAPTER[section] : undefined;
   return (
-    <header className={`${section ? sectionClass(section) : ""} border-b-[1.5px] border-ink ${chapter ? "bg-sec-soft" : "bg-paper-2"}`}>
+    <header className={`${section ? sectionClass(section) : ""} relative isolate border-b-[1.5px] border-ink ${chapter ? "bg-sec-soft" : "bg-paper-2"}`}>
+      <CornerLeaves leftWide />
       <Container className="grid gap-8 pb-12 pt-8 sm:pb-14 sm:pt-10 lg:grid-cols-[1fr_17rem] lg:items-end">
         <div>
           <Breadcrumbs items={crumbs} />
