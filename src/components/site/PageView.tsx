@@ -14,6 +14,7 @@ import { AskButton } from "./HelperWidget";
 import { ContactForm } from "./ContactForm";
 import { HealthUrgentBox } from "./HealthUrgentBox";
 import { EasyRead } from "./EasyRead";
+import { HealthHub, isHealthHub } from "./HealthHub";
 
 const FUNERAL_LINK_SECTIONS = new Set(["chronic-illness-support", "mental-health-support"]);
 
@@ -26,6 +27,7 @@ export function PageView({ page, preview = false }: { page: Page; preview?: bool
   const totalListings = page.listingTopics.length ? searchListings({ topic: page.listingTopics }).length : 0;
   const resources = page.listingTopics.length ? publishedResources(topicIdsForSlugs(page.listingTopics)).slice(0, 3) : [];
   const { funeralCompanionUrl, contactEmail } = getSettings();
+  const hub = isHealthHub(page);
   const isLegal = ["privacy", "accessibility", "about", "contact", "cookies"].includes(page.section);
 
   const crumbs = [...(parent ? [{ label: parent.navLabel || parent.title, href: `/${parent.slug}` }] : []), { label: page.navLabel || page.title }];
@@ -42,7 +44,7 @@ export function PageView({ page, preview = false }: { page: Page; preview?: bool
         morph={`page-${page.id}`}
       />
 
-      {page.template === "section" && kids.length > 0 && (
+      {page.template === "section" && kids.length > 0 && !hub && (
         <Container className="relative z-10 pt-0">
           <h2 className="sr-only">Pages in this section</h2>
           <Stagger className="-mt-7 grid gap-6 md:grid-cols-3">
@@ -68,8 +70,14 @@ export function PageView({ page, preview = false }: { page: Page; preview?: bool
           {page.section === "mental-health-support" && <HealthUrgentBox kind="mental" />}
           {page.section === "chronic-illness-support" && <HealthUrgentBox kind="physical" />}
           {!isLegal && process.env.OPENAI_API_KEY && <EasyRead pageId={page.id} />}
-          {html.trim() && <div className="prose-h" dangerouslySetInnerHTML={{ __html: html }} />}
-          <Accordions sections={page.sections ?? []} preview={preview} />
+          {hub ? (
+            <HealthHub page={page} html={html} preview={preview} />
+          ) : (
+            <>
+              {html.trim() && <div className="prose-h" dangerouslySetInnerHTML={{ __html: html }} />}
+              <Accordions sections={page.sections ?? []} preview={preview} />
+            </>
+          )}
           {page.slug === "contact" && (
             <div className="mt-10 max-w-2xl">
               {contactEmail && (
@@ -86,7 +94,7 @@ export function PageView({ page, preview = false }: { page: Page; preview?: bool
         </div>
 
         <aside className="space-y-6 lg:sticky lg:top-36 lg:self-start" aria-label="Page navigation">
-          {toc.length > 1 && (
+          {toc.length > 1 && !hub && (
             <nav aria-labelledby="toc-title" className="rounded-[var(--radius-card)] border-[1.5px] border-ink bg-surface p-5">
               <h2 id="toc-title" className="font-sans text-[0.8rem] font-bold uppercase tracking-[0.12em] text-ink-2">
                 On this page
@@ -102,7 +110,7 @@ export function PageView({ page, preview = false }: { page: Page; preview?: bool
               </ul>
             </nav>
           )}
-          {sectionNav.length > 0 && (
+          {sectionNav.length > 0 && !hub && (
             <nav aria-labelledby="insection-title" className="rounded-[var(--radius-card)] border-[1.5px] border-ink bg-surface p-5">
               <h2 id="insection-title" className="font-sans text-[0.8rem] font-bold uppercase tracking-[0.12em] text-ink-2">
                 In this section
@@ -176,7 +184,7 @@ export function PageView({ page, preview = false }: { page: Page; preview?: bool
         </section>
       )}
 
-      {resources.length > 0 && (
+      {resources.length > 0 && !hub && (
         <section aria-labelledby="related-res" className="pt-14">
           <Container>
             <h2 id="related-res" className="text-[1.6rem] font-semibold">

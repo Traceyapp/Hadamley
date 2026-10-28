@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { AlertTriangle, CalendarCheck, ChevronDown, Download, ExternalLink, Info } from "lucide-react";
+import { AlertTriangle, CalendarCheck, ChevronDown, Download, ExternalLink, Info, Minus, Plus } from "lucide-react";
 import type { PageSection } from "@/lib/types";
 import { readDb } from "@/lib/db";
 import { formatBytes, formatDate } from "@/lib/format";
@@ -11,33 +11,44 @@ import { AccordionTools, SectionActions } from "./AccordionTools";
  * JavaScript; with it, they unfold like a leaflet, open from a link,
  * open all at once, and print one section on its own.
  */
-export function Accordions({ sections: all, preview = false }: { sections: PageSection[]; preview?: boolean }) {
+export function Accordions({ sections: all, preview = false, nested = false }: { sections: PageSection[]; preview?: boolean; nested?: boolean }) {
   // A heading waiting for its wording stays hidden from visitors, so the page never looks unfinished.
   const sections = preview ? all : all.filter((s) => s.body.replace(/<[^>]*>/g, "").trim());
   if (!sections.length) return null;
   const resources = readDb().resources.filter((r) => r.status === "published");
   return (
-    <section aria-label="More detail" className="fold-group mt-14 max-w-[68ch]" data-accordions>
-      <div className="mb-4 flex flex-wrap items-end justify-between gap-3 border-b-[1.5px] border-ink pb-3">
-        <p className="kicker text-sec">In more detail</p>
-        <AccordionTools />
-      </div>
+    <section aria-label={nested ? undefined : "More detail"} className={`fold-group ${nested ? "mt-4" : "mt-14 max-w-[68ch]"}`} data-accordions>
+      {!nested && (
+        <div className="mb-4 flex flex-wrap items-end justify-between gap-3 border-b-[1.5px] border-ink pb-3">
+          <p className="kicker text-sec">In more detail</p>
+          <AccordionTools />
+        </div>
+      )}
       <div className="space-y-3">
         {sections.map((s, i) => {
           const files = s.resourceIds.map((id) => resources.find((r) => r.id === id)).filter(Boolean);
           return (
-            <details key={s.id} id={s.id} className="fold group card-print overflow-hidden scroll-mt-28">
-              <summary className="flex min-h-16 cursor-pointer list-none items-center gap-4 px-5 py-4 marker:hidden hover:bg-sec-soft [&::-webkit-details-marker]:hidden">
-                <span className="font-display text-[1.1rem] font-semibold text-sec" aria-hidden>
-                  {String(i + 1).padStart(2, "0")}
-                </span>
-                <h3 className="soft-hover flex-1 text-[1.25rem] font-semibold leading-snug">
+            <details key={s.id} id={s.id} className={`fold group overflow-hidden scroll-mt-28 ${nested ? "rounded-xl border-[1.5px] border-champagne bg-surface" : "card-print"}`}>
+              <summary className={`flex cursor-pointer list-none items-center gap-4 marker:hidden hover:bg-sec-soft [&::-webkit-details-marker]:hidden ${nested ? "min-h-12 px-4 py-2.5" : "min-h-16 px-5 py-4"}`}>
+                {!nested && (
+                  <span className="font-display text-[1.1rem] font-semibold text-sec" aria-hidden>
+                    {String(i + 1).padStart(2, "0")}
+                  </span>
+                )}
+                <h3 className={nested ? "flex-1 font-sans text-[1rem] font-bold leading-snug" : "soft-hover flex-1 text-[1.25rem] font-semibold leading-snug"}>
                   {s.heading}
                   {preview && !s.body.replace(/<[^>]*>/g, "").trim() && <span className="ml-2 align-middle text-[0.8rem] font-bold uppercase tracking-wide text-warn">Wording to add · hidden from visitors</span>}
                 </h3>
-                <span className="grid size-9 shrink-0 place-items-center rounded-full border-[1.5px] border-ink transition-transform duration-300 group-open:rotate-180 group-open:bg-ink group-open:text-paper">
-                  <ChevronDown className="size-4" aria-hidden />
-                </span>
+                {nested ? (
+                  <span className="shrink-0" aria-hidden>
+                    <Plus className="size-5 group-open:hidden" />
+                    <Minus className="hidden size-5 group-open:block" />
+                  </span>
+                ) : (
+                  <span className="grid size-9 shrink-0 place-items-center rounded-full border-[1.5px] border-ink transition-transform duration-300 group-open:rotate-180 group-open:bg-ink group-open:text-paper">
+                    <ChevronDown className="size-4" aria-hidden />
+                  </span>
+                )}
               </summary>
               <div className="fold-body border-t border-dashed border-line-strong px-5 pb-5 pt-4">
                 {s.urgent && (
@@ -95,9 +106,9 @@ export function Accordions({ sections: all, preview = false }: { sections: PageS
           );
         })}
       </div>
-      <p className="mt-3 text-sm text-ink-2 no-print">
+      {!nested && <p className="mt-3 text-sm text-ink-2 no-print">
         Something missing? <Link href="/contact" className="link">Tell us</Link>.
-      </p>
+      </p>}
     </section>
   );
 }

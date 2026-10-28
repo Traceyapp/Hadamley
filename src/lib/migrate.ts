@@ -38,8 +38,11 @@ import { applyTraceyOct25 } from "./content/tracey-oct25";
  * the hidden one-page placeholder downloads and their files.
  * Version 15 adds Tracey's wording of 25 October: 17 condition accordions (A to M)
  * and the full Understanding fibromyalgia page (still a draft for her to publish).
+ * Version 16 follows the design notes of 27 October: Mobility, Daily Living and
+ * Transport moves under Chronic Illness ("Mobility & practical help"), so it
+ * leaves the main menu. Its pages keep their addresses.
  */
-export const DB_VERSION = 15;
+export const DB_VERSION = 16;
 
 const T = "2026-10-20T09:00:00.000Z";
 
@@ -295,6 +298,13 @@ export function migrate(db: Database): boolean {
   if ((db.version ?? 1) < 15) {
     applyTraceyOct25(db.pages, DRAFTED_BY);
     db.version = 15;
+    changed = true;
+  }
+
+  if ((db.version ?? 1) < 16) {
+    const mobility = db.pages.find((p) => p.slug === "mobility-daily-living-transport");
+    if (mobility) mobility.showInNav = false;
+    db.version = 16;
     changed = true;
   }
   return changed;

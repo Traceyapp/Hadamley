@@ -46,7 +46,7 @@ export function Footer() {
               <ul className="mt-4 space-y-2.5">
                 {[
                   ["/about", "About Hadamley"],
-                  ["/contact", "Contact"],
+                  ["/contact", "Contact Us"],
                   ["/privacy", "Privacy"],
                   ["/accessibility", "Accessibility"],
                   ["/cookies", "Cookies"],

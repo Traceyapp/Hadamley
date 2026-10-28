@@ -176,7 +176,7 @@ export function MobileNav({ items, funeralUrl }: { items: NavItem[]; funeralUrl:
   const extra = [
     { label: "Noticeboard: news and events", href: "/noticeboard" },
     { label: "About Hadamley", href: "/about" },
-    { label: "Contact", href: "/contact" },
+    { label: "Contact Us", href: "/contact" },
   ];
 
   return (
