@@ -44,8 +44,19 @@ import { applyTraceyOct25 } from "./content/tracey-oct25";
  * Version 17 follows the navigation feedback of 28 October: the printable
  * library is called "Guides & Resources" in the menu and its heading (only
  * where the seed wording is still in place).
+ * Version 18 adds the Community Projects page Tracey asked for on 29 October:
+ * five accordion headings with a short holding line each, for her to fill in.
  */
-export const DB_VERSION = 17;
+export const DB_VERSION = 18;
+
+const COMING_SOON = "<p>Coming soon. We're building this part of Hadamley together with our community, so please check back.</p>";
+const COMMUNITY_SECTIONS: [string, string][] = [
+  ["s-community-group", "Hadamley Community Group"],
+  ["s-community-activities", "Community Activities"],
+  ["s-community-projects", "Our Projects"],
+  ["s-community-stories", "Your Stories & Experiences"],
+  ["s-community-involved", "Get Involved"],
+];
 
 const T = "2026-10-20T09:00:00.000Z";
 
@@ -316,6 +327,31 @@ export function migrate(db: Database): boolean {
     if (library?.navLabel === "Printables") library.navLabel = "Guides & Resources";
     if (library?.title === "Free printable library") library.title = "Guides & Resources";
     db.version = 17;
+    changed = true;
+  }
+
+  if ((db.version ?? 1) < 18) {
+    if (!db.pages.some((p) => p.slug === "community-projects")) {
+      db.pages.push({
+        id: "p-community",
+        slug: "community-projects",
+        title: "Community Projects",
+        navLabel: "Community",
+        template: "information",
+        section: "community",
+        parentId: null,
+        navOrder: 6,
+        showInNav: true,
+        summary: "Community groups, activities, projects and stories from the people who make Hadamley what it is.",
+        body: "",
+        listingTopics: [],
+        sections: COMMUNITY_SECTIONS.map(([id, heading]) => ({ id, heading, body: COMING_SOON, resourceIds: [] })),
+        status: "published",
+        updatedAt: new Date().toISOString(),
+        updatedBy: "Seed content",
+      });
+    }
+    db.version = 18;
     changed = true;
   }
   return changed;

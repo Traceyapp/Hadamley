@@ -34,7 +34,7 @@ export function Header() {
         </div>
       </div>
       <HeaderShell>
-        <div className="site-bar mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-2 px-4 py-3 sm:gap-4 sm:px-6 xl:gap-3">
+        <div className="site-bar mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-2 px-4 py-3 sm:gap-4 sm:px-6 xl:gap-2">
           <Logo />
           <DesktopNav items={[...items, { label: "Contact Us", href: "/contact", children: [] }]} />
           <div className="site-bar-actions flex items-center gap-1.5 sm:gap-2">

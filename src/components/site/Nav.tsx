@@ -77,7 +77,7 @@ export function DesktopNav({ items }: { items: NavItem[] }) {
                 <Link
                   href={item.href}
                   aria-current={path === item.href ? "page" : undefined}
-                  className={`flex min-h-10 items-center whitespace-nowrap rounded-full py-2 text-[0.9rem] font-bold transition-colors ${hasKids ? "pl-3.5 pr-0" : "px-3.5"} ${
+                  className={`flex min-h-10 items-center whitespace-nowrap rounded-full py-2 text-[0.84rem] font-bold transition-colors ${hasKids ? "pl-2.5 pr-0" : "px-2.5"} ${
                     active && pillAt === item.href ? "text-paper" : "text-ink"
                   }`}
                 >
@@ -90,7 +90,7 @@ export function DesktopNav({ items }: { items: NavItem[] }) {
                     aria-controls={`menu-${item.href}`}
                     aria-label={`Show pages in ${item.label}`}
                     onClick={() => setOpen(isOpen ? null : item.href)}
-                    className={`mr-0.5 grid size-8 place-items-center rounded-full transition-colors ${active && pillAt === item.href ? "text-paper hover:bg-white/15" : "hover:bg-sand"}`}
+                    className={`mr-0.5 grid size-7 place-items-center rounded-full transition-colors ${active && pillAt === item.href ? "text-paper hover:bg-white/15" : "hover:bg-sand"}`}
                   >
                     <ChevronDown className={`size-4 transition-transform duration-300 ${isOpen ? "rotate-180" : ""}`} aria-hidden />
                   </button>

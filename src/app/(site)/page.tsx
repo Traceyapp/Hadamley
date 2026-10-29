@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowRight, BookOpen, BrainCircuit, HeartPulse, Search } from "lucide-react";
+import { ArrowRight, BookOpen, BrainCircuit, HeartPulse, Search, Users } from "lucide-react";
 import { ensureDb } from "@/lib/db";
 import { Container } from "@/components/site/bits";
 import { CornerLeaves, LeafDivider } from "@/components/art/Leaves";
@@ -26,12 +26,26 @@ const ENTRIES = [
     Icon: BrainCircuit,
     tone: "bg-[var(--pastel-rose)]",
   },
+  {
+    href: "/resources",
+    title: "Guides & Resources",
+    blurb: "Browse free guides, colouring pages and activities.",
+    Icon: BookOpen,
+    tone: "bg-[var(--pastel-cream)]",
+  },
+  {
+    href: "/community-projects",
+    title: "Community Projects",
+    blurb: "Community groups, activities, projects and your stories.",
+    Icon: Users,
+    tone: "bg-[var(--pastel-blue)]",
+  },
 ];
 
 export default async function HomePage() {
   await ensureDb();
   return (
-    <div className="relative isolate pb-8">
+    <div className="relative isolate pb-32 sm:pb-40">
       <CornerLeaves />
       <CornerLeaves bottom />
       <Container className="max-w-4xl pt-12 text-center sm:pt-16">
@@ -68,27 +82,17 @@ export default async function HomePage() {
 
       <Container className="max-w-4xl pt-8">
         <h2 className="text-center text-[2rem] font-semibold">Explore Hadamley</h2>
-        <ul className="mt-6 grid gap-4 sm:grid-cols-2">
+        <ul className="mt-6 grid grid-cols-2 gap-3 sm:gap-4">
           {ENTRIES.map(({ href, title, blurb, Icon, tone }) => (
             <li key={href}>
-              <Link href={href} className={`group flex h-full flex-col items-center rounded-[var(--radius-card)] border-[1.5px] border-line-strong p-6 text-center text-ink hover:border-ink ${tone}`}>
-                <Icon className="size-10 text-brand" aria-hidden />
-                <span className="mt-3 font-display text-[1.6rem] font-semibold group-hover:underline">{title}</span>
-                <span className="mt-1 text-ink-2">{blurb}</span>
-                <ArrowRight className="mt-3 size-5 transition group-hover:translate-x-1" aria-hidden />
+              <Link href={href} className={`group flex h-full flex-col items-center rounded-[var(--radius-card)] border-[1.5px] border-line-strong px-3 py-5 text-center sm:p-6 text-ink hover:border-ink ${tone}`}>
+                <Icon className="size-8 text-brand sm:size-10" aria-hidden />
+                <span className="mt-2 font-display text-[1.2rem] font-semibold leading-tight group-hover:underline sm:mt-3 sm:text-[1.6rem]">{title}</span>
+                <span className="mb-3 mt-1.5 text-[0.9rem] leading-snug text-ink-2 sm:text-base">{blurb}</span>
+                <ArrowRight className="mt-auto size-5 shrink-0 transition group-hover:translate-x-1" aria-hidden />
               </Link>
             </li>
           ))}
-          <li className="sm:col-span-2">
-            <Link href="/resources" className="group flex items-center gap-5 rounded-[var(--radius-card)] border-[1.5px] border-line-strong bg-[var(--pastel-cream)] p-6 text-ink hover:border-ink">
-              <BookOpen className="size-12 shrink-0 text-brand" aria-hidden />
-              <span className="flex-1">
-                <span className="block font-display text-[1.6rem] font-semibold group-hover:underline">Guides &amp; Resources</span>
-                <span className="text-ink-2">Browse free guides, colouring pages and activities.</span>
-              </span>
-              <ArrowRight className="size-5 shrink-0 transition group-hover:translate-x-1" aria-hidden />
-            </Link>
-          </li>
         </ul>
       </Container>
     </div>
