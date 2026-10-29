@@ -15,6 +15,7 @@ import { ContactForm } from "./ContactForm";
 import { HealthUrgentBox } from "./HealthUrgentBox";
 import { EasyRead } from "./EasyRead";
 import { HealthHub, isHealthHub } from "./HealthHub";
+import { LeafDivider } from "@/components/art/Leaves";
 
 const FUNERAL_LINK_SECTIONS = new Set(["chronic-illness-support", "mental-health-support"]);
 
@@ -200,7 +201,8 @@ export function PageView({ page, preview = false }: { page: Page; preview?: bool
         </section>
       )}
 
-      <Container className="pt-14">
+      <Container className="pt-16">
+        <LeafDivider className="mx-auto mb-10 max-w-xl" />
         <Disclaimer />
         <p className="mt-4 text-sm text-ink-2">Page last updated {new Date(page.updatedAt).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })}</p>
       </Container>

@@ -9,6 +9,7 @@ import { PageHero } from "@/components/site/PageHero";
 import { Stagger } from "@/components/fx/motion";
 import { ResourceCard } from "@/components/site/ResourceCard";
 import { AnimationSlot } from "@/components/site/AnimationSlot";
+import { LeafDivider } from "@/components/art/Leaves";
 
 /** Look of the three design cards; the categories themselves are shared with the menu. */
 const CARD_STYLE: Record<string, { cta: string; Icon: LucideIcon; tone: string }> = {
@@ -103,7 +104,8 @@ export default async function ResourcesPage({ searchParams }: { searchParams: SP
             ))}
           </ul>
         </nav>
-        <p className="mt-6 text-center font-bold text-ink-2">All downloads are free.</p>
+        <LeafDivider className="mx-auto mt-10 max-w-md" />
+        <p className="mt-4 text-center font-bold text-ink-2">All downloads are free.</p>
         <AnimationSlot />
       </Container>
     </div>

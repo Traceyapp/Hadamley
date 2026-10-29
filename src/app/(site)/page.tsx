@@ -3,7 +3,7 @@ import Link from "next/link";
 import { ArrowRight, BookOpen, BrainCircuit, HeartPulse, Search } from "lucide-react";
 import { ensureDb } from "@/lib/db";
 import { Container } from "@/components/site/bits";
-import { CornerLeaves } from "@/components/art/Leaves";
+import { CornerLeaves, LeafDivider } from "@/components/art/Leaves";
 
 export const metadata: Metadata = { alternates: { canonical: "/" } };
 
@@ -62,7 +62,11 @@ export default async function HomePage() {
         </section>
       </Container>
 
-      <Container className="max-w-4xl pt-14">
+      <Container className="max-w-xl pt-12">
+        <LeafDivider />
+      </Container>
+
+      <Container className="max-w-4xl pt-8">
         <h2 className="text-center text-[2rem] font-semibold">Explore Hadamley</h2>
         <ul className="mt-6 grid gap-4 sm:grid-cols-2">
           {ENTRIES.map(({ href, title, blurb, Icon, tone }) => (

@@ -28,33 +28,73 @@ function leafPath(l: number) {
   return `M0 0C${l * 0.3} ${-w} ${l * 0.72} ${-w * 0.95} ${l} 0C${l * 0.72} ${w * 0.6} ${l * 0.3} ${w * 0.75} 0 0Z`;
 }
 
+/** The two leaf shadings, deep (teal to sage) and soft (sage to pale), for one SVG. */
+function LeafGradients({ id }: { id: string }) {
+  return (
+    <defs>
+      <linearGradient id={`${id}-deep`} x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0" stopColor="var(--leaf-deep)" />
+        <stop offset="0.55" stopColor="var(--leaf)" />
+        <stop offset="1" stopColor="var(--leaf-deep)" />
+      </linearGradient>
+      <linearGradient id={`${id}-soft`} x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0" stopColor="var(--leaf)" />
+        <stop offset="1" stopColor="var(--leaf-2)" />
+      </linearGradient>
+    </defs>
+  );
+}
+
+function Leaves({ id, leaves, vein = 0.9 }: { id: string; leaves: Leaf[]; vein?: number }) {
+  return leaves.map(([x, y, a, l, tone], i) => (
+    <g key={i} transform={`translate(${x} ${y}) rotate(${a})`}>
+      <path d={leafPath(l)} fill={`url(#${id}-${tone})`} />
+      <path d={`M2 0Q${l * 0.5} ${-l * 0.04} ${l * 0.86} 0`} fill="none" stroke="var(--stem)" strokeWidth={vein} opacity="0.8" />
+    </g>
+  ));
+}
+
 function Sprig({ className = "" }: { className?: string }) {
   const id = useId().replace(/:/g, "");
   return (
     <svg viewBox="0 0 220 220" className={className} aria-hidden="true" focusable="false">
-      <defs>
-        <linearGradient id={`${id}-deep`} x1="0" y1="0" x2="1" y2="0">
-          <stop offset="0" stopColor="var(--leaf-deep)" />
-          <stop offset="0.55" stopColor="var(--leaf)" />
-          <stop offset="1" stopColor="var(--leaf-deep)" />
-        </linearGradient>
-        <linearGradient id={`${id}-soft`} x1="0" y1="0" x2="1" y2="0">
-          <stop offset="0" stopColor="var(--leaf)" />
-          <stop offset="1" stopColor="var(--leaf-2)" />
-        </linearGradient>
-      </defs>
+      <LeafGradients id={id} />
       <g fill="none" stroke="var(--stem)" strokeLinecap="round">
         <path d="M222 168C196 128 156 76 104 46C76 31 46 38 20 54" strokeWidth="2.2" />
         <path d="M205 146C194 156 184 168 174 186" strokeWidth="1.6" />
         <path d="M150 84L144 94M178 116L170 118M128 66L120 70" strokeWidth="1.4" />
       </g>
-      {LEAVES.map(([x, y, a, l, tone], i) => (
-        <g key={i} transform={`translate(${x} ${y}) rotate(${a})`}>
-          <path d={leafPath(l)} fill={`url(#${id}-${tone})`} />
-          <path d={`M2 0Q${l * 0.5} ${-l * 0.04} ${l * 0.86} 0`} fill="none" stroke="var(--stem)" strokeWidth="0.9" opacity="0.8" />
-        </g>
-      ))}
+      <Leaves id={id} leaves={LEAVES} />
     </svg>
+  );
+}
+
+// A short twig with leaves opening out from the middle, for dividers.
+const TWIG: Leaf[] = [
+  [60, 25, -56, 18, "deep"],
+  [60, 25, -124, 18, "deep"],
+  [45, 26, -150, 16, "soft"],
+  [75, 26, -30, 16, "soft"],
+  [33, 27, 160, 14, "soft"],
+  [87, 27, 20, 14, "soft"],
+];
+
+/**
+ * A quiet break between sections: champagne hairlines either side of a small
+ * leafy twig. Decoration only.
+ */
+export function LeafDivider({ className = "" }: { className?: string }) {
+  const id = useId().replace(/:/g, "");
+  return (
+    <div className={`no-print flex items-center ${className}`} aria-hidden="true">
+      <span className="mt-[1.19rem] h-px flex-1 bg-gradient-to-r from-transparent to-[var(--stem)] opacity-70" />
+      <svg viewBox="0 0 120 40" className="h-10 w-32 shrink-0" focusable="false">
+        <LeafGradients id={id} />
+        <path d="M0 29.5Q60 21 120 29.5" fill="none" stroke="var(--stem)" strokeWidth="1.2" strokeLinecap="round" opacity="0.85" />
+        <Leaves id={id} leaves={TWIG} vein={0.6} />
+      </svg>
+      <span className="mt-[1.19rem] h-px flex-1 bg-gradient-to-l from-transparent to-[var(--stem)] opacity-70" />
+    </div>
   );
 }
 

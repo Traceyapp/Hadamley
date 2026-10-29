@@ -6,6 +6,7 @@ import { ArrowRight, ChevronDown, ExternalLink, Menu, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import type { NavItem } from "@/lib/repo";
+import { LeafDivider } from "@/components/art/Leaves";
 
 function isActive(path: string, href: string) {
   return path === href || path.startsWith(href + "/");
@@ -312,6 +313,7 @@ export function MobileNav({ items, funeralUrl }: { items: NavItem[]; funeralUrl:
                   </a>
                 </motion.li>
               </motion.ul>
+              <LeafDivider className="mx-auto mt-8 max-w-xs pb-4" />
             </nav>
           </motion.div>
         )}
