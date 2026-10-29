@@ -1,45 +1,23 @@
 import { ensureDb } from "@/lib/db";
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowRight, BookOpen, Pencil, Puzzle } from "lucide-react";
+import { ArrowRight, BookOpen, Pencil, Puzzle, type LucideIcon } from "lucide-react";
 import { publishedResources } from "@/lib/repo";
-import type { ResourceKind } from "@/lib/types";
+import { RESOURCE_CATEGORIES } from "@/lib/resource-categories";
 import { Container, Disclaimer } from "@/components/site/bits";
 import { PageHero } from "@/components/site/PageHero";
 import { Stagger } from "@/components/fx/motion";
 import { ResourceCard } from "@/components/site/ResourceCard";
 import { AnimationSlot } from "@/components/site/AnimationSlot";
 
-/** The three categories agreed on 27 October. Every download kind belongs to one. */
-const CATEGORIES = [
-  {
-    slug: "colouring",
-    title: "Colouring Pages",
-    blurb: "Printable designs for a quiet, creative moment.",
-    cta: "Browse colouring pages",
-    kinds: ["colouring"] as ResourceKind[],
-    Icon: Pencil,
-    tone: "bg-[var(--pastel-sage)]",
-  },
-  {
-    slug: "guides",
-    title: "Information Guides",
-    blurb: "Plain-English guides about health, disability and practical support.",
-    cta: "Browse information guides",
-    kinds: ["guide", "leaflet", "checklist", "journal", "tracker", "worksheet"] as ResourceKind[],
-    Icon: BookOpen,
-    tone: "bg-[var(--pastel-cream)]",
-  },
-  {
-    slug: "activities",
-    title: "Puzzles & Activities",
-    blurb: "Word searches, word games and other printable activities.",
-    cta: "Browse puzzles & activities",
-    kinds: ["puzzle", "activity"] as ResourceKind[],
-    Icon: Puzzle,
-    tone: "bg-[var(--pastel-blue)]",
-  },
-];
+/** Look of the three design cards; the categories themselves are shared with the menu. */
+const CARD_STYLE: Record<string, { cta: string; Icon: LucideIcon; tone: string }> = {
+  colouring: { cta: "Browse colouring pages", Icon: Pencil, tone: "bg-[var(--pastel-sage)]" },
+  guides: { cta: "Browse information guides", Icon: BookOpen, tone: "bg-[var(--pastel-cream)]" },
+  activities: { cta: "Browse puzzles & activities", Icon: Puzzle, tone: "bg-[var(--pastel-blue)]" },
+};
+const CARD_ORDER = ["colouring", "guides", "activities"];
+const CATEGORIES = RESOURCE_CATEGORIES;
 
 type SP = Promise<{ category?: string }>;
 
@@ -93,7 +71,8 @@ export default async function ResourcesPage({ searchParams }: { searchParams: SP
       <Container className="max-w-4xl pt-10">
         <h2 className="sr-only">Categories</h2>
         <ul className="grid gap-5">
-          {CATEGORIES.map(({ slug, title, blurb, cta, Icon, tone, kinds }) => {
+          {CARD_ORDER.map((slug) => CATEGORIES.find((c) => c.slug === slug)!).map(({ slug, title, blurb, kinds }) => {
+            const { cta, Icon, tone } = CARD_STYLE[slug];
             const count = all.filter((r) => kinds.includes(r.kind)).length;
             return (
               <li key={slug} className={`flex flex-col gap-5 rounded-[var(--radius-card)] border-[1.5px] border-champagne p-6 sm:flex-row sm:items-center ${tone}`}>
@@ -111,6 +90,19 @@ export default async function ResourcesPage({ searchParams }: { searchParams: SP
             );
           })}
         </ul>
+        <nav aria-labelledby="more-title" className="mt-6 rounded-[var(--radius-card)] border-[1.5px] border-line-strong bg-surface p-5">
+          <h3 id="more-title" className="font-sans text-[1.05rem] font-bold">More to print</h3>
+          <ul className="mt-2 flex flex-wrap gap-x-6 gap-y-2">
+            {CATEGORIES.filter((c) => !c.card).map((c) => (
+              <li key={c.slug}>
+                <Link href={`/resources?category=${c.slug}`} className="link inline-flex items-center gap-1.5 font-bold">
+                  {c.title} <span className="font-normal text-ink-2">({all.filter((r) => c.kinds.includes(r.kind)).length})</span>
+                  <ArrowRight className="size-4" aria-hidden />
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </nav>
         <p className="mt-6 text-center font-bold text-ink-2">All downloads are free.</p>
         <AnimationSlot />
       </Container>

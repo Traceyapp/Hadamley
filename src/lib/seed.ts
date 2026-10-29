@@ -319,8 +319,8 @@ const pages: Page[] = [
   page({
     id: "p-res",
     slug: "resources",
-    title: "Free printable library",
-    navLabel: "Printables",
+    title: "Guides & Resources",
+    navLabel: "Guides & Resources",
     template: "resources",
     section: "resources",
     navOrder: 5,

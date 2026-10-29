@@ -1,5 +1,6 @@
 import { readDb } from "./db";
 import { libraryThumb } from "./library";
+import { RESOURCE_CATEGORIES } from "./resource-categories";
 import type { Delivery, Listing, Page, ProviderType, Resource, Taxon } from "./types";
 
 /* Public read queries. Only published pages and approved listings leave here. */
@@ -29,7 +30,33 @@ export function childPages(parentId: string, includeDrafts = false): Page[] {
 export interface NavItem {
   label: string;
   href: string;
-  children: { label: string; href: string; summary: string }[];
+  /** Children sharing a group show under that small heading in the menus. */
+  children: { label: string; href: string; summary: string; group?: string }[];
+}
+
+type NavChild = NavItem["children"][number];
+
+/**
+ * Menu entries that aren't pages of their own (28 October navigation
+ * feedback): conditions lead under Chronic illness, ahead of the services,
+ * and Guides & Resources lists its subcategories.
+ */
+function extraChildren(slug: string, pages: Page[]): { lead: NavChild[]; group?: string } {
+  if (slug === "chronic-illness-support") {
+    const hub = pages.find((p) => p.slug === slug);
+    const hasBody = (id: string) => hub?.sections?.some((s) => s.id === id && s.body.replace(/<[^>]*>/g, "").trim());
+    const fibro = pages.find((p) => p.slug === "chronic-illness-support/understanding-fibromyalgia");
+    const lead: NavChild[] = [];
+    if (hub?.sections?.some((s) => s.body.replace(/<[^>]*>/g, "").trim()))
+      lead.push({ label: "Conditions A–Z", href: `/${slug}#hub-conditions`, summary: "Information about long-term conditions, from A to Z.", group: "Conditions" });
+    if (fibro) lead.push({ label: "Understanding fibromyalgia", href: `/${fibro.slug}`, summary: fibro.summary, group: "Conditions" });
+    else if (hasBody("cond-fibromyalgia")) lead.push({ label: "Fibromyalgia", href: `/${slug}#cond-fibromyalgia`, summary: "What fibromyalgia is and where to find support.", group: "Conditions" });
+    return { lead, group: lead.length ? "Services and care" : undefined };
+  }
+  if (slug === "resources") {
+    return { lead: RESOURCE_CATEGORIES.map((c) => ({ label: c.menu, href: `/resources?category=${c.slug}`, summary: c.blurb })) };
+  }
+  return { lead: [] };
 }
 
 export function navigation(): NavItem[] {
@@ -37,14 +64,20 @@ export function navigation(): NavItem[] {
   return pages
     .filter((p) => p.showInNav && !p.parentId && p.template !== "home")
     .sort((a, b) => a.navOrder - b.navOrder)
-    .map((p) => ({
-      label: p.navLabel || p.title,
-      href: `/${p.slug}`,
-      children: pages
-        .filter((c) => c.parentId === p.id && c.showInNav)
-        .sort((a, b) => a.navOrder - b.navOrder)
-        .map((c) => ({ label: c.navLabel || c.title, href: `/${c.slug}`, summary: c.summary })),
-    }));
+    .map((p) => {
+      const { lead, group } = extraChildren(p.slug, pages);
+      return {
+        label: p.navLabel || p.title,
+        href: `/${p.slug}`,
+        children: [
+          ...lead,
+          ...pages
+            .filter((c) => c.parentId === p.id && c.showInNav && !lead.some((l) => l.href === `/${c.slug}`))
+            .sort((a, b) => a.navOrder - b.navOrder)
+            .map((c) => ({ label: c.navLabel || c.title, href: `/${c.slug}`, summary: c.summary, group })),
+        ],
+      };
+    });
 }
 
 export function topics(): Taxon[] {

@@ -41,8 +41,11 @@ import { applyTraceyOct25 } from "./content/tracey-oct25";
  * Version 16 follows the design notes of 27 October: Mobility, Daily Living and
  * Transport moves under Chronic Illness ("Mobility & practical help"), so it
  * leaves the main menu. Its pages keep their addresses.
+ * Version 17 follows the navigation feedback of 28 October: the printable
+ * library is called "Guides & Resources" in the menu and its heading (only
+ * where the seed wording is still in place).
  */
-export const DB_VERSION = 16;
+export const DB_VERSION = 17;
 
 const T = "2026-10-20T09:00:00.000Z";
 
@@ -305,6 +308,14 @@ export function migrate(db: Database): boolean {
     const mobility = db.pages.find((p) => p.slug === "mobility-daily-living-transport");
     if (mobility) mobility.showInNav = false;
     db.version = 16;
+    changed = true;
+  }
+
+  if ((db.version ?? 1) < 17) {
+    const library = db.pages.find((p) => p.slug === "resources");
+    if (library?.navLabel === "Printables") library.navLabel = "Guides & Resources";
+    if (library?.title === "Free printable library") library.title = "Guides & Resources";
+    db.version = 17;
     changed = true;
   }
   return changed;

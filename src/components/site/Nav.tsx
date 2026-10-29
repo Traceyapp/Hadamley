@@ -124,6 +124,9 @@ export function DesktopNav({ items }: { items: NavItem[] }) {
                           animate={{ opacity: 1, x: 0 }}
                           transition={{ delay: 0.05 + i * 0.04 }}
                         >
+                          {c.group && c.group !== item.children[i - 1]?.group && (
+                            <p className={`kicker px-4 pb-1 text-ink-2 ${i ? "mt-1 border-t border-line pt-3" : "pt-2"}`}>{c.group}</p>
+                          )}
                           <Link href={c.href} className="group flex gap-3 rounded-xl px-4 py-3 transition hover:bg-sand">
                             <span className="mt-[0.7rem] h-0.5 w-3 shrink-0 bg-accent transition-all group-hover:w-5" aria-hidden />
                             <span>
@@ -150,6 +153,11 @@ export function MobileNav({ items, funeralUrl }: { items: NavItem[]; funeralUrl:
   const reduce = useReducedMotion();
   const path = usePathname();
   useEffect(() => setOpen(false), [path]);
+  // One section open at a time, starting with the one the visitor is in, so the menu stays short.
+  const [expanded, setExpanded] = useState<string | null>(null);
+  useEffect(() => {
+    if (open) setExpanded(items.find((i) => isActive(path, i.href))?.href ?? null);
+  }, [open, path, items]);
   const dialogRef = useRef<HTMLDialogElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
   useEffect(() => {
@@ -238,33 +246,58 @@ export function MobileNav({ items, funeralUrl }: { items: NavItem[]; funeralUrl:
                 animate="show"
                 variants={{ hidden: {}, show: { transition: { staggerChildren: reduce ? 0 : 0.025, delayChildren: 0 } } }}
               >
-                {items.map((item) => (
-                  <motion.li
-                    key={item.href}
-                    variants={{ hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0 } }}
-                    className="card-print overflow-hidden"
-                  >
-                    <Link
-                      href={item.href}
-                      aria-current={path === item.href ? "page" : undefined}
-                      className="flex items-center justify-between px-5 py-4 font-display text-[1.35rem] font-semibold text-ink"
+                {items.map((item) => {
+                  const hasKids = item.children.length > 0;
+                  const isOpen = expanded === item.href;
+                  const panel = `mobile-sub-${item.href.replace(/\W/g, "")}`;
+                  return (
+                    <motion.li
+                      key={item.href}
+                      variants={{ hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0 } }}
+                      className="card-print overflow-hidden"
                     >
-                      {item.label}
-                      <ArrowRight className="size-5" aria-hidden />
-                    </Link>
-                    {item.children.length > 0 && (
-                      <ul className="border-t border-line/70 px-2 py-2">
-                        {item.children.map((c) => (
-                          <li key={c.href}>
-                            <Link href={c.href} className="block rounded-xl px-3 py-2.5 text-ink-2 hover:bg-sand hover:text-ink">
-                              {c.label}
-                            </Link>
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-                  </motion.li>
-                ))}
+                      <div className="flex items-stretch">
+                        <Link
+                          href={item.href}
+                          aria-current={path === item.href ? "page" : undefined}
+                          className="flex min-h-14 flex-1 items-center px-5 font-display text-[1.25rem] font-semibold text-ink"
+                        >
+                          {item.label}
+                        </Link>
+                        {hasKids ? (
+                          <button
+                            type="button"
+                            aria-expanded={isOpen}
+                            aria-controls={panel}
+                            onClick={() => setExpanded(isOpen ? null : item.href)}
+                            className="flex min-w-14 items-center justify-center border-l border-line/70 hover:bg-sand"
+                          >
+                            <ChevronDown className={`size-5 transition-transform duration-300 ${isOpen ? "rotate-180" : ""}`} aria-hidden />
+                            <span className="sr-only">{isOpen ? "Hide" : "Show"} pages in {item.label}</span>
+                          </button>
+                        ) : (
+                          <span className="flex min-w-14 items-center justify-center" aria-hidden>
+                            <ArrowRight className="size-5" />
+                          </span>
+                        )}
+                      </div>
+                      {hasKids && (
+                        <ul id={panel} hidden={!isOpen} className="border-t border-line/70 px-2 py-2">
+                          {item.children.map((c, i) => (
+                            <li key={c.href}>
+                              {c.group && c.group !== item.children[i - 1]?.group && (
+                                <p className={`kicker px-3 pb-1 text-ink-2 ${i ? "mt-2 border-t border-line/70 pt-3" : "pt-1"}`}>{c.group}</p>
+                              )}
+                              <Link href={c.href} className="flex min-h-11 items-center rounded-xl px-3 text-ink hover:bg-sand">
+                                {c.label}
+                              </Link>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </motion.li>
+                  );
+                })}
                 {extra.map((e) => (
                   <motion.li key={e.href} variants={{ hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0 } }}>
                     <Link href={e.href} className="block rounded-xl px-5 py-3 font-bold hover:bg-sand">

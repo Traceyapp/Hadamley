@@ -19,7 +19,12 @@ export function ConditionFilter({ label = "Find a condition" }: { label?: string
     const openFromHash = () => {
       const id = decodeURIComponent(location.hash.slice(1));
       const outer = ref.current?.closest("details");
-      if (id && outer && outer.querySelector(`[id="${CSS.escape(id)}"]`)) outer.open = true;
+      const target = id && outer ? outer.querySelector<HTMLElement>(`[id="${CSS.escape(id)}"]`) : null;
+      if (!outer || !target) return;
+      outer.open = true;
+      if (target instanceof HTMLDetailsElement) target.open = true;
+      // Let the page settle before scrolling to the condition.
+      setTimeout(() => target.scrollIntoView({ block: "start", behavior: "smooth" }), 600);
     };
     openFromHash();
     window.addEventListener("hashchange", openFromHash);
