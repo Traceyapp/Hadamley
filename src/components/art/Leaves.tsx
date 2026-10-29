@@ -61,13 +61,14 @@ function Sprig({ className = "" }: { className?: string }) {
 /**
  * A pair of sprigs reaching in from the left and right edges, at the top or
  * bottom of the parent. `leftWide` keeps the left one for wide screens only,
- * for left-aligned headers whose breadcrumb sits in that corner.
+ * for left-aligned headers whose breadcrumb sits in that corner. `narrowOnly`
+ * drops both on large screens, where a header's own illustration takes that corner.
  */
-export function CornerLeaves({ bottom = false, leftWide = false }: { bottom?: boolean; leftWide?: boolean }) {
+export function CornerLeaves({ bottom = false, leftWide = false, narrowOnly = false }: { bottom?: boolean; leftWide?: boolean; narrowOnly?: boolean }) {
   const pos = bottom ? "bottom-0" : "top-0";
   const flipY = bottom ? "-scale-y-100" : "";
   return (
-    <div className={`no-print pointer-events-none absolute inset-x-0 ${pos} -z-10 h-36 overflow-hidden sm:h-48`} aria-hidden="true">
+    <div className={`no-print pointer-events-none absolute inset-x-0 ${pos} ${narrowOnly ? "lg:hidden" : ""} -z-10 h-36 overflow-hidden sm:h-48`} aria-hidden="true">
       <Sprig className={`absolute left-0 ${pos} ${leftWide ? "hidden 2xl:block" : ""} size-32 -scale-x-100 sm:size-48 ${flipY}`} />
       <Sprig className={`absolute right-0 ${pos} size-32 sm:size-48 ${flipY}`} />
     </div>

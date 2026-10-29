@@ -13,7 +13,8 @@ const CHAPTER: Record<string, { n: string; name: string }> = {
 };
 
 /**
- * Chapter opener for inner pages: the section's colour, its chapter number
+ * Chapter opener for inner pages: the section's colour, its name (no number,
+ * at Tracey's request of 29 October)
  * and a small illustrated scene. Legal and info pages get a plain version.
  */
 export function PageHero({
@@ -39,15 +40,13 @@ export function PageHero({
   const chapter = section ? CHAPTER[section] : undefined;
   return (
     <header className={`${section ? sectionClass(section) : ""} relative isolate border-b-[1.5px] border-ink ${chapter ? "bg-sec-soft" : "bg-paper-2"}`}>
-      <CornerLeaves leftWide />
+      <CornerLeaves leftWide narrowOnly={!!section} />
       <Container className="grid gap-8 pb-12 pt-8 sm:pb-14 sm:pt-10 lg:grid-cols-[1fr_17rem] lg:items-end">
         <div>
           <Breadcrumbs items={crumbs} />
           <Reveal className="mt-10 max-w-3xl" y={10}>
             {chapter && (
               <p className="kicker flex items-center gap-3 text-sec">
-                <span className="font-display text-[1.6rem] font-semibold normal-case tracking-normal">{chapter.n}</span>
-                <span className="h-px w-8 bg-current" aria-hidden />
                 {chapter.name}
               </p>
             )}

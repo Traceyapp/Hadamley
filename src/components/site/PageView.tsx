@@ -23,7 +23,8 @@ export function PageView({ page, preview = false }: { page: Page; preview?: bool
   const kids = childPages(page.id, preview);
   const siblings = parent ? childPages(parent.id, preview) : [];
   const { html, toc } = withHeadingIds(page.body);
-  const listings = listingsForTopics(page.listingTopics, 6);
+  // Tracey will run local groups and services from a directory page of her own, so the Chronic Illness hub doesn't list them (29 October).
+  const listings = page.slug === "chronic-illness-support" ? [] : listingsForTopics(page.listingTopics, 6);
   const totalListings = page.listingTopics.length ? searchListings({ topic: page.listingTopics }).length : 0;
   const resources = page.listingTopics.length ? publishedResources(topicIdsForSlugs(page.listingTopics)).slice(0, 3) : [];
   const { funeralCompanionUrl, contactEmail } = getSettings();
