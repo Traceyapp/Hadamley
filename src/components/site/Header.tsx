@@ -14,7 +14,7 @@ export function Header() {
   return (
     <>
       <div className="no-print relative z-40 border-b border-line bg-sand text-[0.85rem]">
-        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-1.5 sm:px-6">
+        <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-x-4 gap-y-1 px-4 py-1.5 sm:px-6">
           <p className="hidden text-ink-2 lg:block">Information and signposting for Havering, Romford, Brentwood and nearby</p>
           <div className="flex items-center gap-1 sm:gap-3">
             <TextSizeControl />
@@ -25,7 +25,7 @@ export function Header() {
             href={funeralCompanionUrl}
             target="_blank"
             rel="noopener"
-            className="inline-flex items-center gap-1.5 font-bold text-brand underline-offset-4 hover:underline"
+            className="inline-flex flex-[1_1_6rem] items-center justify-end gap-1.5 text-right font-bold text-brand underline-offset-4 hover:underline pointer-coarse:min-h-11"
           >
             <span className="hidden lg:inline">Bereavement and funerals:</span> The Funeral Companion
             <ExternalLink className="size-3.5" aria-hidden />
@@ -46,8 +46,8 @@ export function Header() {
         <div className="flex divide-x divide-line border-t border-line bg-surface sm:hidden">
           <SearchPanel variant="bar" />
           <AskButton className="flex min-h-11 flex-1 items-center justify-center gap-2 px-4 text-sm font-bold text-brand">
-            <MessageCircleQuestion className="size-4" aria-hidden /> Ask Hadamley
-            <ArrowRight className="size-4" aria-hidden />
+            <MessageCircleQuestion className="size-4 shrink-0" aria-hidden /> <span className="whitespace-nowrap">Ask Hadamley</span>
+            <ArrowRight className="size-4 shrink-0 max-[359px]:hidden" aria-hidden />
           </AskButton>
         </div>
       </HeaderShell>

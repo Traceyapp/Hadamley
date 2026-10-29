@@ -56,7 +56,7 @@ export default async function ResourcesPage({ searchParams }: { searchParams: SP
             <p className="rounded-2xl border border-dashed border-line-strong p-10 text-center text-ink-2">New downloads are on the way. Please check back soon.</p>
           )}
           <p className="mt-10">
-            <Link href="/resources" className="link inline-flex items-center gap-1.5 font-bold">
+            <Link href="/resources" className="link inline-flex min-h-11 items-center gap-1.5 font-bold">
               All Guides &amp; Resources <ArrowRight className="size-4" aria-hidden />
             </Link>
           </p>
@@ -96,7 +96,7 @@ export default async function ResourcesPage({ searchParams }: { searchParams: SP
           <ul className="mt-2 flex flex-wrap gap-x-6 gap-y-2">
             {CATEGORIES.filter((c) => !c.card).map((c) => (
               <li key={c.slug}>
-                <Link href={`/resources?category=${c.slug}`} className="link inline-flex items-center gap-1.5 font-bold">
+                <Link href={`/resources?category=${c.slug}`} className="link inline-flex min-h-11 items-center gap-1.5 font-bold">
                   {c.title} <span className="font-normal text-ink-2">({all.filter((r) => c.kinds.includes(r.kind)).length})</span>
                   <ArrowRight className="size-4" aria-hidden />
                 </Link>

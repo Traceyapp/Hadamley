@@ -47,7 +47,7 @@ export function ThemeToggle() {
       }}
       aria-label={`Theme: ${LABEL[pref]}. Switch to ${LABEL[next]}.`}
       title={`Theme: ${LABEL[pref]}`}
-      className="inline-flex h-8 items-center gap-1.5 rounded-md px-2 font-bold text-ink hover:bg-sand-2"
+      className="inline-flex h-8 min-w-8 items-center justify-center gap-1.5 rounded-md px-2 pointer-coarse:h-11 pointer-coarse:min-w-11 font-bold text-ink hover:bg-sand-2"
     >
       <Icon className="size-4" aria-hidden />
       <span className="hidden sm:inline">{LABEL[pref]}</span>

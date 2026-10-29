@@ -82,7 +82,7 @@ export function HealthHub({ page, html, preview = false }: { page: Page; html: s
           )}
           {g.finder && (
             <p className="mt-4">
-              <Link href={`/find-support${page.listingTopics.length ? `?${page.listingTopics.map((t) => `topic=${t}`).join("&")}` : ""}`} className="link inline-flex items-center gap-1.5 font-bold">
+              <Link href={`/find-support${page.listingTopics.length ? `?${page.listingTopics.map((t) => `topic=${t}`).join("&")}` : ""}`} className="link inline-flex min-h-11 items-center gap-1.5 font-bold">
                 Search services in Find Support <ArrowRight className="size-4" aria-hidden />
               </Link>
             </p>
@@ -92,7 +92,7 @@ export function HealthHub({ page, html, preview = false }: { page: Page; html: s
               <ul className="space-y-2">
                 {resources.map((r) => (
                   <li key={r.id}>
-                    <a href={`/files/${r.storedName}`} download={r.fileName} className="inline-flex items-center gap-2 font-bold text-brand hover:underline">
+                    <a href={`/files/${r.storedName}`} download={r.fileName} className="inline-flex min-h-11 items-center gap-2 font-bold text-brand hover:underline">
                       <Download className="size-4" aria-hidden /> {r.title}
                       <span className="font-normal text-ink-2">({r.fileName.split(".").pop()?.toUpperCase()}, {formatBytes(r.size)})</span>
                     </a>
@@ -100,7 +100,7 @@ export function HealthHub({ page, html, preview = false }: { page: Page; html: s
                 ))}
               </ul>
               <p className="mt-4">
-                <Link href="/resources" className="link inline-flex items-center gap-1.5 font-bold">
+                <Link href="/resources" className="link inline-flex min-h-11 items-center gap-1.5 font-bold">
                   All Guides &amp; Resources <ArrowRight className="size-4" aria-hidden />
                 </Link>
               </p>
@@ -128,7 +128,7 @@ export function HealthHub({ page, html, preview = false }: { page: Page; html: s
         ))}
       </div>
       <p className="mt-8 text-center">
-        <Link href={hub.across.href} className="link inline-flex items-center gap-1.5 font-bold">
+        <Link href={hub.across.href} className="link inline-flex min-h-11 items-center gap-1.5 font-bold">
           {hub.across.label} <ArrowRight className="size-4" aria-hidden />
         </Link>
       </p>

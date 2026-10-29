@@ -149,7 +149,7 @@ export function PageView({ page, preview = false }: { page: Page; preview?: bool
             <div className="rounded-2xl border border-line bg-sand p-5 text-[0.95rem]">
               <p className="font-bold">Bereavement and funerals</p>
               <p className="mt-1 text-ink-2">Support with grief and arranging a funeral is on The Funeral Companion.</p>
-              <a href={funeralCompanionUrl} target="_blank" rel="noopener" className="link mt-2 inline-flex items-center gap-1.5 font-bold">
+              <a href={funeralCompanionUrl} target="_blank" rel="noopener" className="link mt-1 inline-flex min-h-11 items-center gap-1.5 font-bold">
                 The Funeral Companion <ExternalLink className="size-3.5" aria-hidden />
                 <span className="sr-only">(opens in a new tab)</span>
               </a>

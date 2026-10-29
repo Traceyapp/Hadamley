@@ -35,7 +35,7 @@ export function TextSizeControl() {
           onClick={() => choose(s.key)}
           aria-pressed={current === s.key}
           aria-label={s.label}
-          className={`grid size-8 place-items-center rounded-md font-bold leading-none ${s.scale} ${
+          className={`grid size-8 place-items-center rounded-md pointer-coarse:size-11 font-bold leading-none ${s.scale} ${
             current === s.key ? "bg-ink text-paper" : "text-ink hover:bg-sand-2"
           }`}
         >

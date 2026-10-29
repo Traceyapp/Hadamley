@@ -38,7 +38,7 @@ export function AccordionTools() {
         all().forEach((d) => (d.open = next));
         setAllOpen(next);
       }}
-      className="no-print text-sm font-bold underline-offset-4 hover:underline"
+      className="no-print inline-flex min-h-11 items-center text-sm font-bold underline-offset-4 hover:underline"
     >
       {allOpen ? "Close all" : "Open all"}
     </button>
