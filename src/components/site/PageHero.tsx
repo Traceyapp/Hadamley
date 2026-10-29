@@ -73,14 +73,14 @@ export function PageHero({
   );
 }
 
-/** Sets the last word of a title in the section colour, in italic. */
+/** Sets the last word of a title in the section colour, same lettering as the rest (Tracey, 29 October). */
 export function AccentTitle({ text }: { text: string }) {
   const i = text.trimEnd().lastIndexOf(" ");
   if (i < 0) return <>{text}</>;
   return (
     <>
       {text.slice(0, i + 1)}
-      <span className="font-normal italic text-sec">{text.slice(i + 1)}</span>
+      <span className="text-sec">{text.slice(i + 1)}</span>
     </>
   );
 }
