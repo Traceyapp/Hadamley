@@ -94,13 +94,13 @@ describe("Tracey's printable library", () => {
 });
 
 describe("health content drafts", () => {
-  it("loads every drafted page as a draft, with health sections ending in the disclaimer setting", async () => {
+  it("loads every drafted page as a draft (fibromyalgia now published), with health sections ending in the disclaimer setting", async () => {
     const { readDb } = await import("@/lib/db");
     const { HEALTH_DRAFTS } = await import("@/lib/content");
     const db = readDb();
     for (const d of HEALTH_DRAFTS) {
       const p = db.pages.find((x) => x.id === d.id);
-      expect(p?.status, d.id).toBe("draft");
+      expect(p?.status, d.id).toBe(d.id === "p-fibro" ? "published" : "draft");
       expect(p!.sections!.length, d.id).toBeGreaterThan(0);
       for (const s of p!.sections!) expect(["2026-10-24", "2026-10-25"], `${d.id}/${s.id}`).toContain(s.reviewedAt);
     }
@@ -112,8 +112,8 @@ describe("health content drafts", () => {
   it("keeps drafts out of the AI helper and site search", async () => {
     const { readDb } = await import("@/lib/db");
     const { siteSearch } = await import("@/lib/site-search");
-    expect(readDb().chunks.some((c) => c.url.includes("understanding-fibromyalgia"))).toBe(false);
-    expect(siteSearch("tender points").some((r) => r.url.includes("fibromyalgia"))).toBe(false);
+    expect(readDb().chunks.some((c) => c.url.includes("/lupus"))).toBe(false);
+    expect(siteSearch("lupus").some((r) => r.url.endsWith("/lupus"))).toBe(false);
   });
 
   it("never tells visitors that information is still being prepared, and has no diagram until Tracey supplies one", async () => {
@@ -176,12 +176,20 @@ describe("Tracey's condition wording (25 October)", () => {
     expect(filled.filter((s) => s.urgent).length).toBeGreaterThanOrEqual(16);
   });
 
-  it("puts the full fibromyalgia wording into the draft page, still unpublished", () => {
+  it("puts the full fibromyalgia wording into its page, published so the hub can link to it", () => {
     const p = readDb().pages.find((x) => x.id === "p-fibro")!;
-    expect(p.status).toBe("draft");
+    expect(p.status).toBe("published");
     expect(p.sections!.map((s) => s.heading).slice(0, 3)).toEqual(["What is fibromyalgia?", "The history of fibromyalgia", "What might cause fibromyalgia?"]);
     expect(p.sections!).toHaveLength(11);
     expect(p.body).toMatch(/Do not assume every new symptom is fibromyalgia/);
     expect(JSON.stringify(p)).not.toMatch(/Ronald|\[\d+\]/);
+  });
+});
+
+describe("links to unpublished pages", () => {
+  it("become plain text, so visitors never land on page not found", async () => {
+    const { unlinkDrafts } = await import("@/lib/repo");
+    expect(unlinkDrafts('<p>See <a href="/chronic-illness-support/lupus">Lupus</a> and <a href="/your-rights">rights</a>.</p>')).toBe("<p>See Lupus and rights.</p>");
+    expect(unlinkDrafts('<a href="/chronic-illness-support/understanding-fibromyalgia">F</a> <a href="/contact">C</a> <a href="https://nhs.uk">N</a>')).toBe('<a href="/chronic-illness-support/understanding-fibromyalgia">F</a> <a href="/contact">C</a> <a href="https://nhs.uk">N</a>');
   });
 });

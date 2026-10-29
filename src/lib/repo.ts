@@ -17,6 +17,16 @@ export function getPublishedPage(slug: string): Page | undefined {
   return publishedPages().find((p) => p.slug === slug);
 }
 
+/**
+ * Turns links to pages that aren't published yet into plain text, so a draft
+ * mentioned in page wording never sends a visitor to a "page not found".
+ */
+export function unlinkDrafts(html: string): string {
+  const drafts = new Set(readDb().pages.filter((p) => p.status !== "published").map((p) => `/${p.slug}`));
+  if (!drafts.size) return html;
+  return html.replace(/<a\b[^>]*\bhref="([^"#?]*)[^"]*"[^>]*>([\s\S]*?)<\/a>/g, (link, href: string, text: string) => (drafts.has(href.replace(/\/$/, "")) ? text : link));
+}
+
 export function getPageAnyStatus(id: string): Page | undefined {
   return readDb().pages.find((p) => p.id === id);
 }

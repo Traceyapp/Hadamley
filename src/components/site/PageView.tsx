@@ -2,7 +2,7 @@ import Link from "next/link";
 import { ArrowRight, ExternalLink, MessageCircleQuestion } from "lucide-react";
 import type { Page } from "@/lib/types";
 import { withHeadingIds } from "@/lib/html";
-import { childPages, getPageAnyStatus, getSettings, listingsForTopics, publishedResources, searchListings, topicIdsForSlugs } from "@/lib/repo";
+import { childPages, getPageAnyStatus, getSettings, listingsForTopics, publishedResources, searchListings, topicIdsForSlugs, unlinkDrafts } from "@/lib/repo";
 import { Container, Disclaimer } from "./bits";
 import { sectionClass } from "@/components/art/Landmarks";
 import { PageHero } from "./PageHero";
@@ -23,7 +23,7 @@ export function PageView({ page, preview = false }: { page: Page; preview?: bool
   const parent = page.parentId ? getPageAnyStatus(page.parentId) : undefined;
   const kids = childPages(page.id, preview);
   const siblings = parent ? childPages(parent.id, preview) : [];
-  const { html, toc } = withHeadingIds(page.body);
+  const { html, toc } = withHeadingIds(preview ? page.body : unlinkDrafts(page.body));
   // Tracey will run local groups and services from a directory page of her own, so the Chronic Illness hub doesn't list them (29 October).
   const listings = page.slug === "chronic-illness-support" ? [] : listingsForTopics(page.listingTopics, 6);
   const totalListings = page.listingTopics.length ? searchListings({ topic: page.listingTopics }).length : 0;

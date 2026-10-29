@@ -2,6 +2,7 @@ import Link from "next/link";
 import { AlertTriangle, CalendarCheck, ChevronDown, Download, ExternalLink, Info, Minus, Plus } from "lucide-react";
 import type { PageSection } from "@/lib/types";
 import { readDb } from "@/lib/db";
+import { unlinkDrafts } from "@/lib/repo";
 import { formatBytes, formatDate } from "@/lib/format";
 import { HEALTH_DISCLAIMER } from "./bits";
 import { AccordionTools, SectionActions } from "./AccordionTools";
@@ -57,7 +58,7 @@ export function Accordions({ sections: all, preview = false, nested = false }: {
                     <p className="whitespace-pre-line font-bold text-ink">{s.urgent}</p>
                   </div>
                 )}
-                <div className="prose-h" dangerouslySetInnerHTML={{ __html: s.body }} />
+                <div className="prose-h" dangerouslySetInnerHTML={{ __html: preview ? s.body : unlinkDrafts(s.body) }} />
                 {files.length > 0 && (
                   <ul className="mt-5 space-y-2">
                     {files.map((r) => (

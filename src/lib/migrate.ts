@@ -46,8 +46,10 @@ import { applyTraceyOct25 } from "./content/tracey-oct25";
  * where the seed wording is still in place).
  * Version 18 adds the Community Projects page Tracey asked for on 29 October:
  * five accordion headings with a short holding line each, for her to fill in.
+ * Version 19 publishes Understanding fibromyalgia (if still a draft), so the
+ * Fibromyalgia fold and the links to it lead somewhere (Tracey, 29 October).
  */
-export const DB_VERSION = 18;
+export const DB_VERSION = 19;
 
 const COMING_SOON = "<p>Coming soon. We're building this part of Hadamley together with our community, so please check back.</p>";
 const COMMUNITY_SECTIONS: [string, string][] = [
@@ -352,6 +354,16 @@ export function migrate(db: Database): boolean {
       });
     }
     db.version = 18;
+    changed = true;
+  }
+
+  if ((db.version ?? 1) < 19) {
+    const fibro = db.pages.find((p) => p.slug === "chronic-illness-support/understanding-fibromyalgia");
+    if (fibro && fibro.status === "draft") {
+      fibro.status = "published";
+      fibro.updatedAt = new Date().toISOString();
+    }
+    db.version = 19;
     changed = true;
   }
   return changed;
