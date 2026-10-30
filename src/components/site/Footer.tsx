@@ -84,7 +84,12 @@ export function Footer() {
             <p className="max-w-3xl">
               General information and signposting only. Health information does not replace advice from a qualified healthcare professional. Hadamley does not provide counselling, diagnosis or medical treatment. Including a service does not mean we recommend it or work in partnership with it.
             </p>
-            <p className="shrink-0">© {new Date().getFullYear()} Hadamley Information Services</p>
+            <div className="shrink-0 space-y-1 sm:text-right">
+              <p>© {new Date().getFullYear()} Hadamley Information Services</p>
+              <p className="text-[0.8rem] tracking-wide">
+                Website designed &amp; developed by <span className="font-semibold text-ink">VisioWave Studios</span>
+              </p>
+            </div>
           </div>
         </div>
       </div>
