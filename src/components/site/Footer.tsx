@@ -13,7 +13,7 @@ export function Footer() {
         <Skyline className="block h-auto w-full min-w-[720px] translate-y-[2px]" />
       </div>
       <div className="border-t-4 border-champagne bg-paper-2">
-        <div className="mx-auto max-w-7xl px-4 pb-10 pt-14 sm:px-6">
+        <div className="mx-auto max-w-7xl px-4 pb-10 pt-14 sm:px-6 sm:pb-28">
           <div className="grid gap-12 lg:grid-cols-[1.3fr_1fr_1fr_1.3fr]">
             <div>
               <div className="flex items-center gap-3">
