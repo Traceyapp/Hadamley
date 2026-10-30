@@ -825,7 +825,7 @@ export function buildSeed(): Database {
     uploads: [],
     questions: [],
     settings: {
-      funeralCompanionUrl: process.env.FUNERAL_COMPANION_URL || "https://example.com/the-funeral-companion",
+      funeralCompanionUrl: process.env.FUNERAL_COMPANION_URL || "https://www.thefuneralcompanion.co.uk/",
       aiLastIndexedAt: null,
       aiLastIndexMs: null,
       aiSpend: { month: new Date().toISOString().slice(0, 7), usd: 0, requests: 0 },

@@ -48,8 +48,10 @@ import { applyTraceyOct25 } from "./content/tracey-oct25";
  * five accordion headings with a short holding line each, for her to fill in.
  * Version 19 publishes Understanding fibromyalgia (if still a draft), so the
  * Fibromyalgia fold and the links to it lead somewhere (Tracey, 29 October).
+ * Version 20 points the header's funeral link at The Funeral Companion's own
+ * site, replacing the placeholder address (unless it was already changed).
  */
-export const DB_VERSION = 19;
+export const DB_VERSION = 20;
 
 const COMING_SOON = "<p>Coming soon. We're building this part of Hadamley together with our community, so please check back.</p>";
 const COMMUNITY_SECTIONS: [string, string][] = [
@@ -364,6 +366,14 @@ export function migrate(db: Database): boolean {
       fibro.updatedAt = new Date().toISOString();
     }
     db.version = 19;
+    changed = true;
+  }
+
+  if ((db.version ?? 1) < 20) {
+    if (!db.settings.funeralCompanionUrl || db.settings.funeralCompanionUrl.includes("example.com")) {
+      db.settings.funeralCompanionUrl = "https://www.thefuneralcompanion.co.uk/";
+    }
+    db.version = 20;
     changed = true;
   }
   return changed;
