@@ -25,6 +25,11 @@ export const metadata: Metadata = {
     images: [{ url: SHARE_IMAGE, width: 1254, height: 1254, alt: "Hadamley" }],
   },
   twitter: { card: "summary", title: "Hadamley | Local support and independent information" },
+  // Search Console and Bing Webmaster Tools ownership checks (HTML tag method). Set in the host's environment.
+  verification: {
+    ...(process.env.GOOGLE_SITE_VERIFICATION ? { google: process.env.GOOGLE_SITE_VERIFICATION } : {}),
+    ...(process.env.BING_SITE_VERIFICATION ? { other: { "msvalidate.01": process.env.BING_SITE_VERIFICATION } } : {}),
+  },
 };
 
 export const viewport: Viewport = {

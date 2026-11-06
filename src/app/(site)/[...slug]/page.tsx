@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { getPageAnyStatus, getPublishedPage } from "@/lib/repo";
 import { PageView } from "@/components/site/PageView";
 import { JsonLd } from "@/components/seo/JsonLd";
-import { absoluteUrl, breadcrumbSchema } from "@/lib/seo";
+import { absoluteUrl, breadcrumbSchema, metaDescription } from "@/lib/seo";
 
 type Props = { params: Promise<{ slug: string[] }> };
 
@@ -15,9 +15,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return page
     ? {
         title: page.title,
-        description: page.summary,
+        description: metaDescription(page.summary),
         alternates: { canonical: `/${page.slug}` },
-        openGraph: { type: "website", url: `/${page.slug}`, title: page.title, description: page.summary },
+        openGraph: { type: "website", url: `/${page.slug}`, title: page.title, description: metaDescription(page.summary) },
       }
     : {};
 }

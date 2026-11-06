@@ -35,6 +35,7 @@ OPENAI_API_KEY=sk-... npm run eval:helper
 | Directory: free-text search, filters for topic, provider type, area and delivery mode, listing detail, report outdated details | `src/app/(site)/find-support` |
 | AI helper: crisis rule, Funeral Companion redirect, retrieval over approved content only, cited sources | `src/lib/ai`, `src/components/site/HelperWidget.tsx` |
 | Admin: pages with rich-text editor, preview, publish and unpublish; listings with the four-state workflow and review dates; downloads with replace; topics, areas and menu; inbox; AI index refresh; settings and content export | `src/app/admin` |
+| Visitor analytics: cookieless tracking and an admin board | `src/lib/analytics`, `src/app/admin/(app)/analytics` |
 | Supabase schema (drafted, not in use) | `supabase/migrations/0001_hadamley_schema.sql` |
 
 ## How it is built
@@ -53,6 +54,34 @@ OPENAI_API_KEY=sk-... npm run eval:helper
 4. With `OPENAI_API_KEY` set, OpenAI (`gpt-5.4-mini` at low reasoning effort) writes a short answer using only those chunks and cites them. Without a key, or past the monthly cap in `AI_MONTHLY_BUDGET_USD`, the helper quotes the matching content directly. If nothing relevant is found it says it can't find that on Hadamley.
 
 Rate limit: 20 questions per visitor every 10 minutes, held in memory. That is correct for the single-server hosting above.
+
+### Visitor analytics
+
+Admin > Analytics (`/admin/analytics`) shows visitors, visits, page views, average visit time, bounce rate and "help found" (visits where someone went on to a service, tapped a phone number or email, downloaded a resource or got a useful answer from the helper). It also shows the trend over time, top and landing pages, channels and referring sites (including AI assistants and NHS or council sites), UTM campaigns, towns and countries with a local-reach share, devices, busiest hours and who is on the site now. Date ranges run from today to 12 months, and selecting any row filters the whole board.
+
+- **Cookieless and anonymous.** No cookies, no third-party scripts, no IP addresses stored, and nothing stored in visitors' browsers. Each visitor gets an HMAC hash of IP and browser with a salt that changes at UK midnight (keyed by `SESSION_SECRET`), so nobody can be followed across days. Helper questions are never recorded, only the kind of reply. Records older than 400 days are deleted.
+- **Accuracy filters** (the Stage 2 plan's promises, each covered in `tests/analytics.test.ts`):
+  - Admins' own visits are never counted, even after signing out. Every admin screen sets a `hadamley-analytics-ignore` mark in that browser's localStorage, and the endpoint also skips anyone signed in.
+  - Search engine robots, link-preview fetchers and automated browsers (`navigator.webdriver`) are left out.
+  - Test copies never touch the real numbers: Vercel preview and development deployments are ignored, and so is a local copy pointed at the real Supabase.
+  - Each page counts once per view, including when Back or Forward restores it from the browser's memory. "Page not found" screens are left out (marked with `data-analytics-404`).
+  - Days follow UK time.
+  - Facebook, Instagram and WhatsApp are recognised when the app hides the referrer: from Android's `android-app://` referrer, the apps' built-in browsers, or the `fbclid` on the link. `gclid` and `msclkid` mark paid search.
+- **Help found** counts visits that went on to a service's website, tapped a phone number or email, downloaded a resource, or got a useful helper reply. Helper replies that found nothing don't count.
+- **Definitions** follow GA4 and Plausible: a visit ends after 30 minutes without activity, and a visit is "engaged" if it lasts 10 seconds or more, views 2 or more pages, or includes a key action. Bounce rate is the share of visits that were not engaged. Visitors are counted per day.
+- **Where things are:** tracker `src/components/site/Analytics.tsx`, endpoint `src/app/api/hv/route.ts`, logic `src/lib/analytics`, board `src/app/admin/(app)/analytics`.
+- **Storage:** the Supabase table `analytics_events`. Run `supabase/migrations/0002_analytics.sql` once in the SQL Editor; until then the board shows setup steps. Without Supabase, records go to `data/analytics.jsonl`.
+- **Location** comes from Vercel's `x-vercel-ip-*` headers (Cloudflare's `cf-ipcountry` as a fallback), so towns show only when hosted on Vercel. IP location is approximate.
+- **Check Supabase is ready:** `npm run analytics:check` (read-only; needs the Supabase keys in `.env.local`).
+
+### Search engines
+
+- `/sitemap.xml` lists every published page and approved listing; `/robots.txt` points to it and keeps `/admin`, `/api` and `/files` out.
+- Every page's title, description, canonical and share tags are in the `<head>` for all visitors (`htmlLimitedBots` in `next.config.ts`). Descriptions are trimmed to about 160 characters at a sentence break (`metaDescription` in `src/lib/seo.ts`).
+- **Google Search Console:** a Domain property verified by a DNS TXT record is best (it covers www and non-www). If DNS isn't available, use the URL-prefix property's HTML tag: set `GOOGLE_SITE_VERIFICATION` to the tag's `content` value and redeploy.
+- **Bing Webmaster Tools:** use "Import from Google Search Console" once Google is verified, or set `BING_SITE_VERIFICATION` (the `msvalidate.01` value). Bing also feeds Yahoo and DuckDuckGo.
+- Submit `https://www.hadamley.com/sitemap.xml` in both.
+- Lighthouse on 6 November 2026: performance 90–99 on phones and 97–100 on desktop; accessibility, best practices and SEO all 100.
 
 ## Acceptance checklist status
 

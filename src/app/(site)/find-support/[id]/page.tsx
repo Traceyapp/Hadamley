@@ -11,7 +11,7 @@ import { Stagger } from "@/components/fx/motion";
 import { ReportForm } from "@/components/site/ReportForm";
 import { ListingCard } from "@/components/site/ListingCard";
 import { JsonLd } from "@/components/seo/JsonLd";
-import { absoluteUrl, breadcrumbSchema } from "@/lib/seo";
+import { absoluteUrl, breadcrumbSchema, metaDescription } from "@/lib/seo";
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -21,9 +21,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return l
     ? {
         title: l.name,
-        description: l.summary,
+        description: metaDescription(l.summary),
         alternates: { canonical: `/find-support/${l.id}` },
-        openGraph: { type: "website", url: `/find-support/${l.id}`, title: l.name, description: l.summary },
+        openGraph: { type: "website", url: `/find-support/${l.id}`, title: l.name, description: metaDescription(l.summary) },
       }
     : {};
 }
