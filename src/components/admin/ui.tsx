@@ -34,9 +34,9 @@ export function AdminHeader({ title, description, actions, back }: { title: stri
   );
 }
 
-export function Card({ title, description, children, className = "", aside }: { title?: string; description?: string; children: React.ReactNode; className?: string; aside?: React.ReactNode }) {
+export function Card({ title, description, children, className = "", aside, id }: { title?: string; description?: string; children: React.ReactNode; className?: string; aside?: React.ReactNode; id?: string }) {
   return (
-    <section className={`admin-card p-5 sm:p-6 ${className}`}>
+    <section id={id} className={`admin-card p-5 sm:p-6 ${className}`}>
       {(title || aside) && (
         <div className="mb-5 flex items-start justify-between gap-3">
           <div>

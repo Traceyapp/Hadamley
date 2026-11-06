@@ -27,27 +27,58 @@ export const fmt = {
   },
 };
 
-/** Change against the previous period. `upIsGood` sets the colour; an arrow and words carry it too. */
-export function Delta({ now, before, upIsGood = true, percentPoints = false }: { now: number; before: number | undefined; upIsGood?: boolean; percentPoints?: boolean }) {
+/** Below this many in the previous period, a percentage misleads ("+1000%"), so the change is shown as "Up from 3". */
+const SMALL_BASE = 20;
+
+/**
+ * Change against the previous period. `upIsGood` sets the colour; an arrow and
+ * words carry it too. Counts with a small previous figure show the figure
+ * itself ("Up from 3"), and very large swings are capped at "999%+".
+ */
+export function Delta({
+  now,
+  before,
+  upIsGood = true,
+  percentPoints = false,
+  count = false,
+}: {
+  now: number;
+  before: number | undefined;
+  upIsGood?: boolean;
+  percentPoints?: boolean;
+  /** A count of people or views, where "Up from 3" reads better than a percentage when numbers are small. */
+  count?: boolean;
+}) {
   if (before === undefined) return null;
-  if (!before && !now) return <span className="text-[0.8rem] text-ink-2">No change</span>;
-  if (!before && !percentPoints) return <span className="text-[0.8rem] font-bold text-ink-2">New this period</span>;
+  const quiet = "inline-flex items-center gap-1 text-[0.8rem] text-ink-2";
+  if (!before && !now) return <span className={quiet}>No change</span>;
+  if (!before && !percentPoints) return <span className={`${quiet} font-bold`}>New this period</span>;
   const diff = percentPoints ? Math.round((now - before) * 100) : Math.round(((now - before) / before) * 100);
-  if (diff === 0) {
+  if (diff === 0 || (count && now === before)) {
     return (
-      <span className="inline-flex items-center gap-1 text-[0.8rem] text-ink-2">
+      <span className={quiet}>
         <Minus className="size-3.5" aria-hidden /> No change
       </span>
     );
   }
-  const good = diff > 0 === upIsGood;
-  const Icon = diff > 0 ? ArrowUpRight : ArrowDownRight;
+  const up = now > before;
+  const good = up === upIsGood;
+  const Icon = up ? ArrowUpRight : ArrowDownRight;
+  const tone = `inline-flex items-center gap-0.5 text-[0.8rem] font-bold ${good ? "text-ok" : "text-urgent"}`;
+  if (count && before < SMALL_BASE) {
+    return (
+      <span className={tone}>
+        <Icon className="size-3.5" aria-hidden />
+        {up ? "Up" : "Down"} from {before.toLocaleString("en-GB")}
+        <span className="sr-only"> in the previous period</span>
+      </span>
+    );
+  }
   return (
-    <span className={`inline-flex items-center gap-0.5 text-[0.8rem] font-bold ${good ? "text-ok" : "text-urgent"}`}>
+    <span className={tone}>
       <Icon className="size-3.5" aria-hidden />
-      {Math.abs(diff)}
-      {percentPoints ? " pts" : "%"}
-      <span className="sr-only">{diff > 0 ? " up" : " down"} on the previous period</span>
+      {Math.abs(diff) > 999 ? "999%+" : `${Math.abs(diff)}${percentPoints ? " pts" : "%"}`}
+      <span className="sr-only">{up ? " up" : " down"} on the previous period</span>
     </span>
   );
 }
@@ -97,8 +128,9 @@ export function BarList({
           )}
         </div>
         <div className="flex gap-2 text-right text-[0.88rem] tabular-nums sm:gap-3">
-          {cols.map((c) => (
-            <span key={c.label} className={`${c.wide ? "w-[4.5rem] sm:w-[5.5rem]" : "w-[3.75rem] sm:w-[4.5rem]"} ${c === cols[0] ? "font-bold" : "text-ink-2"}`}>
+          {cols.map((c, i) => (
+            // On phones only the first two columns show, so the names stay readable.
+            <span key={c.label} className={`${c.wide ? "w-[4.5rem] sm:w-[5.5rem]" : "w-[3.75rem] sm:w-[4.5rem]"} ${i > 1 ? "hidden sm:inline-block" : ""} ${i === 0 ? "font-bold" : "text-ink-2"}`}>
               {c.get(r)}
             </span>
           ))}
@@ -111,8 +143,8 @@ export function BarList({
       <div className="mb-1.5 grid grid-cols-[minmax(0,1fr)_auto] gap-3 text-[0.68rem] font-bold uppercase tracking-[0.06em] text-ink-2">
         <span className="pl-2.5">{head}</span>
         <span className="flex gap-2 text-right sm:gap-3">
-          {cols.map((c) => (
-            <span key={c.label} className={c.wide ? "w-[4.5rem] sm:w-[5.5rem]" : "w-[3.75rem] sm:w-[4.5rem]"}>
+          {cols.map((c, i) => (
+            <span key={c.label} className={`${c.wide ? "w-[4.5rem] sm:w-[5.5rem]" : "w-[3.75rem] sm:w-[4.5rem]"} ${i > 1 ? "hidden sm:inline-block" : ""}`}>
               {c.label}
             </span>
           ))}

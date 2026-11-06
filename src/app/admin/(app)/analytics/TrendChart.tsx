@@ -44,8 +44,10 @@ export function TrendChart({ points, metric }: { points: Point[]; metric: string
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [points, w, max]);
 
-  // Show about six date labels, always including the first and last.
-  const every = Math.max(1, Math.ceil(points.length / 6));
+  // Show a few date labels, always including the first and last.
+  // About one date label per 80px of chart, so they never run into each other on a phone.
+  const fit = Math.max(2, Math.min(6, Math.floor(innerW / 80)));
+  const every = Math.max(1, Math.ceil(points.length / fit));
   const last = points.length - 1;
   // Skip a regular label that would crowd the last one.
   const labelled = points.map((_, i) => i === last || (i % every === 0 && last - i >= every * 0.6));

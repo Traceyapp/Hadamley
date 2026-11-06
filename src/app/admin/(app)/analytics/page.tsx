@@ -8,6 +8,8 @@ import { AnalyticsNotSetUp } from "@/lib/analytics/store";
 import { AdminHeader, Card } from "@/components/admin/ui";
 import { BarList, boardHref, Delta, fmt, SubHead, type Params } from "./parts";
 import { TrendChart } from "./TrendChart";
+import { HoursChart } from "./HoursChart";
+import { InfoTip } from "./InfoTip";
 
 export const metadata = { title: "Visitor analytics" };
 export const dynamic = "force-dynamic";
@@ -42,19 +44,76 @@ export default async function AnalyticsPage({ searchParams }: { searchParams: Pr
   const p = r.previous ?? undefined;
   const vs = r.previous ? `vs previous ${r.range.key === "today" ? "day so far" : "period"}` : "";
 
-  const tiles: { key: string; label: string; value: string; icon: LucideIcon; delta?: React.ReactNode; metric?: MetricKey; hint: string }[] = [
-    { key: "visitors", label: "Visitors", value: fmt.n(t.visitors), icon: Users, delta: <Delta now={t.visitors} before={p?.visitors} />, metric: "visitors", hint: "Different people each day. No cookies are used, so someone who comes back on another day counts again." },
-    { key: "visits", label: "Visits", value: fmt.n(t.visits), icon: Footprints, delta: <Delta now={t.visits} before={p?.visits} />, metric: "visits", hint: "A visit ends after 30 minutes without activity." },
-    { key: "pageviews", label: "Page views", value: fmt.n(t.pageviews), icon: Eye, delta: <Delta now={t.pageviews} before={p?.pageviews} />, metric: "pageviews", hint: `${fmt.dec(t.pagesPerVisit)} pages per visit on average.` },
-    { key: "time", label: "Average visit", value: fmt.ms(t.avgVisitMs), icon: Clock, delta: <Delta now={t.avgVisitMs} before={p?.avgVisitMs} />, hint: "Time the site was on screen during a visit." },
-    { key: "bounce", label: "Bounce rate", value: fmt.pct(t.bounceRate), icon: Activity, delta: <Delta now={t.bounceRate} before={p?.bounceRate} upIsGood={false} percentPoints />, hint: "Visits that left within 10 seconds after one page, with no action. Lower is better." },
-    { key: "action", label: "Help found", value: fmt.pct(t.actionRate), icon: MousePointerClick, delta: <Delta now={t.actionRate} before={p?.actionRate} percentPoints />, hint: "Visits where someone went on to a service, tapped a number or email, downloaded a resource or got a useful answer from the helper." },
+  const perVisitor = t.visitors ? t.visits / t.visitors : 0;
+  const tiles: { key: string; label: string; value: string; sub?: string; icon: LucideIcon; delta?: React.ReactNode; metric?: MetricKey; hint: string }[] = [
+    {
+      key: "visitors",
+      label: "Visitors",
+      value: fmt.n(t.visitors),
+      icon: Users,
+      delta: <Delta now={t.visitors} before={p?.visitors} count />,
+      metric: "visitors",
+      hint: "Different people on each day. No cookies are used, so someone who comes back on another day is counted again that day.",
+    },
+    {
+      key: "visits",
+      label: "Visits",
+      value: fmt.n(t.visits),
+      sub: t.visitors ? `${fmt.dec(perVisitor)} per visitor` : undefined,
+      icon: Footprints,
+      delta: <Delta now={t.visits} before={p?.visits} count />,
+      metric: "visits",
+      hint: "Each time someone comes to the site. A visit ends after 30 minutes without activity, so one person can make several visits in a day.",
+    },
+    {
+      key: "pageviews",
+      label: "Page views",
+      value: fmt.n(t.pageviews),
+      sub: t.visits ? `${fmt.dec(t.pagesPerVisit)} per visit` : undefined,
+      icon: Eye,
+      delta: <Delta now={t.pageviews} before={p?.pageviews} count />,
+      metric: "pageviews",
+      hint: "Every page opened. \"Page not found\" screens are left out.",
+    },
+    {
+      key: "time",
+      label: "Average visit",
+      value: fmt.ms(t.avgVisitMs),
+      icon: Clock,
+      delta: <Delta now={t.avgVisitMs} before={p?.avgVisitMs} />,
+      hint: "How long the site was on screen during a visit, on average. Time with the tab in the background isn't counted.",
+    },
+    {
+      key: "bounce",
+      label: "Bounce rate",
+      value: fmt.pct(t.bounceRate),
+      icon: Activity,
+      delta: <Delta now={t.bounceRate} before={p?.bounceRate} upIsGood={false} percentPoints />,
+      hint: "Visits that left within 10 seconds after one page, without doing anything. Lower is better. Around 40 to 60% is usual for an information site.",
+    },
+    {
+      key: "action",
+      label: "Help found",
+      value: fmt.pct(t.actionRate),
+      icon: MousePointerClick,
+      delta: <Delta now={t.actionRate} before={p?.actionRate} percentPoints />,
+      hint: "Visits where someone went on to a service's website, tapped a phone number or email, downloaded a resource, or got a useful answer from the helper. The clearest sign Hadamley helped.",
+    },
   ];
 
   const active = FILTER_KEYS.filter((k) => filters[k]);
   const empty = t.visits === 0 && !active.length;
+  // Early days: too few visits for percentages and comparisons to mean much yet.
+  const early = !empty && !active.length && t.visits < 30;
   const series = r.series.map((pt) => ({ key: pt.key, label: pt.label, value: METRICS[metric].get(pt) }));
-  const maxHour = Math.max(...r.hours, 1);
+  const SECTIONS = [
+    ["trend", "Over time"],
+    ["pages", "Pages"],
+    ["sources", "Sources"],
+    ["help", "Help found"],
+    ["where", "Where & devices"],
+    ["landing", "Landing & hours"],
+  ] as const;
 
   return (
     <>
@@ -105,43 +164,72 @@ export default async function AnalyticsPage({ searchParams }: { searchParams: Pr
         )}
       </div>
 
-      {empty && (
+      {(empty || early) && (
         <div className="mb-6 flex gap-3 rounded-xl border border-brand/20 bg-brand-tint px-4 py-4">
           <Sparkles className="mt-0.5 size-5 shrink-0 text-brand" aria-hidden />
           <div>
-            <p className="font-bold">No visits recorded for {r.range.label.toLowerCase()} yet.</p>
-            <p className="text-[0.92rem] text-ink-2">Counting starts as soon as this version of the site is live. Your own visits while signed in to the admin are never counted.</p>
+            {empty ? (
+              <>
+                <p className="font-bold">No visits recorded for {r.range.label.toLowerCase()} yet.</p>
+                <p className="text-[0.92rem] text-ink-2">Visits appear here as soon as people use the site. Your own visits from this device are never counted, even after you sign out.</p>
+              </>
+            ) : (
+              <>
+                <p className="font-bold">Early days: {t.visits} {t.visits === 1 ? "visit" : "visits"} so far.</p>
+                <p className="text-[0.92rem] text-ink-2">With only a few visits, percentages swing a lot. The trends become meaningful after a couple of weeks. Your own visits are never counted.</p>
+              </>
+            )}
           </div>
         </div>
       )}
 
-      <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
+      <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
         {tiles.map((tile) => {
           const selected = tile.metric === metric;
-          const body = (
-            <>
-              <span className="flex items-center gap-2 text-[0.86rem] font-bold text-ink-2">
-                <tile.icon className={`size-4 ${selected ? "text-brand" : ""}`} aria-hidden />
-                {tile.label}
-              </span>
-              <span className="mt-2 block text-[1.85rem] font-bold leading-none tracking-tight">{tile.value}</span>
-              <span className="mt-2 block min-h-5">{tile.delta}</span>
-            </>
-          );
-          const cls = `admin-card block p-4 text-left ${selected ? "ring-2 ring-[var(--brand)]" : ""}`;
-          return tile.metric ? (
-            <Link key={tile.key} href={boardHref(params, { metric: tile.metric === "visitors" ? undefined : tile.metric })} className={`${cls} admin-card-hover`} title={tile.hint} aria-current={selected ? "true" : undefined}>
-              {body}
-            </Link>
-          ) : (
-            <div key={tile.key} className={cls} title={tile.hint}>
-              {body}
+          return (
+            <div
+              key={tile.key}
+              className={`admin-card relative p-4 text-left has-[[aria-expanded=true]]:z-30 ${tile.metric ? "admin-card-hover" : ""} ${selected ? "ring-2 ring-[var(--brand)]" : ""}`}
+            >
+              <div className="flex items-start justify-between gap-1">
+                <span className="flex min-h-7 items-center gap-2 text-[0.86rem] font-bold text-ink-2">
+                  <tile.icon className={`hidden size-4 shrink-0 sm:block ${selected ? "text-brand" : ""}`} aria-hidden />
+                  {tile.metric ? (
+                    // The whole card is the link (the after: layer); the ⓘ sits above it.
+                    <Link
+                      href={boardHref(params, { metric: tile.metric === "visitors" ? undefined : tile.metric })}
+                      aria-current={selected ? "true" : undefined}
+                      className="after:absolute after:inset-0 after:rounded-[1rem] focus-visible:outline-none focus-visible:after:ring-2 focus-visible:after:ring-[var(--focus)]"
+                    >
+                      {tile.label}
+                      <span className="sr-only">: show on the chart</span>
+                    </Link>
+                  ) : (
+                    tile.label
+                  )}
+                </span>
+                <InfoTip label={tile.label}>{tile.hint}</InfoTip>
+              </div>
+              <span className="mt-1.5 block text-[1.85rem] font-bold leading-none tracking-tight">{tile.value}</span>
+              <span className="mt-1.5 block min-h-[1.1rem] text-[0.8rem] text-ink-2">{tile.sub ?? ""}</span>
+              <span className="mt-1 block min-h-5">{tile.delta}</span>
             </div>
           );
         })}
       </div>
 
-      <Card className="mt-4" title={`${METRICS[metric].label} ${r.range.bucket === "hour" ? "by hour" : r.range.bucket === "month" ? "by month" : "by day"}`} description="Choose Visitors, Visits or Page views above to change the chart.">
+      <nav
+        aria-label="Jump to a section"
+        className="no-scrollbar sticky top-0 z-20 -mx-4 mt-4 flex gap-1 overflow-x-auto bg-paper-2/90 px-4 py-2 backdrop-blur sm:-mx-8 sm:px-8 lg:-mx-10 lg:px-10"
+      >
+        {SECTIONS.map(([id, label]) => (
+          <a key={id} href={`#${id}`} className="shrink-0 rounded-full border border-line bg-surface px-3 py-1.5 text-[0.84rem] font-bold text-ink-2 transition hover:border-brand hover:text-brand">
+            {label}
+          </a>
+        ))}
+      </nav>
+
+      <Card className="mt-2 scroll-mt-16" id="trend" title={`${METRICS[metric].label} ${r.range.bucket === "hour" ? "by hour" : r.range.bucket === "month" ? "by month" : "by day"}`} description="Choose Visitors, Visits or Page views above to change the chart.">
         <TrendChart points={series} metric={METRICS[metric].label} />
         <details className="mt-3">
           <summary className="cursor-pointer text-[0.86rem] font-bold text-brand hover:underline">Show as a table</summary>
@@ -171,7 +259,7 @@ export default async function AnalyticsPage({ searchParams }: { searchParams: Pr
       </Card>
 
       <div className="mt-4 grid grid-cols-[minmax(0,1fr)] gap-4 xl:grid-cols-2">
-        <Card title="Top pages" description="What people read. Select a page to see only visits that included it.">
+        <Card id="pages" className="scroll-mt-16" title="Top pages" description="What people read. Select a page to see only visits that included it.">
           <BarList
             rows={r.pages}
             head="Page"
@@ -185,7 +273,7 @@ export default async function AnalyticsPage({ searchParams }: { searchParams: Pr
           />
         </Card>
 
-        <Card title="Where visitors come from" description="The channel and website that brought each visit.">
+        <Card id="sources" className="scroll-mt-16" title="Where visitors come from" description="The channel and website that brought each visit.">
           <SubHead>Channels</SubHead>
           <BarList rows={r.channels} head="Channel" params={params} filterKey="channel" cols={[{ label: "Visitors", get: (x) => fmt.n(x.value) }, { label: "Visits", get: (x) => fmt.n(x.second ?? 0) }]} />
           <SubHead>Websites and apps</SubHead>
@@ -199,7 +287,7 @@ export default async function AnalyticsPage({ searchParams }: { searchParams: Pr
         </Card>
       </div>
 
-      <Card className="mt-4" title="Signposting: did people find help?" description="The actions that show a visit turned into support found. Counted without recording who did them.">
+      <Card id="help" className="mt-4 scroll-mt-16" title="Signposting: did people find help?" description="The actions that show a visit turned into support found. Counted without recording who did them.">
         <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6">
           {(
             [
@@ -247,7 +335,7 @@ export default async function AnalyticsPage({ searchParams }: { searchParams: Pr
       </Card>
 
       <div className="mt-4 grid grid-cols-[minmax(0,1fr)] gap-4 xl:grid-cols-2">
-        <Card title="Locations" description="Approximate, from the visitor's internet connection. Mobile networks often show as London." aside={<LocalShare t={t} />}>
+        <Card id="where" className="scroll-mt-16" title="Locations" description="Approximate, from the visitor's internet connection. Mobile networks often show as London." aside={<LocalShare t={t} />}>
           <SubHead>Towns and cities</SubHead>
           <BarList rows={r.cities} head="Town" params={params} filterKey="city" cols={[{ label: "Visitors", get: (x) => fmt.n(x.value) }, { label: "Visits", get: (x) => fmt.n(x.second ?? 0) }]} />
           <SubHead>Countries</SubHead>
@@ -270,7 +358,7 @@ export default async function AnalyticsPage({ searchParams }: { searchParams: Pr
       </div>
 
       <div className="mt-4 grid grid-cols-[minmax(0,1fr)] gap-4 xl:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
-        <Card title="Landing pages" description="The first page of each visit, usually from Google or a shared link. A high bounce rate can mean the page didn't match what people were looking for.">
+        <Card id="landing" className="scroll-mt-16" title="Landing pages" description="The first page of each visit, usually from Google or a shared link. A high bounce rate can mean the page didn't match what people were looking for.">
           <BarList
             rows={r.landing}
             head="Page"
@@ -282,21 +370,8 @@ export default async function AnalyticsPage({ searchParams }: { searchParams: Pr
             ]}
           />
         </Card>
-        <Card title="When people visit" description="Visits by hour of the day, UK time.">
-          <div className="flex h-36 items-end gap-[2px]" role="img" aria-label={`Busiest hour: ${r.hours.indexOf(Math.max(...r.hours))}:00`}>
-            {r.hours.map((n, h) => (
-              <div key={h} className="group relative flex h-full flex-1 items-end" title={`${String(h).padStart(2, "0")}:00 to ${String((h + 1) % 24).padStart(2, "0")}:00: ${n} ${n === 1 ? "visit" : "visits"}`}>
-                <div className="w-full rounded-t-[4px] bg-[var(--brand)] opacity-80 transition group-hover:opacity-100" style={{ height: `${n ? Math.max((n / maxHour) * 100, 3) : 0}%` }} />
-              </div>
-            ))}
-          </div>
-          <div className="mt-1.5 flex justify-between text-[0.75rem] tabular-nums text-ink-2" aria-hidden>
-            <span>00:00</span>
-            <span>06:00</span>
-            <span>12:00</span>
-            <span>18:00</span>
-            <span>23:00</span>
-          </div>
+        <Card title="When people visit" description="Visits by hour of the day, UK time. Hover or tap a bar for the figure.">
+          <HoursChart hours={r.hours} />
           {live.pages.length > 0 && (
             <>
               <SubHead>Being read right now</SubHead>
