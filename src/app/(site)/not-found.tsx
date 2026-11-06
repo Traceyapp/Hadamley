@@ -3,6 +3,8 @@ import { Container } from "@/components/site/bits";
 
 export default function NotFound() {
   return (
+    // data-analytics-404 keeps "page not found" views out of the visitor numbers.
+    <div data-analytics-404="">
     <Container className="py-24">
       <p className="text-[0.85rem] font-bold uppercase tracking-[0.14em] text-accent">Page not found</p>
       <h1 className="mt-3 text-[2.6rem] font-semibold">We can&apos;t find that page</h1>
@@ -20,5 +22,6 @@ export default function NotFound() {
         </li>
       </ul>
     </Container>
+    </div>
   );
 }

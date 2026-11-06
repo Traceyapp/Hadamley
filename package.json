@@ -12,7 +12,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "eval:helper": "tsx --env-file=.env.local scripts/eval-helper.ts",
-    "db:push": "tsx --env-file=.env.local scripts/push-to-supabase.ts"
+    "db:push": "tsx --env-file=.env.local scripts/push-to-supabase.ts",
+    "analytics:check": "tsx --env-file=.env.local scripts/check-analytics.ts"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.58.0",

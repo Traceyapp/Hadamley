@@ -6,6 +6,7 @@ import { relativeDays } from "@/lib/format";
 import { logout } from "../actions";
 import { LogoMark } from "@/components/site/Logo";
 import { AdminNav } from "./AdminNav";
+import { AnalyticsOptOut } from "@/components/admin/AnalyticsOptOut";
 
 const initials = (name: string) =>
   name
@@ -61,6 +62,7 @@ export default async function AdminAppLayout({ children }: { children: React.Rea
         </div>
       </aside>
       <div className="min-w-0">
+        <AnalyticsOptOut />
         <main id="main" className="mx-auto max-w-6xl px-4 py-8 sm:px-8 lg:px-10 lg:py-10">
           {children}
         </main>

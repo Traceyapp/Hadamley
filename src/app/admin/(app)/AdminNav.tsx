@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef } from "react";
-import { Bot, FileText, FolderOpen, Inbox, LayoutDashboard, ListChecks, Pin, Settings, Tags, type LucideIcon } from "lucide-react";
+import { Bot, ChartLine, FileText, FolderOpen, Inbox, LayoutDashboard, ListChecks, Pin, Settings, Tags, type LucideIcon } from "lucide-react";
 
 type Item = { href: string; label: string; icon: LucideIcon; exact?: boolean; count?: "inbox" | "due" };
 
@@ -22,6 +22,7 @@ const GROUPS: { label: string; items: Item[] }[] = [
   {
     label: "Visitors",
     items: [
+      { href: "/admin/analytics", label: "Analytics", icon: ChartLine },
       { href: "/admin/inbox", label: "Inbox", icon: Inbox, count: "inbox" },
       { href: "/admin/ai", label: "Ask Hadamley", icon: Bot },
     ],

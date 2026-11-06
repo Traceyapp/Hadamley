@@ -4,6 +4,7 @@ import Link from "next/link";
 import { ArrowUp, ExternalLink, LifeBuoy, MessageCircleQuestion, Phone, RotateCcw, X } from "lucide-react";
 import { Fragment, useCallback, useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
+import { track } from "@/lib/analytics/track";
 
 type Source = { title: string; url: string; type: "page" | "listing" };
 type Reply =
@@ -166,6 +167,8 @@ export function HelperWidget() {
         const res = await fetch("/api/helper", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ message: q, history }) });
         const data = (await res.json()) as Reply | { error: string };
         const reply: Reply = "error" in data ? { kind: "error", text: data.error } : data;
+        // Only the kind of reply is counted, never the question.
+        track("helper", reply.kind);
         setMsgs((m) => [...m, { role: "assistant", reply }]);
       } catch {
         setMsgs((m) => [

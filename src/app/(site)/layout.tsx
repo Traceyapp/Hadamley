@@ -2,6 +2,8 @@ import { ensureDb } from "@/lib/db";
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
 import { HelperWidget } from "@/components/site/HelperWidget";
+import { Analytics } from "@/components/site/Analytics";
+import { Suspense } from "react";
 
 export const dynamic = "force-dynamic";
 
@@ -18,6 +20,9 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
       </main>
       <Footer />
       <HelperWidget />
+      <Suspense fallback={null}>
+        <Analytics />
+      </Suspense>
     </>
   );
 }
