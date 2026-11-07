@@ -38,6 +38,16 @@
         "3100"
       ],
       "port": 3100
+    },
+    {
+      "name": "hadamley-prod-local",
+      "runtimeExecutable": "sh",
+      "runtimeArgs": [
+        "-c",
+        "export HADAMLEY_STORE=file NEXT_DIST_DIR=.next-build && npx next build && npx next start -H 127.0.0.1 -p 3102"
+      ],
+      "port": 3102,
+      "url": "http://127.0.0.1:3102"
     }
   ]
 }

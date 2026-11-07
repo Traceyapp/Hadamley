@@ -62,7 +62,12 @@ const g = globalThis as unknown as { __hadamleyAnalyticsPurged?: string };
 export async function recordHits(hits: Hit[]) {
   if (!hits.length) return;
   if (useSupabase()) {
-    const { error } = await supabase().from(TABLE).insert(hits.map(toRow));
+    // One retry after a short pause covers a momentary network or database blip.
+    let { error } = await supabase().from(TABLE).insert(hits.map(toRow));
+    if (error) {
+      await new Promise((r) => setTimeout(r, 400));
+      ({ error } = await supabase().from(TABLE).insert(hits.map(toRow)));
+    }
     if (error) throw new Error(`Could not save analytics: ${error.message}`);
   } else {
     fs.mkdirSync(DATA_DIR, { recursive: true });
@@ -116,26 +121,21 @@ export async function loadHits(since: Date, until: Date): Promise<Hit[]> {
     if (/does not exist|schema cache|Could not find the table/i.test(error.message)) throw new AnalyticsNotSetUp(error.message);
     throw new Error(`Could not load analytics: ${error.message}`);
   }
-  // Supabase sends at most 1,000 rows per request, so fetch pages a few at a time.
-  const page = 1000;
-  const starts: number[] = [];
-  for (let s = 0; s < (count ?? 0); s += page) starts.push(s);
+  // Page through by id ("keyset"): each request asks for rows after the last id
+  // seen, until none are left. Unlike counting pages of 1,000, this can't skip
+  // rows if the project's "max rows per request" setting is lower than expected.
+  const cols = ["id", ...COLS.map(([, c]) => c)].join(",");
   const rows: Record<string, unknown>[] = [];
-  for (let i = 0; i < starts.length; i += 8) {
-    const batch = await Promise.all(
-      starts.slice(i, i + 8).map(async (s) => {
-        const { data, error: e } = await sb
-          .from(TABLE)
-          .select(COLS.map(([, c]) => c).join(","))
-          .gte("at", from)
-          .lt("at", to)
-          .order("id")
-          .range(s, s + page - 1);
-        if (e) throw new Error(`Could not load analytics: ${e.message}`);
-        return (data ?? []) as unknown as Record<string, unknown>[];
-      }),
-    );
-    for (const b of batch) rows.push(...b);
+  let lastId = 0;
+  for (;;) {
+    const { data, error: e } = await sb.from(TABLE).select(cols).gte("at", from).lt("at", to).gt("id", lastId).order("id").limit(1000);
+    if (e) throw new Error(`Could not load analytics: ${e.message}`);
+    const batch = (data ?? []) as unknown as Record<string, unknown>[];
+    if (!batch.length) break;
+    rows.push(...batch);
+    lastId = Number(batch[batch.length - 1]!.id);
   }
+  // Rows can only be added while loading, never removed, so fewer than counted means something went wrong.
+  if (count !== null && rows.length < count) throw new Error(`Analytics load incomplete: expected ${count} records, got ${rows.length}`);
   return rows.map(fromRow).sort((a, b) => a.at.localeCompare(b.at));
 }

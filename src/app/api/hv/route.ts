@@ -18,7 +18,8 @@ const none = () => new Response(null, { status: 204, headers: { "Cache-Control":
 export async function POST(req: Request) {
   const info = requestInfo(req.headers);
   if (!isLiveCopy(info.host, { VERCEL_ENV: process.env.VERCEL_ENV, supabase: useSupabase() })) return none();
-  if (!rateLimit(clientKey(req, "hv"), 240, 10 * 60_000)) return none();
+  // Per address *and* browser, generously: mobile networks put many people behind one address.
+  if (!rateLimit(clientKey(req, `hv:${info.ua}`), 600, 10 * 60_000)) return none();
   if (req.headers.get("sec-purpose")?.includes("prefetch")) return none();
   let body: unknown;
   try {

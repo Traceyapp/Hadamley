@@ -16,6 +16,8 @@ import type { EventName, Hit } from "./types";
  */
 
 export const SESSION_GAP_MS = 30 * 60_000;
+/** How far ahead of its page view an action may arrive and still count with that visit. */
+const EARLY_MS = 5_000;
 const ENGAGED_MS = 10_000;
 
 export type RangeKey = "today" | "7d" | "30d" | "90d" | "12m";
@@ -83,20 +85,28 @@ export function buildSessions(hits: Hit[]): Session[] {
   const out: Session[] = [];
   for (const [visitor, list] of byVisitor) {
     let cur: Session | null = null;
+    // An action sent at the same moment as a page view (a search on arrival)
+    // can reach the server a few milliseconds before it. Hold such actions
+    // briefly and attach them to the visit that page view starts.
+    let early: Hit[] = [];
     for (const h of list) {
       const at = Date.parse(h.at);
       const stale = !cur || at - cur.end > SESSION_GAP_MS;
       if (h.kind === "pageview") {
         if (stale) {
           cur = { visitor, start: at, end: at, pages: [], events: [], engagedMs: 0, first: h };
+          cur.events.push(...early.filter((e) => at - Date.parse(e.at) <= EARLY_MS));
           out.push(cur);
         }
+        early = [];
         cur!.pages.push({ path: h.path, at });
         cur!.end = at;
       } else if (cur && !stale) {
         if (h.kind === "event") cur.events.push(h);
         else cur.engagedMs += h.ms ?? 0;
         cur.end = Math.max(cur.end, at);
+      } else if (h.kind === "event") {
+        early.push(h);
       }
     }
   }
